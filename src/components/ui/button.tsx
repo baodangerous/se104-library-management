@@ -13,15 +13,15 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const VARIANT_STYLES: Record<ButtonVariant, string> = {
   primary:
-    'bg-[#0054A6] text-white hover:bg-[#004285] active:bg-[#00366E] border border-transparent shadow-xs',
+    'bg-gradient-to-r from-[#3a86ff] to-[#1556d6] text-white hover:brightness-110 dark:from-[#8fefff] dark:to-[#4da8ff] dark:text-[#030a24] border border-transparent shadow-xs',
   secondary:
-    'bg-slate-100 text-slate-900 hover:bg-slate-200 border border-transparent',
+    'bg-[#dcebff] text-[#0a1f4d] hover:bg-[#c8e0ff] dark:bg-[#0a2272] dark:text-[#eef5ff] border border-transparent',
   outline:
-    'bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900 border border-slate-200',
+    'bg-white text-[#2c4a7d] hover:bg-[#f3f8ff] hover:text-[#0a1f4d] border border-slate-200',
   ghost:
-    'bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-transparent',
+    'bg-transparent text-[#2c4a7d] hover:bg-[#dcebff]/60 hover:text-[#0a1f4d] border border-transparent',
   danger:
-    'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 border border-transparent shadow-xs',
+    'bg-[#a8321a] text-white hover:brightness-110 dark:bg-[#ff9a85] dark:text-[#030a24] border border-transparent shadow-xs',
 };
 
 const SIZE_STYLES: Record<ButtonSize, string> = {

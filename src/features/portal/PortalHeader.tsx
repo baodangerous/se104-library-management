@@ -54,7 +54,7 @@ export function PortalHeader({
   return (
     <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-xs">
       {/* Topbar */}
-      <div className="bg-gradient-to-r from-[#001B3A] via-[#002B5C] to-[#003B73] text-sky-100 text-xs">
+      <div className="bg-gradient-to-r from-[#030a24] via-[#06164a] to-[#0a2b86] text-[#c3d6fa] text-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-9 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4 sm:gap-6 truncate">
             <span className="inline-flex items-center gap-1.5">
@@ -104,8 +104,8 @@ export function PortalHeader({
                 className={cn(
                   'px-3 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer whitespace-nowrap',
                   active
-                    ? 'bg-gradient-to-r from-[#0054A6] to-[#0284C7] text-white font-semibold shadow-xs'
-                    : 'text-slate-700 hover:text-[#0054A6] hover:bg-[#EFF6FF]'
+                    ? 'bg-gradient-to-r from-[#3a86ff] to-[#1556d6] dark:from-[#8fefff] dark:to-[#4da8ff] text-white dark:text-[#030a24] font-semibold shadow-xs'
+                    : 'text-slate-700 hover:text-[#1556d6] hover:bg-[#dcebff]/60'
                 )}
               >
                 {item.label}

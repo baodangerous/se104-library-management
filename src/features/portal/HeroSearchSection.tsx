@@ -65,17 +65,18 @@ export function HeroSearchSection({
             'linear-gradient(125deg, rgba(0, 27, 58, 0.92) 0%, rgba(0, 59, 115, 0.84) 48%, rgba(2, 132, 199, 0.78) 100%)',
         }}
       />
-      {/* Subtle tonal glow orbs */}
-      <div className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 rounded-full bg-sky-400/20 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 -right-16 w-80 h-80 rounded-full bg-blue-500/25 blur-3xl" />
+      {/* Subtle breathing tonal glow orbs */}
+      <div className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 rounded-full bg-[#4de1ff]/25 blur-3xl uit-glow-breathe" />
+      <div className="pointer-events-none absolute -bottom-24 -right-16 w-80 h-80 rounded-full bg-[#7a5cff]/25 blur-3xl uit-glow-breathe" />
 
       <div className="relative z-10 px-6 sm:px-10 py-10 sm:py-12 max-w-4xl mx-auto text-center space-y-6">
         <div className="space-y-3">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-sky-300/30 backdrop-blur-md text-[11px] font-semibold uppercase tracking-widest text-sky-100">
+          <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-[#ffd98a]/40 backdrop-blur-md text-[11px] font-semibold uppercase tracking-widest text-[#ffd98a] uit-float">
             Thư viện Trường Đại học Công nghệ Thông tin – ĐHQG-HCM
           </span>
           <h1 className="text-2xl sm:text-4xl font-bold text-white tracking-tight leading-tight">
-            Cổng tra cứu Học liệu &amp; Tri thức số UIT
+            Cổng tra cứu Học liệu &amp;{' '}
+            <span className="uit-hero-gradient-text">Tri thức số UIT</span>
           </h1>
           <p className="text-sm sm:text-base text-sky-100/90 max-w-2xl mx-auto">
             Tìm kiếm nhanh giáo trình, sách ngoại văn chuyên ngành CNTT, luận văn tốt nghiệp theo
@@ -181,6 +182,7 @@ export function HeroSearchSection({
           </button>
         </div>
       </div>
+      <div className="relative z-10 h-1 w-full uit-light-strip" />
     </section>
   );
 }
