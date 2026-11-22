@@ -2,23 +2,26 @@ import 'dotenv/config';
 import express from 'express';
 import fs from 'node:fs';
 import path from 'node:path';
-import { apiRouter } from './server/routes';
+import { apiRouter } from './server/routes/index';
 import { chatbotRouter } from './server/chatbotRoute';
+import { createRateLimiter, securityHeaders } from './server/security';
 
 const PORT = Number(process.env.PORT) || 3000;
 const isProd = process.env.NODE_ENV === 'production';
 
 async function startServer() {
   const app = express();
-  app.use((_req, res, next) => {
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-    next();
-  });
+  app.disable('x-powered-by');
+  app.use(securityHeaders);
   app.use(express.json({ limit: '10mb' }));
 
-  app.use('/api/chatbot', chatbotRouter);
+  const chatbotLimiter = createRateLimiter({
+    windowMs: 60_000,
+    max: 30,
+    message: 'Bạn gửi câu hỏi quá nhanh. Vui lòng thử lại sau 1 phút.',
+  });
+
+  app.use('/api/chatbot', chatbotLimiter, chatbotRouter);
   app.use('/api', apiRouter);
 
   if (!isProd) {
