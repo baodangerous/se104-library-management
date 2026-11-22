@@ -1,5 +1,6 @@
 import { LogOut, X } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
+import { ThemeToggle } from '../../../components/ui/theme-toggle';
 import { UitLogo } from '../../../components/ui/uit-logo';
 import { cn } from '../../../lib/utils';
 import type { AuthUser } from '../../../types/library';
@@ -36,14 +37,17 @@ export function Sidebar({
             </span>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={onCloseMobile}
-          aria-label="Đóng thanh điều hướng"
-          className="lg:hidden p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 cursor-pointer"
-        >
-          <X className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-1.5">
+          <ThemeToggle />
+          <button
+            type="button"
+            onClick={onCloseMobile}
+            aria-label="Đóng thanh điều hướng"
+            className="lg:hidden p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       <nav

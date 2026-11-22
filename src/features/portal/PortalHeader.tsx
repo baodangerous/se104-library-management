@@ -10,6 +10,7 @@ import {
   X,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { ThemeToggle } from '../../components/ui/theme-toggle';
 import { UitLogo } from '../../components/ui/uit-logo';
 import { cn } from '../../lib/utils';
 import { portalService } from '../../services/portalService';
@@ -115,6 +116,7 @@ export function PortalHeader({
 
         {/* Auth / Workspace Action */}
         <div className="flex items-center gap-2 shrink-0">
+          <ThemeToggle />
           {user ? (
             <>
               <Button

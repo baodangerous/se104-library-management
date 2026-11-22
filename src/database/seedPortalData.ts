@@ -129,24 +129,27 @@ export const SEED_TINTUC: TinHoatDong[] = [
     tieuDe: 'Tập huấn chuyên đề “Khai thác hiệu quả thư viện UIT và Hệ thống Thư viện ĐHQG-HCM”',
     ngayDang: '28/10/2026',
     chuyenMuc: 'Sự kiện học thuật',
-    tomTat:
-      'Gần 300 sinh viên UIT tham gia tập huấn kỹ năng khai thác học liệu số và cổng tra cứu tập trung hưởng ứng Tuần lễ học tập suốt đời 2026.',
+    hinhAnh: 'https://thuvien.uit.edu.vn/media/image_1791770378016_f7e223016c.jpg',
+    duongDan: 'https://thuvien.uit.edu.vn/bai-viet/tap-huan-chuyen-de-khai-thac-hieu-qua-thu-vien-uit-va-he-thong-thu-vien-dhqg-hcm-dien-ra-thanh-cong-tot-dep',
+    tomTat: 'Gần 300 sinh viên UIT tham gia tập huấn kỹ năng khai thác học liệu số và cổng tra cứu tập trung.',
   },
   {
     id: 'news-2',
     tieuDe: 'Khép lại thành công Ngày hội “Thư viện đồng hành cùng sinh viên ĐHQG-HCM” lần XI',
     ngayDang: '17/10/2026',
     chuyenMuc: 'Hoạt động sinh viên',
-    tomTat:
-      'Diễn ra tại Hội trường A – Trường ĐH Công nghệ Thông tin ĐHQG-HCM, kết nối cộng đồng sinh viên với không gian tri thức và sản phẩm KHCN.',
+    hinhAnh: 'https://thuvien.uit.edu.vn/media/image_1792573995382_89b745a048.jpg',
+    duongDan: 'https://thuvien.uit.edu.vn/bai-viet/khep-lai-thanh-cong-ngay-hoi-thu-vien-dong-hanh-cung-sinh-vien-dhqg-hcm-lan-xi-nam-2026',
+    tomTat: 'Diễn ra tại Hội trường A – Trường ĐH Công nghệ Thông tin ĐHQG-HCM, kết nối sinh viên với không gian tri thức.',
   },
   {
     id: 'news-3',
-    tieuDe: 'Tuần lễ học tập suốt đời 2026 & Webinar AI Research Solutions từ NXB Elsevier',
+    tieuDe: 'Tuần lễ học tập suốt đời 2026 & Giới thiệu sách Ngoại văn mới',
     ngayDang: '30/09/2026',
     chuyenMuc: 'Học liệu mới',
-    tomTat:
-      'Chủ đề “Thực học, thực hành, làm chủ công nghệ số và trí tuệ nhân tạo” cùng chuỗi giới thiệu sách ngoại văn mới về Embedded, 5G và Computer Vision.',
+    hinhAnh: 'https://thuvien.uit.edu.vn/media/image_1790759273431_9189e7b354.jpg',
+    duongDan: 'https://thuvien.uit.edu.vn/bai-viet/tuan-le-hoc-tap-suot-doi-2026',
+    tomTat: 'Chủ đề “Thực học, thực hành, làm chủ công nghệ số và trí tuệ nhân tạo” cùng bộ sách Embedded, 5G và Computer Vision.',
   },
 ];
 

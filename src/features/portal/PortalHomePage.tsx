@@ -1,9 +1,10 @@
-import { ArrowRight, BookOpen, Calendar, DoorOpen, GraduationCap, Library, Network } from 'lucide-react';
+import { ArrowRight, BookOpen, DoorOpen, GraduationCap, Library, Network } from 'lucide-react';
 import { portalService } from '../../services/portalService';
 import type { Sach, TheLoai } from '../../types/library';
 import type { PortalTabId } from '../../types/portal';
 import { FeaturedBooksCarousel } from './FeaturedBooksCarousel';
 import { HeroSearchSection, type HeroSearchQuery } from './HeroSearchSection';
+import { PortalNewsSection } from './PortalNewsSection';
 
 interface PortalHomePageProps {
   books: Sach[];
@@ -69,43 +70,7 @@ export function PortalHomePage({
 
       {/* Bento Grid: News + Thematic Shelves */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Tin hoạt động */}
-        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-xl p-6 shadow-xs flex flex-col">
-          <div className="flex items-center justify-between gap-2 pb-4 border-b border-slate-100">
-            <div>
-              <h2 className="text-base sm:text-lg font-bold text-slate-900">Tin hoạt động</h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Thông báo học liệu mới, sự kiện học thuật và lịch phục vụ tại Thư viện UIT
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => onNavigateTab('about')}
-              className="text-xs font-semibold text-[#0054A6] hover:underline shrink-0 cursor-pointer"
-            >
-              Lịch phục vụ
-            </button>
-          </div>
-
-          <div className="divide-y divide-slate-100 flex-1">
-            {PORTAL_NEWS.map((item) => (
-              <article key={item.id} className="py-4 first:pt-4 last:pb-0 space-y-1.5">
-                <div className="flex items-center gap-2.5 text-xs text-slate-500">
-                  <span className="font-semibold text-[#0054A6]">{item.chuyenMuc}</span>
-                  <span>·</span>
-                  <span className="inline-flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                    {item.ngayDang}
-                  </span>
-                </div>
-                <h3 className="text-sm font-semibold text-slate-900 leading-snug">
-                  {item.tieuDe}
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">{item.tomTat}</p>
-              </article>
-            ))}
-          </div>
-        </div>
+        <PortalNewsSection news={PORTAL_NEWS} onOpenAbout={() => onNavigateTab('about')} />
 
         {/* Tủ sách Chuyên đề */}
         <div className="lg:col-span-5 bg-white border border-slate-200 rounded-xl p-6 shadow-xs flex flex-col">

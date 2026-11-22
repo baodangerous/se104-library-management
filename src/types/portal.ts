@@ -67,6 +67,8 @@ export interface TinHoatDong {
   ngayDang: string;
   chuyenMuc: string;
   tomTat: string;
+  hinhAnh?: string;
+  duongDan?: string;
 }
 
 export interface TuSachChuyenDe {

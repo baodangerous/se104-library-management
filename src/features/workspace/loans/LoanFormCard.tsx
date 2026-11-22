@@ -6,6 +6,7 @@ import { SurfaceCard, SurfaceCardHeader } from '../../../components/ui/card';
 import { FieldLabel, SelectInput, TextInput } from '../../../components/ui/input';
 import { addDaysIso, diffDaysIso, todayIsoDate } from '../../../services/rules/dateUtils';
 import type { DocGia, Sach, ThamSo } from '../../../types/library';
+import { LoanBookSelector } from './LoanBookSelector';
 import { LoanEligibilityBox, type LoanRuleStatus } from './LoanEligibilityBox';
 
 interface LoanFormCardProps {
@@ -20,7 +21,9 @@ export function LoanFormCard({ readers, books, thamSo, onCreateLoan }: LoanFormC
   const [ngayMuon, setNgayMuon] = React.useState(todayIsoDate());
   const [selectedBookIds, setSelectedBookIds] = React.useState<string[]>([]);
   const [bookSearch, setBookSearch] = React.useState('');
+  const [scanCode, setScanCode] = React.useState('');
   const [submitting, setSubmitting] = React.useState(false);
+  const scanInputRef = React.useRef<HTMLInputElement>(null);
 
   const selectedReader = readers.find((r) => r.MaDocGia === selectedReaderId) || null;
   const availableBooks = React.useMemo(() => {
@@ -58,6 +61,28 @@ export function LoanFormCard({ readers, books, thamSo, onCreateLoan }: LoanFormC
     );
   }
 
+  function handleQuickScan(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const code = scanCode.trim().toUpperCase();
+    if (!code) return;
+    const match = books.find((b) => b.MaSach.toUpperCase() === code);
+    if (!match) {
+      toast.error(`Không tìm thấy mã sách "${code}".`);
+      return;
+    }
+    if (match.TinhTrang !== 'Có sẵn') {
+      toast.error(`Sách "${match.TenSach}" (${match.MaSach}) hiện đang được mượn.`);
+      return;
+    }
+    if (!selectedBookIds.includes(match.MaSach)) {
+      setSelectedBookIds((prev) => [...prev, match.MaSach]);
+      toast.success(`Đã thêm ${match.MaSach} – ${match.TenSach}`);
+    }
+    setScanCode('');
+    scanInputRef.current?.focus();
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!selectedReaderId || selectedBookIds.length === 0) {
@@ -68,6 +93,7 @@ export function LoanFormCard({ readers, books, thamSo, onCreateLoan }: LoanFormC
     try {
       await onCreateLoan(selectedReaderId, ngayMuon, selectedBookIds);
       setSelectedBookIds([]);
+      scanInputRef.current?.focus();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Không thể lập phiếu mượn.');
     } finally {
@@ -124,54 +150,17 @@ export function LoanFormCard({ readers, books, thamSo, onCreateLoan }: LoanFormC
           />
         ) : null}
 
-        <div>
-          <FieldLabel htmlFor="pm-search-sach" required>
-            Chọn sách có sẵn ({selectedBookIds.length} đã chọn)
-          </FieldLabel>
-          <TextInput
-            id="pm-search-sach"
-            type="search"
-            placeholder="Lọc nhanh theo mã hoặc tên sách..."
-            value={bookSearch}
-            onChange={(e) => setBookSearch(e.target.value)}
-            className="mb-2 h-9"
-          />
-          <div className="border border-slate-200 rounded-lg max-h-56 overflow-y-auto divide-y divide-slate-100">
-            {availableBooks.length === 0 ? (
-              <p className="p-4 text-xs text-slate-500 text-center">
-                Không có sách phù hợp đang ở trạng thái Có sẵn.
-              </p>
-            ) : (
-              availableBooks.map((book) => {
-                const checked = selectedBookIds.includes(book.MaSach);
-                return (
-                  <label
-                    key={book.MaSach}
-                    className={`flex items-start gap-3 px-3.5 py-2.5 cursor-pointer transition-colors ${
-                      checked ? 'bg-[#EFF6FF]' : 'hover:bg-slate-50'
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => toggleBook(book.MaSach)}
-                      className="mt-0.5 rounded border-slate-300 text-[#0054A6]"
-                    />
-                    <div className="min-w-0 text-xs">
-                      <p className="font-medium text-slate-900">
-                        <span className="font-mono text-slate-500 mr-1.5">{book.MaSach}</span>
-                        {book.TenSach}
-                      </p>
-                      <p className="text-slate-500 mt-0.5 truncate">
-                        {book.TenTheLoai} · {book.TacGiaList.join(', ')}
-                      </p>
-                    </div>
-                  </label>
-                );
-              })
-            )}
-          </div>
-        </div>
+        <LoanBookSelector
+          availableBooks={availableBooks}
+          selectedBookIds={selectedBookIds}
+          scanCode={scanCode}
+          bookSearch={bookSearch}
+          scanInputRef={scanInputRef}
+          onChangeScanCode={setScanCode}
+          onScanKeyDown={handleQuickScan}
+          onChangeBookSearch={setBookSearch}
+          onToggleBook={toggleBook}
+        />
 
         <Button
           type="submit"

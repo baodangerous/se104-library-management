@@ -130,6 +130,7 @@ export const SEED_SACH_MORE: SachRow[] = [
     NguonTaiLieu: 'Sách Ngoại văn',
     NoiBat: true,
     MaKeSach: 'T2-KTM-02',
+    AnhBia: 'https://thuvien.uit.edu.vn/media/small_image_1794972747401_59f9fb24f9.jpg',
     MoTa: 'Thiết kế hệ thống vi xử lý nhúng thực tế, giao tiếp ngoại vi, bộ nhớ và tối ưu phần cứng (376 trang).',
   },
   {
@@ -145,6 +146,7 @@ export const SEED_SACH_MORE: SachRow[] = [
     NguonTaiLieu: 'Sách Ngoại văn',
     NoiBat: true,
     MaKeSach: 'T2-MMT-03',
+    AnhBia: 'https://thuvien.uit.edu.vn/media/small_image_1794819922597_9696276026.jpg',
     MoTa: 'Công nghệ truy cập vô tuyến thế hệ mới 5G và 5G-Advanced, kiến trúc mạng lõi và tối ưu phổ tần (687 trang).',
   },
   {
@@ -159,6 +161,7 @@ export const SEED_SACH_MORE: SachRow[] = [
     NgonNgu: 'Tiếng Anh',
     NguonTaiLieu: 'Sách Ngoại văn',
     MaKeSach: 'T2-KTM-05',
+    AnhBia: 'https://thuvien.uit.edu.vn/media/small_image_1794457389426_2e3a18200a.jpg',
     MoTa: 'Tiếng Anh chuyên ngành Kỹ thuật Máy tính, từ vựng phần cứng, hệ điều hành và quy trình phát triển hệ thống.',
   },
   {
@@ -174,6 +177,7 @@ export const SEED_SACH_MORE: SachRow[] = [
     NguonTaiLieu: 'Sách Ngoại văn',
     NoiBat: true,
     MaKeSach: 'T2-KHM-01',
+    AnhBia: 'https://thuvien.uit.edu.vn/media/small_image_1794382305354_edd42caca6.jpg',
     MoTa: 'Thuật toán thị giác máy tính, xử lý ảnh, tái tạo 3D và nhận dạng đối tượng bằng học sâu (925 trang).',
   },
   {
@@ -188,6 +192,7 @@ export const SEED_SACH_MORE: SachRow[] = [
     NgonNgu: 'Tiếng Anh',
     NguonTaiLieu: 'Sách Ngoại văn',
     MaKeSach: 'T2-DPT-01',
+    AnhBia: 'https://thuvien.uit.edu.vn/media/small_image_1794303320733_9e6b953889.jpg',
     MoTa: 'Tài liệu phục vụ môn CS232 (Tính toán đa phương tiện) và CS338 (Nhận dạng) tại UIT (368 trang).',
   },
 ];
