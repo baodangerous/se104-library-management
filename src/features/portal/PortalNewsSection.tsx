@@ -67,3 +67,4 @@ export function PortalNewsSection({ news, onOpenAbout }: PortalNewsSectionProps)
     </div>
   );
 }
+

@@ -2,7 +2,7 @@ import type { AuthUser, NhatKyThaoTac } from '../types/library';
 import type { LibraryDatabase } from './schema';
 import { createInitialDatabase } from './seedData';
 
-const STORAGE_KEY = 'uit_library_portal_db_v5';
+const STORAGE_KEY = 'uit_library_portal_db_v6';
 let memoryFallbackDb: LibraryDatabase | null = null;
 let currentActor: AuthUser | null = null;
 

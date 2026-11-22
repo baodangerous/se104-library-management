@@ -118,6 +118,47 @@ export function PortalHomePage({
           </div>
         </div>
       </section>
+
+      {/* Real UIT Library Space Gallery */}
+      <section className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 className="text-base sm:text-lg font-bold text-slate-900">
+              Không gian &amp; Hoạt động Thư viện UIT
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Hình ảnh thực tế khu đọc mở, phòng học nhóm và các hoạt động học thuật tại UIT
+            </p>
+          </div>
+          <a
+            href="https://www.facebook.com/LibUIT.Fanpage"
+            target="_blank"
+            rel="noreferrer"
+            className="text-xs font-semibold text-[#0054A6] hover:underline"
+          >
+            Fanpage Thư viện UIT →
+          </a>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {[
+            { src: '/resources/library/uit-lib-space-1.jpg', label: 'Không gian đọc mở UIT' },
+            { src: '/resources/library/uit-lib-banner.jpg', label: 'Kệ sách chuyên ngành CNTT' },
+            { src: '/resources/library/uit-lib-training.jpg', label: 'Tập huấn kỹ năng thông tin' },
+            { src: '/resources/library/uit-lib-festival.jpg', label: 'Ngày hội Thư viện ĐHQG-HCM' },
+          ].map((photo) => (
+            <div key={photo.src} className="group relative rounded-xl overflow-hidden border border-slate-200 h-36">
+              <img
+                src={photo.src}
+                alt={photo.label}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent p-2.5">
+                <p className="text-[11px] font-medium text-white truncate">{photo.label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

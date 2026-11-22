@@ -54,7 +54,7 @@ export function HeroSearchSection({
   return (
     <section className="relative overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
       <img
-        src="/images/uit-library-hero.jpg"
+        src="/resources/library/uit-lib-space-1.jpg"
         alt="Không gian đọc Thư viện Trường Đại học Công nghệ Thông tin – ĐHQG-HCM"
         className="absolute inset-0 w-full h-full object-cover"
       />
