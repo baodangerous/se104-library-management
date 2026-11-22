@@ -37,6 +37,9 @@ export function CatalogBookCard({ book, onSelect }: CatalogBookCardProps) {
           alt={book.TenSach}
           fallbackGradient={grad}
           fallbackTitle={book.TenSach}
+          isThesis={book.NguonTaiLieu === 'Luận văn UIT' || book.MaTheLoai === 'C'}
+          author={book.TacGiaList[0]}
+          year={book.NamXuatBan}
         />
         <span
           className={cn(

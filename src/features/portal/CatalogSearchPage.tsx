@@ -24,6 +24,8 @@ export function CatalogSearchPage({
   const [books, setBooks] = React.useState<Sach[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [sortBy, setSortBy] = React.useState<'newest' | 'available' | 'title' | 'year'>('newest');
+  const [page, setPage] = React.useState(1);
+  const PAGE_SIZE = 24;
 
   const majors = React.useMemo(() => portalService.listMajors(), []);
   const themes = React.useMemo(() => portalService.listThematicShelves(), []);
@@ -61,6 +63,16 @@ export function CatalogSearchPage({
         return list.sort((a, b) => b.NgayNhap.localeCompare(a.NgayNhap));
     }
   }, [books, sortBy]);
+
+  React.useEffect(() => {
+    setPage(1);
+  }, [books.length, sortBy, filters]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedBooks.length / PAGE_SIZE));
+  const pagedBooks = React.useMemo(
+    () => sortedBooks.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [sortedBooks, page]
+  );
 
   const update = (patch: Partial<CatalogFilterState>) =>
     onChangeFilters({ ...filters, ...patch });
@@ -127,10 +139,45 @@ export function CatalogSearchPage({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sortedBooks.map((book) => (
-            <CatalogBookCard key={book.MaSach} book={book} onSelect={onSelectBook} />
-          ))}
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {pagedBooks.map((book) => (
+              <CatalogBookCard key={book.MaSach} book={book} onSelect={onSelectBook} />
+            ))}
+          </div>
+          {totalPages > 1 ? (
+            <div className="flex items-center justify-between bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-600">
+              <span>
+                Trang <strong className="text-slate-900">{page}</strong> / {totalPages} · Hiển thị{' '}
+                {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, sortedBooks.length)} /{' '}
+                {sortedBooks.length}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={page <= 1}
+                  onClick={() => {
+                    setPage((p) => Math.max(1, p - 1));
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 cursor-pointer disabled:cursor-default font-medium"
+                >
+                  Trang trước
+                </button>
+                <button
+                  type="button"
+                  disabled={page >= totalPages}
+                  onClick={() => {
+                    setPage((p) => Math.min(totalPages, p + 1));
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 cursor-pointer disabled:cursor-default font-medium"
+                >
+                  Trang sau
+                </button>
+              </div>
+            </div>
+          ) : null}
         </div>
       )}
     </div>

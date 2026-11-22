@@ -4,6 +4,7 @@ import { SEED_SACH_TACGIA } from './seedBookAuthors';
 import { SEED_SACH_MORE } from './seedBooksCatalog';
 import { SEED_SACH_EXTRA } from './seedBooksExtra';
 import { SEED_TEXTBOOK_AUTHORS, SEED_TEXTBOOK_BOOKS } from './seedTextbooks';
+import { SEED_THESIS_AUTHORS, SEED_THESIS_BOOKS } from './seedTheses';
 
 export { SEED_SACH_TACGIA };
 
@@ -88,6 +89,7 @@ export const SEED_TACGIA: TacGia[] = [
   { MaTacGia: 72, TenTacGia: 'Udayan Das' },
   { MaTacGia: 73, TenTacGia: 'Shaun V. Ault' },
   ...SEED_TEXTBOOK_AUTHORS,
+  ...SEED_THESIS_AUTHORS,
 ];
 
 const SEED_SACH_CORE: SachRow[] = [
@@ -216,4 +218,5 @@ export const SEED_SACH: SachRow[] = [
   ...SEED_SACH_MORE,
   ...SEED_SACH_EXTRA,
   ...SEED_TEXTBOOK_BOOKS,
+  ...SEED_THESIS_BOOKS,
 ];

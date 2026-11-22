@@ -1,5 +1,6 @@
 import type { SachTacGiaRow } from './schema';
 import { SEED_TEXTBOOK_BOOK_AUTHORS } from './seedTextbooks';
+import { SEED_THESIS_BOOK_AUTHORS } from './seedTheses';
 
 export const SEED_SACH_TACGIA: SachTacGiaRow[] = [
   { MaSachTacGia: 1, MaSach: 'S001', MaTacGia: 1 },
@@ -82,5 +83,6 @@ export const SEED_SACH_TACGIA: SachTacGiaRow[] = [
   { MaSachTacGia: 78, MaSach: 'S057', MaTacGia: 72 },
   { MaSachTacGia: 79, MaSach: 'S058', MaTacGia: 73 },
   ...SEED_TEXTBOOK_BOOK_AUTHORS,
+  ...SEED_THESIS_BOOK_AUTHORS,
 ];
 
