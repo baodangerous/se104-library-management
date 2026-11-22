@@ -3,6 +3,7 @@ import { BookOpen, CheckCircle2, Clock, DoorOpen, GraduationCap, MapPin, Users }
 import { LiveLibraryHours } from '../../components/ui/live-library-hours';
 import { portalService } from '../../services/portalService';
 import type { Sach } from '../../types/library';
+import { AboutOrgAndStats } from './AboutOrgAndStats';
 
 interface AboutPageProps {
   books: Sach[];
@@ -172,6 +173,8 @@ export function AboutPage({ books }: AboutPageProps) {
           </div>
         </div>
       </div>
+
+      <AboutOrgAndStats />
     </div>
   );
 }
