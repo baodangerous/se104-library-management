@@ -25,12 +25,12 @@ export function CatalogBookCard({ book, onSelect }: CatalogBookCardProps) {
       className="text-left bg-white border border-slate-200 hover:border-[#0054A6]/60 rounded-xl overflow-hidden shadow-xs hover:shadow-lg transition-all cursor-pointer flex flex-col justify-between group"
     >
       {/* Visual Cover Strip */}
-      <div className="relative h-36 w-full overflow-hidden bg-slate-900">
+      <div className="relative w-full aspect-[35/24] overflow-hidden bg-slate-900">
         <img
           src={imgSrc}
           alt={book.TenSach}
           onError={() => setImgSrc(majorArtwork)}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/15 to-transparent" />
         <span

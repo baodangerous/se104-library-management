@@ -92,11 +92,11 @@ export function MajorsCatalogPage({
                   : 'bg-white text-slate-900 border-slate-200 hover:border-[#0054A6]/50 hover:shadow-sm'
               )}
             >
-              <div className="relative h-28 w-full overflow-hidden">
+              <div className="relative w-full aspect-[35/24] overflow-hidden bg-slate-900">
                 <img
-                  src={major.HinhAnh || `/resources/majors/${major.MaNganh}.svg`}
+                  src={major.HinhAnh || `/resources/majors/${major.MaNganh}.jpg`}
                   alt={major.TenNganh}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute top-2 inset-x-2.5 flex items-center justify-between gap-2">
                   <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-950/65 text-white backdrop-blur-xs">

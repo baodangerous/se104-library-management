@@ -28,7 +28,7 @@ export const portalService = {
   getMajorImage(maNganh?: string): string {
     const code = maNganh || 'CNTT';
     const major = loadDb().NGANHHOC.find((m) => m.MaNganh === code);
-    return major?.HinhAnh || `/resources/majors/${code}.svg`;
+    return major?.HinhAnh || `/resources/majors/${code}.jpg`;
   },
 
   listNews(): TinHoatDong[] {

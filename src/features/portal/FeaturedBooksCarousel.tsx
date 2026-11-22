@@ -74,11 +74,11 @@ export function FeaturedBooksCarousel({
               className="snap-start shrink-0 w-64 text-left bg-slate-50/70 hover:bg-white border border-slate-200 hover:border-[#0054A6]/50 rounded-xl overflow-hidden transition-all hover:shadow-md cursor-pointer flex flex-col group"
             >
               {/* Visual Cover */}
-              <div className="h-36 relative overflow-hidden bg-slate-900">
+              <div className="w-full aspect-[35/24] relative overflow-hidden bg-slate-900">
                 <img
                   src={coverSrc}
                   alt={book.TenSach}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent" />
                 <div className="absolute top-2.5 inset-x-3 flex items-center justify-between gap-2 text-[11px]">
