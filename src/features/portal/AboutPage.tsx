@@ -4,6 +4,7 @@ import { LiveLibraryHours } from '../../components/ui/live-library-hours';
 import { portalService } from '../../services/portalService';
 import type { Sach } from '../../types/library';
 import { AboutOrgAndStats } from './AboutOrgAndStats';
+import { PortalNewsSection } from './PortalNewsSection';
 
 interface AboutPageProps {
   books: Sach[];
@@ -14,6 +15,7 @@ export function AboutPage({ books }: AboutPageProps) {
   const [roomCount, setRoomCount] = React.useState(0);
   const majors = React.useMemo(() => portalService.listMajors(), []);
   const portalConfig = React.useMemo(() => portalService.getConfig(), []);
+  const news = React.useMemo(() => portalService.listNews(), []);
 
   React.useEffect(() => {
     portalService
@@ -175,6 +177,8 @@ export function AboutPage({ books }: AboutPageProps) {
       </div>
 
       <AboutOrgAndStats />
+
+      <PortalNewsSection news={news} />
     </div>
   );
 }
