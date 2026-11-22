@@ -168,3 +168,4 @@ export function migrateAndSeedPortalTables(db: Database.Database): void {
 
   runSync();
 }
+
