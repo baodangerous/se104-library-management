@@ -66,9 +66,10 @@ export function PortalHomePage({
           </button>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {majors.map((major) => {
             const count = books.filter((b) => b.MaNganh === major.MaNganh).length;
+            const thumb = major.HinhAnh || portalService.getMajorImage(major.MaNganh);
             return (
               <button
                 key={major.MaNganh}
@@ -82,19 +83,27 @@ export function PortalHomePage({
                     tinhTrang: 'ALL',
                   })
                 }
-                className="text-left p-4 rounded-xl border border-slate-200 bg-[#f3f8ff]/60 hover:bg-[#dcebff]/60 hover:border-[#1556d6]/50 transition-colors cursor-pointer group"
+                className="text-left rounded-xl border border-slate-200 bg-white hover:border-[#1556d6]/50 hover:shadow-sm transition-all cursor-pointer group overflow-hidden flex flex-col"
               >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="px-2 py-0.5 rounded bg-[#0a2b86] text-white text-[11px] font-bold">
+                <div className="relative aspect-[35/24] w-full overflow-hidden bg-slate-100">
+                  <img
+                    src={thumb}
+                    alt={major.TenNganh}
+                    loading="lazy"
+                    className="w-full h-full object-cover object-center group-hover:scale-[1.03] transition-transform duration-300"
+                  />
+                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded bg-[#0a2b86]/90 text-white text-[11px] font-bold">
                     {major.MaNganh}
                   </span>
-                  <span className="text-[11px] font-normal text-slate-500">
-                    {count} đầu sách
-                  </span>
                 </div>
-                <p className="text-sm font-bold text-[#0a1f4d] group-hover:text-[#1556d6] mt-2 line-clamp-1">
-                  {major.TenNganh}
-                </p>
+                <div className="p-3 space-y-1 flex-1 flex flex-col justify-between">
+                  <p className="text-sm font-bold text-[#0a1f4d] group-hover:text-[#1556d6] line-clamp-2 leading-snug">
+                    {major.TenNganh}
+                  </p>
+                  <p className="text-[11px] font-normal text-slate-500">
+                    {count} đầu sách
+                  </p>
+                </div>
               </button>
             );
           })}
