@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ArrowRight, BookMarked, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Sach } from '../../types/library';
+import { BookCoverFrame } from './BookCoverFrame';
 
 interface FeaturedBooksCarouselProps {
   books: Sach[];
@@ -79,21 +80,15 @@ export function FeaturedBooksCarousel({
               onClick={() => onSelectBook(book)}
               className="snap-start shrink-0 w-64 text-left bg-slate-50/70 hover:bg-white border border-slate-200 hover:border-[#0054A6]/50 rounded-xl overflow-hidden transition-all hover:shadow-md cursor-pointer flex flex-col group"
             >
-              {/* Book Cover: real image if available, otherwise CSS gradient spine */}
-              <div className="w-full aspect-[35/24] relative overflow-hidden bg-slate-900">
-                {book.AnhBia ? (
-                  <>
-                    <img
-                      src={book.AnhBia}
-                      alt={book.TenSach}
-                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent" />
-                  </>
-                ) : (
-                  <div className={`w-full h-full bg-gradient-to-br ${grad}`} />
-                )}
-                <div className="absolute top-2.5 inset-x-3 flex items-center justify-between gap-2 text-[11px]">
+              {/* Book Cover: full contain book cover over blurred backdrop */}
+              <div className="w-full aspect-[4/3] relative overflow-hidden bg-slate-900">
+                <BookCoverFrame
+                  src={book.AnhBia}
+                  alt={book.TenSach}
+                  fallbackGradient={grad}
+                />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-950/90 via-slate-950/45 to-transparent z-[2]" />
+                <div className="absolute top-2.5 inset-x-3 z-[3] flex items-center justify-between gap-2 text-[11px]">
                   <span className="font-mono font-semibold px-2 py-0.5 rounded bg-slate-900/75 text-white backdrop-blur-xs">
                     {book.MaSach}
                   </span>
@@ -101,7 +96,7 @@ export function FeaturedBooksCarousel({
                     {book.NgonNgu === 'Tiếng Anh' ? 'Ngoại văn' : 'Tiếng Việt'}
                   </span>
                 </div>
-                <div className="absolute bottom-2.5 inset-x-3 flex items-end justify-between gap-2 text-white">
+                <div className="absolute bottom-2.5 inset-x-3 z-[3] flex items-end justify-between gap-2 text-white">
                   <p className="text-xs font-bold leading-snug line-clamp-2 drop-shadow-xs">
                     {book.TenSach}
                   </p>
