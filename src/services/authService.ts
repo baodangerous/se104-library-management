@@ -1,5 +1,5 @@
 import type { AuthUser, UserRole } from '../types/library';
-import { appendAuditLog, loadDb, mutateDb, setCurrentActor } from './storage';
+import { appendAuditLog, loadDb, mutateDb, setCurrentActor } from '../database/dbEngine';
 
 const SESSION_KEY = 'uit_library_session_v1';
 

@@ -3,7 +3,7 @@ import test from 'node:test';
 import { bookService } from '../../services/bookService';
 import { serviceRequestService } from '../../services/serviceRequestService';
 import { settingsService } from '../../services/settingsService';
-import { resetDb } from '../../services/storage';
+import { resetDb } from '../../database/dbEngine';
 import { buildLocalBotReply } from './libBotEngine';
 
 test('UIT LibBot: diacritic-insensitive major search returns real ATTT books', async () => {

@@ -14,7 +14,7 @@ import {
 } from './returnService';
 import { validateBorrowEligibility } from './rules/circulationRules';
 import { todayIsoDate } from './rules/dateUtils';
-import { appendAuditLog, loadDb, mutateDb, nextNumericId, nextPrefixedId } from './storage';
+import { appendAuditLog, loadDb, mutateDb, nextNumericId, nextPrefixedId } from '../database/dbEngine';
 
 export interface ActiveBorrowedItem {
   MaChiTietMuon: number;

@@ -1,6 +1,6 @@
 import type { LichDatPhong, PhongHop, YeuCauTaiLieu } from '../types/portal';
 import { diffDaysIso, isValidIsoDate, todayIsoDate } from './rules/dateUtils';
-import { appendAuditLog, loadDb, mutateDb, nextPrefixedId } from './storage';
+import { appendAuditLog, loadDb, mutateDb, nextPrefixedId } from '../database/dbEngine';
 
 export interface RoomBookingInput {
   MaPhong: string;

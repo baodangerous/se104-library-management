@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { toast } from 'sonner';
-import { booksService, type BookInput } from '../../../services/booksService';
+import { bookService, type BookInput } from '../../../services/bookService';
 import type { Sach, ThamSo, TheLoai } from '../../../types/library';
 
 export function useBooks() {
@@ -17,9 +17,9 @@ export function useBooks() {
     setLoading(true);
     try {
       const [bData, cData, tsData] = await Promise.all([
-        booksService.list({ q: search, maTheLoai: catFilter, tinhTrang: statusFilter }),
-        booksService.listCategories(),
-        booksService.getParams(),
+        bookService.list({ q: search, maTheLoai: catFilter, tinhTrang: statusFilter }),
+        bookService.listCategories(),
+        bookService.getParams(),
       ]);
       setBooks(bData);
       setCategories(cData);
@@ -38,17 +38,17 @@ export function useBooks() {
 
   async function saveBook(editing: Sach | null, payload: BookInput) {
     if (editing) {
-      await booksService.update(editing.MaSach, payload);
+      await bookService.update(editing.MaSach, payload);
       toast.success(`Đã cập nhật thông tin sách ${editing.MaSach}`);
     } else {
-      const created = await booksService.create(payload);
+      const created = await bookService.create(payload);
       toast.success(`Đã tiếp nhận sách mới ${created.MaSach} – ${created.TenSach}`);
     }
     await loadData();
   }
 
   async function deleteBook(book: Sach) {
-    await booksService.remove(book.MaSach);
+    await bookService.remove(book.MaSach);
     toast.success(`Đã xóa đầu sách ${book.MaSach}`);
     await loadData();
   }

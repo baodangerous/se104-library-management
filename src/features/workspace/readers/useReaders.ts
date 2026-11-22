@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { toast } from 'sonner';
-import { readersService, type ReaderInput } from '../../../services/readersService';
+import { readerService, type ReaderInput } from '../../../services/readerService';
 import { formatDateVn } from '../../../services/rules/dateUtils';
 import type { DocGia, LoaiDocGia, ThamSo } from '../../../types/library';
 
@@ -16,9 +16,9 @@ export function useReaders() {
     setLoading(true);
     try {
       const [rData, lData, tsData] = await Promise.all([
-        readersService.list(search, loaiFilter),
-        readersService.listTypes(),
-        readersService.getParams(),
+        readerService.list(search, loaiFilter),
+        readerService.listTypes(),
+        readerService.getParams(),
       ]);
       setReaders(rData);
       setLoaiList(lData);
@@ -37,10 +37,10 @@ export function useReaders() {
 
   async function saveReader(editing: DocGia | null, payload: ReaderInput) {
     if (editing) {
-      await readersService.update(editing.MaDocGia, payload);
+      await readerService.update(editing.MaDocGia, payload);
       toast.success(`Đã cập nhật thông tin độc giả ${editing.MaDocGia}`);
     } else {
-      const created = await readersService.create(payload);
+      const created = await readerService.create(payload);
       toast.success(
         `Đã lập thẻ độc giả ${created.MaDocGia} (Hết hạn ${formatDateVn(created.NgayHetHan)})`
       );
@@ -49,13 +49,13 @@ export function useReaders() {
   }
 
   async function deleteReader(reader: DocGia) {
-    await readersService.remove(reader.MaDocGia);
+    await readerService.remove(reader.MaDocGia);
     toast.success(`Đã xóa thẻ độc giả ${reader.MaDocGia}`);
     await loadData();
   }
 
   async function renewReaderCard(reader: DocGia) {
-    const updated = await readersService.renewCard(reader.MaDocGia);
+    const updated = await readerService.renewCard(reader.MaDocGia);
     toast.success(
       `Đã gia hạn thẻ ${updated.MaDocGia} đến ${formatDateVn(updated.NgayHetHan)}`
     );

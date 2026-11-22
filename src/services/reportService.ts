@@ -5,7 +5,7 @@ import {
   computeCategoryReportPercentages,
 } from './rules/circulationRules';
 import { diffDaysIso, formatDateVn } from './rules/dateUtils';
-import { loadDb } from './storage';
+import { loadDb } from '../database/dbEngine';
 
 export const reportService = {
   async getBM71(thang: number, nam: number): Promise<BaoCaoBM71Response> {

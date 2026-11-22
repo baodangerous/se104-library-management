@@ -1,7 +1,7 @@
 import type { PhieuThuTienPhat } from '../types/library';
 import { validateFinePayment } from './rules/circulationRules';
 import { formatVnd } from './rules/dateUtils';
-import { appendAuditLog, loadDb, mutateDb, nextPrefixedId } from './storage';
+import { appendAuditLog, loadDb, mutateDb, nextPrefixedId } from '../database/dbEngine';
 
 export function listFineReceiptsSync(): PhieuThuTienPhat[] {
   const db = loadDb();

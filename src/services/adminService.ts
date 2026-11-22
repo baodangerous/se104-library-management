@@ -19,7 +19,7 @@ import {
   loadDb,
   mutateDb,
   nextNumericId,
-} from './storage';
+} from '../database/dbEngine';
 
 export type { ReaderProfileData };
 

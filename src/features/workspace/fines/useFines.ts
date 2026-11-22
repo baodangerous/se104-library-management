@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { toast } from 'sonner';
 import { circulationService } from '../../../services/circulationService';
-import { readersService } from '../../../services/readersService';
+import { readerService } from '../../../services/readerService';
 import { validateFinePayment } from '../../../services/rules/circulationRules';
 import { formatVnd, todayIsoDate } from '../../../services/rules/dateUtils';
 import type { DocGia, PhieuThuTienPhat } from '../../../types/library';
@@ -19,7 +19,7 @@ export function useFines() {
     try {
       setLoading(true);
       const [r, p] = await Promise.all([
-        readersService.list(),
+        readerService.list(),
         circulationService.listFineReceipts(),
       ]);
       setReaders(r);

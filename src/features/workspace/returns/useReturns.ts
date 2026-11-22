@@ -4,7 +4,7 @@ import {
   circulationService,
   type ActiveBorrowedItem,
 } from '../../../services/circulationService';
-import { readersService } from '../../../services/readersService';
+import { readerService } from '../../../services/readerService';
 import { calculateReturnFine } from '../../../services/rules/circulationRules';
 import { formatVnd, todayIsoDate } from '../../../services/rules/dateUtils';
 import type { DocGia, PhieuTra } from '../../../types/library';
@@ -24,7 +24,7 @@ export function useReturns() {
     try {
       setLoading(true);
       const [r, rt] = await Promise.all([
-        readersService.list(),
+        readerService.list(),
         circulationService.listReturns(),
       ]);
       setReaders(r);

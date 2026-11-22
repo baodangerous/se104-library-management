@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { toast } from 'sonner';
 import { adminService } from '../../../services/adminService';
-import { readersService } from '../../../services/readersService';
+import { readerService } from '../../../services/readerService';
 import type { DocGia, TaiKhoan, UserRole } from '../../../types/library';
 
 export interface AccountFormState {
@@ -37,7 +37,7 @@ export function useAccounts() {
       setLoading(true);
       const [a, r] = await Promise.all([
         adminService.listAccounts(),
-        readersService.list(),
+        readerService.list(),
       ]);
       setAccounts(a);
       setReaders(r);

@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { Button } from '../../../components/ui/button';
 import { ModalDialog } from '../../../components/ui/dialog';
 import { FieldLabel, SelectInput, TextInput } from '../../../components/ui/input';
-import type { ReaderInput } from '../../../services/readersService';
+import type { ReaderInput } from '../../../services/readerService';
 import { validateReaderCard } from '../../../services/rules/catalogRules';
 import { formatDateVn, todayIsoDate } from '../../../services/rules/dateUtils';
 import type { DocGia, LoaiDocGia, ThamSo } from '../../../types/library';

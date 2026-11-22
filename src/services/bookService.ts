@@ -3,7 +3,7 @@ import type { NgonNguSach, NguonTaiLieu } from '../types/portal';
 import { hydrateBooks, linkBookAuthors } from './bookHydrator';
 import { validateBookIntake } from './rules/catalogRules';
 import { matchesVietnameseSearch } from './rules/searchUtils';
-import { appendAuditLog, loadDb, mutateDb, nextPrefixedId } from './storage';
+import { appendAuditLog, loadDb, mutateDb, nextPrefixedId } from '../database/dbEngine';
 
 export interface BookInput {
   TenSach: string;

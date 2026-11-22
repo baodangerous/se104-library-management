@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { toast } from 'sonner';
-import { booksService } from '../../../services/booksService';
+import { bookService } from '../../../services/bookService';
 import { circulationService } from '../../../services/circulationService';
-import { readersService } from '../../../services/readersService';
+import { readerService } from '../../../services/readerService';
 import { formatDateVn } from '../../../services/rules/dateUtils';
 import type { DocGia, PhieuMuon, Sach, ThamSo } from '../../../types/library';
 
@@ -17,10 +17,10 @@ export function useLoans() {
     setLoading(true);
     try {
       const [rData, bData, pmData, tsData] = await Promise.all([
-        readersService.list(),
-        booksService.list(),
+        readerService.list(),
+        bookService.list(),
         circulationService.listLoans(),
-        readersService.getParams(),
+        readerService.getParams(),
       ]);
       setReaders(rData);
       setBooks(bData);

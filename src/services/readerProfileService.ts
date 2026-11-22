@@ -4,9 +4,9 @@ import type {
   PhieuThuTienPhat,
   ThamSo,
 } from '../types/library';
-import type { LibraryDatabase } from './dbSchema';
+import type { LibraryDatabase } from '../database/schema';
 import { hydrateReaders } from './readerService';
-import { appendAuditLog, getCurrentActor, loadDb, saveDb } from './storage';
+import { appendAuditLog, getCurrentActor, loadDb, saveDb } from '../database/dbEngine';
 
 export interface ReaderProfileData {
   docGia: DocGia | null;

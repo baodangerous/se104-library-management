@@ -1,9 +1,9 @@
 import type { DocGia, LoaiDocGia, ThamSo } from '../types/library';
-import type { LibraryDatabase } from './dbSchema';
+import type { LibraryDatabase } from '../database/schema';
 import { validateReaderCard } from './rules/catalogRules';
 import { addMonthsIso, diffDaysIso, todayIsoDate } from './rules/dateUtils';
 import { matchesVietnameseSearch } from './rules/searchUtils';
-import { appendAuditLog, loadDb, mutateDb, nextPrefixedId } from './storage';
+import { appendAuditLog, loadDb, mutateDb, nextPrefixedId } from '../database/dbEngine';
 
 export interface ReaderInput {
   HoTen: string;

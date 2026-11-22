@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { toast } from 'sonner';
-import { reportsService } from '../../../services/reportsService';
+import { reportService } from '../../../services/reportService';
 import { todayIsoDate } from '../../../services/rules/dateUtils';
 import type { BaoCaoBM71Response, BaoCaoBM72Response } from '../../../types/library';
 
@@ -17,7 +17,7 @@ export function useReports() {
   const loadBM71 = React.useCallback(async () => {
     try {
       setLoading71(true);
-      const data = await reportsService.getBM71(thang, nam);
+      const data = await reportService.getBM71(thang, nam);
       setBm71(data);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Lỗi tải thống kê mượn theo thể loại');
@@ -29,7 +29,7 @@ export function useReports() {
   const loadBM72 = React.useCallback(async () => {
     try {
       setLoading72(true);
-      const data = await reportsService.getBM72(ngayBM72);
+      const data = await reportService.getBM72(ngayBM72);
       setBm72(data);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Lỗi tải báo cáo sách trả trễ');
@@ -48,13 +48,13 @@ export function useReports() {
 
   function exportBM71() {
     if (!bm71) return;
-    reportsService.exportBM71Csv(bm71);
+    reportService.exportBM71Csv(bm71);
     toast.success('Đã xuất file thống kê mượn sách (CSV).');
   }
 
   function exportBM72() {
     if (!bm72) return;
-    reportsService.exportBM72Csv(bm72);
+    reportService.exportBM72Csv(bm72);
     toast.success('Đã xuất file danh sách sách trả trễ (CSV).');
   }
 

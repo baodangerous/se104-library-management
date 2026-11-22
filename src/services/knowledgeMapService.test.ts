@@ -6,7 +6,7 @@ import { buildKnowledgeGraph } from './knowledgeMapService';
 import { readerService } from './readerService';
 import { removeVietnameseTones } from './rules/searchUtils';
 import { serviceRequestService } from './serviceRequestService';
-import { resetDb } from './storage';
+import { resetDb } from '../database/dbEngine';
 
 test('Vietnamese diacritic-insensitive search matches accented titles from ASCII queries', async () => {
   resetDb();

@@ -3,7 +3,7 @@ import { hydrateBooks } from './bookHydrator';
 import { hydrateReaders } from './readerService';
 import { computeCategoryReportPercentages } from './rules/circulationRules';
 import { diffDaysIso, formatVnd, todayIsoDate } from './rules/dateUtils';
-import { loadDb } from './storage';
+import { loadDb } from '../database/dbEngine';
 
 export function buildDashboardSummary(): DashboardSummary {
   const db = loadDb();
