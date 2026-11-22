@@ -4,6 +4,7 @@ import { PublicPortalShell } from './features/portal/PublicPortalShell';
 import { WorkspaceApp } from './features/workspace/WorkspaceApp';
 import { parseHashRoute, setHashRoute } from './lib/hashRouter';
 import { authService } from './services/authService';
+import { portalService } from './services/portalService';
 import type { AuthUser } from './types/library';
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
   });
 
   React.useEffect(() => {
+    void portalService.hydrateFromServer();
     if (!initialSession?.user) return;
     authService.verifySession().then((verified) => {
       if (!verified) {

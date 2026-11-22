@@ -284,6 +284,54 @@ portalRouter.get('/public/tintuc', (_req, res) => {
   res.json(rows);
 });
 
+portalRouter.get('/public/nganhhoc', (_req, res) => {
+  const rows = db.prepare('SELECT * FROM NGANHHOC ORDER BY rowid ASC').all() as Array<any>;
+  res.json(
+    rows.map((r) => ({
+      MaNganh: r.MaNganh,
+      TenNganh: r.TenNganh,
+      Khoa: r.Khoa,
+      BacDaoTao: r.BacDaoTao ?? undefined,
+      MauSac: r.MauSac ?? undefined,
+      Icon: r.Icon ?? undefined,
+      HinhAnh: r.HinhAnh ?? undefined,
+      ChuongTrinh: JSON.parse(r.ChuongTrinhJson || '[]'),
+      MoTaNgan: r.MoTaNgan,
+    }))
+  );
+});
+
+portalRouter.get('/public/tusach', (_req, res) => {
+  const rows = db.prepare('SELECT * FROM TUSACH_CHUYENDE ORDER BY rowid ASC').all();
+  res.json(rows);
+});
+
+portalRouter.get('/public/portal-bundle', (_req, res) => {
+  const majorRows = db.prepare('SELECT * FROM NGANHHOC ORDER BY rowid ASC').all() as Array<any>;
+  const majors = majorRows.map((r) => ({
+    MaNganh: r.MaNganh,
+    TenNganh: r.TenNganh,
+    Khoa: r.Khoa,
+    BacDaoTao: r.BacDaoTao ?? undefined,
+    MauSac: r.MauSac ?? undefined,
+    Icon: r.Icon ?? undefined,
+    HinhAnh: r.HinhAnh ?? undefined,
+    ChuongTrinh: JSON.parse(r.ChuongTrinhJson || '[]'),
+    MoTaNgan: r.MoTaNgan,
+  }));
+  const news = db.prepare('SELECT * FROM PORTAL_TINTUC ORDER BY rowid DESC').all();
+  const shelves = db.prepare('SELECT * FROM TUSACH_CHUYENDE ORDER BY rowid ASC').all();
+  const cfgRow = db.prepare("SELECT valueJson FROM PORTAL_META WHERE key = 'config'").get() as { valueJson: string } | undefined;
+  const guideRow = db.prepare("SELECT valueJson FROM PORTAL_META WHERE key = 'guide'").get() as { valueJson: string } | undefined;
+  res.json({
+    majors,
+    news,
+    shelves,
+    config: cfgRow ? JSON.parse(cfgRow.valueJson) : null,
+    guide: guideRow ? JSON.parse(guideRow.valueJson) : null,
+  });
+});
+
 portalRouter.post(
   '/tintuc',
   requireAuth,

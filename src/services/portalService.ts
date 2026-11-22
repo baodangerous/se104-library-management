@@ -14,65 +14,101 @@ import type {
 } from '../types/portal';
 import { apiRequest } from './apiClient';
 
+let cachedMajors: NganhHoc[] = SEED_NGANHHOC;
+let cachedNews: TinHoatDong[] = SEED_TINTUC;
+let cachedShelves: TuSachChuyenDe[] = SEED_TUSACHCHUYENDE;
+let cachedConfig: LibraryPortalConfig = SEED_CAUHINHCONG;
+let cachedGuide: LibraryGuideData = SEED_HUONGDAN;
+let hydrated = false;
+
 export const portalService = {
+  async hydrateFromServer(): Promise<void> {
+    if (hydrated) return;
+    try {
+      const bundle = await apiRequest<{
+        majors?: NganhHoc[];
+        news?: TinHoatDong[];
+        shelves?: TuSachChuyenDe[];
+        config?: LibraryPortalConfig | null;
+        guide?: LibraryGuideData | null;
+      }>('/public/portal-bundle');
+      if (bundle.majors?.length) cachedMajors = bundle.majors;
+      if (bundle.news?.length) cachedNews = bundle.news;
+      if (bundle.shelves?.length) cachedShelves = bundle.shelves;
+      if (bundle.config) cachedConfig = bundle.config;
+      if (bundle.guide) cachedGuide = bundle.guide;
+      hydrated = true;
+    } catch {
+      // Keep fallback data if backend unreachable
+    }
+  },
+
   listMajors(): NganhHoc[] {
-    return SEED_NGANHHOC;
+    return cachedMajors;
   },
 
   getMajorByCode(maNganh?: string): NganhHoc | undefined {
     if (!maNganh) return undefined;
-    return SEED_NGANHHOC.find((m) => m.MaNganh === maNganh);
+    return cachedMajors.find((m) => m.MaNganh === maNganh);
   },
 
   getMajorName(maNganh?: string): string {
     if (!maNganh) return 'Chung';
-    return SEED_NGANHHOC.find((m) => m.MaNganh === maNganh)?.TenNganh || maNganh;
+    return cachedMajors.find((m) => m.MaNganh === maNganh)?.TenNganh || maNganh;
   },
 
   getMajorImage(maNganh?: string): string {
     const code = maNganh || 'CNTT';
-    const major = SEED_NGANHHOC.find((m) => m.MaNganh === code);
+    const major = cachedMajors.find((m) => m.MaNganh === code);
     return major?.HinhAnh || `/resources/majors/${code}.jpg`;
   },
 
   listNews(): TinHoatDong[] {
-    return SEED_TINTUC;
+    return cachedNews;
   },
 
   async listNewsAsync(): Promise<TinHoatDong[]> {
-    return apiRequest<TinHoatDong[]>('/public/tintuc');
+    const rows = await apiRequest<TinHoatDong[]>('/public/tintuc');
+    cachedNews = rows;
+    return rows;
   },
 
   async createNews(payload: Omit<TinHoatDong, 'id'>): Promise<TinHoatDong> {
-    return apiRequest<TinHoatDong>('/tintuc', {
+    const created = await apiRequest<TinHoatDong>('/tintuc', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
+    cachedNews = [created, ...cachedNews];
+    return created;
   },
 
   async updateNews(id: string, payload: Partial<Omit<TinHoatDong, 'id'>>): Promise<TinHoatDong> {
-    return apiRequest<TinHoatDong>(`/tintuc/${encodeURIComponent(id)}`, {
+    const updated = await apiRequest<TinHoatDong>(`/tintuc/${encodeURIComponent(id)}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
     });
+    cachedNews = cachedNews.map((n) => (n.id === id ? updated : n));
+    return updated;
   },
 
   async removeNews(id: string): Promise<{ success: boolean }> {
-    return apiRequest<{ success: boolean }>(`/tintuc/${encodeURIComponent(id)}`, {
+    const res = await apiRequest<{ success: boolean }>(`/tintuc/${encodeURIComponent(id)}`, {
       method: 'DELETE',
     });
+    cachedNews = cachedNews.filter((n) => n.id !== id);
+    return res;
   },
 
   listThematicShelves(): TuSachChuyenDe[] {
-    return SEED_TUSACHCHUYENDE;
+    return cachedShelves;
   },
 
   getConfig(): LibraryPortalConfig {
-    return SEED_CAUHINHCONG;
+    return cachedConfig;
   },
 
   getGuide(): LibraryGuideData {
-    return SEED_HUONGDAN;
+    return cachedGuide;
   },
 
   async getPublicStats(): Promise<{ roomCount: number; readerCount: number }> {

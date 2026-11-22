@@ -1,7 +1,13 @@
 import bcrypt from 'bcryptjs';
 import type Database from 'better-sqlite3';
 import { SEED_SACH, SEED_SACH_TACGIA, SEED_TACGIA } from '../src/database/seedBooks';
-import { SEED_TINTUC } from '../src/database/seedPortalData';
+import { SEED_HUONGDAN } from '../src/database/seedGuideData';
+import { SEED_NGANHHOC } from '../src/database/seedMajors';
+import {
+  SEED_CAUHINHCONG,
+  SEED_TINTUC,
+  SEED_TUSACHCHUYENDE,
+} from '../src/database/seedPortalData';
 import {
   createSeedBookRequests,
   createSeedBookings,
@@ -228,6 +234,68 @@ export function migrateAndSeedPortalTables(db: Database.Database): void {
         insNews.run(n.id, n.tieuDe, n.ngayDang, n.chuyenMuc, n.hinhAnh ?? null, n.duongDan ?? null, n.tomTat);
       }
     }
+
+    // Majors, Thematic Shelves & Portal Metadata (config + guide) in SQLite
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS NGANHHOC (
+        MaNganh TEXT PRIMARY KEY,
+        TenNganh TEXT NOT NULL,
+        Khoa TEXT NOT NULL,
+        BacDaoTao TEXT,
+        MauSac TEXT,
+        Icon TEXT,
+        HinhAnh TEXT,
+        ChuongTrinhJson TEXT NOT NULL,
+        MoTaNgan TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS TUSACH_CHUYENDE (
+        id TEXT PRIMARY KEY,
+        tenTuSach TEXT NOT NULL,
+        moTa TEXT NOT NULL,
+        soTaiLieuMinhHoa INTEGER NOT NULL DEFAULT 0,
+        accentColor TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS PORTAL_META (
+        key TEXT PRIMARY KEY,
+        valueJson TEXT NOT NULL
+      );
+    `);
+
+    const majorCount = (db.prepare('SELECT COUNT(*) as cnt FROM NGANHHOC').get() as { cnt: number }).cnt;
+    if (majorCount === 0) {
+      const insMajor = db.prepare(
+        `INSERT OR IGNORE INTO NGANHHOC (MaNganh, TenNganh, Khoa, BacDaoTao, MauSac, Icon, HinhAnh, ChuongTrinhJson, MoTaNgan)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      );
+      for (const m of SEED_NGANHHOC) {
+        insMajor.run(
+          m.MaNganh,
+          m.TenNganh,
+          m.Khoa,
+          m.BacDaoTao ?? null,
+          m.MauSac ?? null,
+          m.Icon ?? null,
+          m.HinhAnh ?? null,
+          JSON.stringify(m.ChuongTrinh),
+          m.MoTaNgan
+        );
+      }
+    }
+
+    const shelfCount = (db.prepare('SELECT COUNT(*) as cnt FROM TUSACH_CHUYENDE').get() as { cnt: number }).cnt;
+    if (shelfCount === 0) {
+      const insShelf = db.prepare(
+        `INSERT OR IGNORE INTO TUSACH_CHUYENDE (id, tenTuSach, moTa, soTaiLieuMinhHoa, accentColor)
+         VALUES (?, ?, ?, ?, ?)`
+      );
+      for (const s of SEED_TUSACHCHUYENDE) {
+        insShelf.run(s.id, s.tenTuSach, s.moTa, s.soTaiLieuMinhHoa, s.accentColor);
+      }
+    }
+
+    const insMeta = db.prepare('INSERT OR IGNORE INTO PORTAL_META (key, valueJson) VALUES (?, ?)');
+    insMeta.run('config', JSON.stringify(SEED_CAUHINHCONG));
+    insMeta.run('guide', JSON.stringify(SEED_HUONGDAN));
   });
 
   runSync();
