@@ -46,7 +46,6 @@ export const SEED_HUONGDAN: LibraryGuideData = {
         { src: '/resources/library/floor2-english-shelf.jpg', caption: 'Khu vực tài liệu ngoại văn & ôn luyện TOEIC' },
         { src: '/resources/library/floor2-student-browse.jpg', caption: 'Không gian tìm kiếm học liệu đa ngành tại tầng 2' },
         { src: '/resources/library/floor2-group.jpg', caption: 'Phòng học & thảo luận nhóm' },
-        { src: '/resources/library/floor2-counter.png', caption: 'Quầy mượn trả sách & hỗ trợ bạn đọc' },
       ],
       khuVuc: [
         {
