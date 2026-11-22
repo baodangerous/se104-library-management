@@ -75,7 +75,7 @@ export const SEED_CAUHINHCONG: LibraryPortalConfig = {
   tenNgan: 'Thư viện UIT',
   hotline: '(028) 372 51993',
   email: 'thuvien@uit.edu.vn',
-  diaChi: 'Tòa nhà A, Khu phố 6, P. Linh Trung, TP. Thủ Đức, TP. Hồ Chí Minh',
+  diaChi: 'Thuộc Toà nhà A, Khu phố 34, Phường Linh Xuân, TP. Hồ Chí Minh',
   gioMoCuaNgan: 'T2–T6: 07:30–18:00 | T7: 08:00–16:00',
   gioMoCuaChiTiet: [
     { thu: 'Thứ 2 – Thứ 6', gio: '07:30 – 18:00', ghiChu: 'Phục vụ liên tục không nghỉ trưa' },
