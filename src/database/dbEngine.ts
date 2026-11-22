@@ -2,7 +2,7 @@ import type { AuthUser, NhatKyThaoTac } from '../types/library';
 import type { LibraryDatabase } from './schema';
 import { createInitialDatabase } from './seedData';
 
-const STORAGE_KEY = 'uit_library_portal_db_v3';
+const STORAGE_KEY = 'uit_library_portal_db_v4';
 let memoryFallbackDb: LibraryDatabase | null = null;
 let currentActor: AuthUser | null = null;
 
@@ -128,3 +128,4 @@ export function appendAuditLog(
     db.NHATKYTHAOTAC.length = 300;
   }
 }
+

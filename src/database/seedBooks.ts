@@ -1,6 +1,7 @@
 import type { TacGia, TheLoai } from '../types/library';
 import type { SachRow } from './schema';
-import { SEED_SACH_MORE, SEED_SACH_TACGIA } from './seedBooksCatalog';
+import { SEED_SACH_TACGIA } from './seedBookAuthors';
+import { SEED_SACH_MORE } from './seedBooksCatalog';
 
 export { SEED_SACH_TACGIA };
 
@@ -26,6 +27,12 @@ export const SEED_TACGIA: TacGia[] = [
   { MaTacGia: 13, TenTacGia: 'Andrew S. Tanenbaum' },
   { MaTacGia: 14, TenTacGia: 'ThS. Trần Minh Quang' },
   { MaTacGia: 15, TenTacGia: 'TS. Lê Đình Duy' },
+  { MaTacGia: 16, TenTacGia: 'Stuart R. Ball' },
+  { MaTacGia: 17, TenTacGia: 'Erik Dahlman' },
+  { MaTacGia: 18, TenTacGia: 'Jenny Dooley' },
+  { MaTacGia: 19, TenTacGia: 'Richard Szeliski' },
+  { MaTacGia: 20, TenTacGia: 'Gerald Friedland' },
+  { MaTacGia: 21, TenTacGia: 'Ramesh Jain' },
 ];
 
 const SEED_SACH_CORE: SachRow[] = [

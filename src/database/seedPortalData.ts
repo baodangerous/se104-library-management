@@ -126,27 +126,27 @@ export const SEED_NGANHHOC: NganhHoc[] = [
 export const SEED_TINTUC: TinHoatDong[] = [
   {
     id: 'news-1',
-    tieuDe: 'Bổ sung hơn 120 đầu sách Ngoại văn mới về An toàn Thông tin & DevOps',
-    ngayDang: '18/11/2026',
-    chuyenMuc: 'Học liệu mới',
+    tieuDe: 'Tập huấn chuyên đề “Khai thác hiệu quả thư viện UIT và Hệ thống Thư viện ĐHQG-HCM”',
+    ngayDang: '28/10/2026',
+    chuyenMuc: 'Sự kiện học thuật',
     tomTat:
-      'Thư viện UIT vừa đưa vào phục vụ bộ sách CompTIA Security+, Learning DevOps và Cryptography bản ấn hành mới nhất tại tầng 2.',
+      'Gần 300 sinh viên UIT tham gia tập huấn kỹ năng khai thác học liệu số và cổng tra cứu tập trung hưởng ứng Tuần lễ học tập suốt đời 2026.',
   },
   {
     id: 'news-2',
-    tieuDe: 'Mở đăng ký phòng học nhóm trực tuyến phục vụ mùa đồ án cuối kỳ',
-    ngayDang: '12/11/2026',
-    chuyenMuc: 'Dịch vụ độc giả',
+    tieuDe: 'Khép lại thành công Ngày hội “Thư viện đồng hành cùng sinh viên ĐHQG-HCM” lần XI',
+    ngayDang: '17/10/2026',
+    chuyenMuc: 'Hoạt động sinh viên',
     tomTat:
-      'Sinh viên có thể đặt trước phòng thảo luận nhóm trang bị màn hình trình chiếu 65 inch theo khung giờ 2 tiếng ngay trên cổng thư viện.',
+      'Diễn ra tại Hội trường A – Trường ĐH Công nghệ Thông tin ĐHQG-HCM, kết nối cộng đồng sinh viên với không gian tri thức và sản phẩm KHCN.',
   },
   {
     id: 'news-3',
-    tieuDe: 'Workshop: Kỹ năng khai thác CSDL IEEE Xplore & Quản lý trích dẫn khoa học',
-    ngayDang: '05/11/2026',
-    chuyenMuc: 'Sự kiện học thuật',
+    tieuDe: 'Tuần lễ học tập suốt đời 2026 & Webinar AI Research Solutions từ NXB Elsevier',
+    ngayDang: '30/09/2026',
+    chuyenMuc: 'Học liệu mới',
     tomTat:
-      'Hướng dẫn sinh viên năm 3, năm 4 và học viên cao học tìm kiếm bài báo hội nghị quốc tế phục vụ khóa luận tốt nghiệp.',
+      'Chủ đề “Thực học, thực hành, làm chủ công nghệ số và trí tuệ nhân tạo” cùng chuỗi giới thiệu sách ngoại văn mới về Embedded, 5G và Computer Vision.',
   },
 ];
 
