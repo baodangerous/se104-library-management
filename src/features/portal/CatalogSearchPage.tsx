@@ -60,7 +60,11 @@ export function CatalogSearchPage({
         return list.sort((a, b) => b.NamXuatBan - a.NamXuatBan);
       case 'newest':
       default:
-        return list.sort((a, b) => b.NgayNhap.localeCompare(a.NgayNhap));
+        return list.sort((a, b) => {
+          const imgDiff = Number(Boolean(b.AnhBia)) - Number(Boolean(a.AnhBia));
+          if (imgDiff !== 0) return imgDiff;
+          return b.NgayNhap.localeCompare(a.NgayNhap);
+        });
     }
   }, [books, sortBy]);
 

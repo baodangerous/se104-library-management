@@ -22,6 +22,13 @@ export function FeaturedBooksCarousel({
   onViewAll,
 }: FeaturedBooksCarouselProps) {
   const scrollerRef = React.useRef<HTMLDivElement>(null);
+  const orderedBooks = React.useMemo(
+    () =>
+      [...books].sort(
+        (a, b) => Number(Boolean(b.AnhBia)) - Number(Boolean(a.AnhBia))
+      ),
+    [books]
+  );
 
   const scrollByCards = (direction: -1 | 1) => {
     scrollerRef.current?.scrollBy({ left: direction * 300, behavior: 'smooth' });
@@ -70,7 +77,7 @@ export function FeaturedBooksCarousel({
         ref={scrollerRef}
         className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth"
       >
-        {books.map((book, idx) => {
+        {orderedBooks.map((book, idx) => {
           const isAvailable = book.TinhTrang === 'Có sẵn';
           const grad = BOOK_SPINE_GRADIENTS[idx % BOOK_SPINE_GRADIENTS.length];
           return (

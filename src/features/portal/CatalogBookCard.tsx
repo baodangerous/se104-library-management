@@ -48,13 +48,13 @@ export function CatalogBookCard({ book, onSelect }: CatalogBookCardProps) {
         />
         <span
           className={cn(
-            'absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full font-semibold text-[11px] shadow-xs backdrop-blur-xs',
+            'absolute top-2.5 right-2.5 z-10 px-2 py-0.5 rounded-full font-semibold text-[11px] shadow-xs backdrop-blur-xs',
             isAvailable ? 'bg-emerald-600/95 text-white' : 'bg-amber-600/95 text-white'
           )}
         >
           {book.TinhTrang}
         </span>
-        <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full font-mono font-semibold text-[10px] bg-slate-900/75 text-white backdrop-blur-xs">
+        <span className="absolute top-2.5 left-2.5 z-10 px-2 py-0.5 rounded-full font-mono font-semibold text-[10px] bg-slate-900/75 text-white backdrop-blur-xs">
           {book.MaSach}
         </span>
       </div>
