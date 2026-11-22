@@ -14,6 +14,7 @@ export const SEED_SACH_EXTRA: SachRow[] = [
     NguonTaiLieu: 'Sách Ngoại văn',
     NoiBat: true,
     MaKeSach: 'T2-KHM-03',
+    AnhBia: '/resources/books/s023.jpg',
     MoTa: 'Đáp ứng môn CS323, CS336, CS419, CS524, DS314 (ISBN-13: 9780521865715, 506 trang). OPAC: opac.vnulib.edu.vn/record=b1298869~S17*vie',
   },
   {
@@ -415,6 +416,7 @@ export const SEED_SACH_EXTRA: SachRow[] = [
     NgonNgu: 'Tiếng Việt',
     NguonTaiLieu: 'Sách Tiếng Việt',
     MaKeSach: 'T1-ATT-02',
+    AnhBia: '/resources/books/s051.jpg',
     MoTa: 'Tủ sách Học tập suốt đời UIT (ISBN: 978-604-45-3783-2). OPAC: opac.vnulib.edu.vn/record=b1442923~S1*vie',
   },
   {
