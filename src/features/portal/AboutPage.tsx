@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { BookOpen, CheckCircle2, Clock, DoorOpen, GraduationCap, MapPin, Users } from 'lucide-react';
+import { LiveLibraryHours } from '../../components/ui/live-library-hours';
 import { portalService } from '../../services/portalService';
 import type { Sach } from '../../types/library';
 
@@ -79,6 +80,8 @@ export function AboutPage({ books }: AboutPageProps) {
             <Clock className="w-5 h-5" />
             <h2 className="text-base font-bold text-slate-900">Lịch phục vụ bạn đọc</h2>
           </div>
+
+          <LiveLibraryHours variant="card" />
 
           <div className="divide-y divide-slate-100">
             {portalConfig.gioMoCuaChiTiet.map((row) => (

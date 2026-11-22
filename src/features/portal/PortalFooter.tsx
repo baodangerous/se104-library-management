@@ -1,4 +1,5 @@
-import { Clock, Mail, MapPin, Phone } from 'lucide-react';
+import { Mail, MapPin, Phone } from 'lucide-react';
+import { LiveLibraryHours } from '../../components/ui/live-library-hours';
 import { UitLogo } from '../../components/ui/uit-logo';
 import { portalService } from '../../services/portalService';
 import type { PortalTabId } from '../../types/portal';
@@ -42,10 +43,7 @@ export function PortalFooter({ onSelectTab }: PortalFooterProps) {
             <Mail className="w-4 h-4 text-sky-400 shrink-0" />
             <span>{UIT_LIBRARY_INFO.email}</span>
           </p>
-          <p className="flex items-center gap-2 text-slate-300">
-            <Clock className="w-4 h-4 text-sky-400 shrink-0" />
-            <span>{UIT_LIBRARY_INFO.gioMoCuaNgan}</span>
-          </p>
+          <LiveLibraryHours variant="footer" />
         </div>
 
         <div className="md:col-span-3 space-y-2 text-xs">
