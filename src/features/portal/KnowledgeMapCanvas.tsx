@@ -89,12 +89,13 @@ export function KnowledgeMapCanvas({
         </button>
       </div>
 
-      <div className="absolute bottom-3 left-3 z-10 flex flex-wrap items-center gap-3 bg-slate-900/85 border border-slate-700/80 rounded-lg px-3 py-1.5 text-[11px] text-slate-200 backdrop-blur-xs">
-        <LegendDot color="#4F46E5" label="Ngành học UIT" />
-        <LegendDot color="#0054A6" label="Thể loại" />
-        <LegendDot color="#0284C7" label="Sách (Có sẵn)" />
-        <LegendDot color="#EA580C" label="Sách (Đang mượn)" />
-        <LegendDot color="#0F766E" label="Tác giả" />
+      <div className="absolute bottom-3 left-3 z-10 flex flex-wrap items-center gap-3 bg-slate-900/90 border border-slate-700/80 rounded-lg px-3 py-2 text-[11px] text-slate-200 backdrop-blur-xs">
+        <LegendDot color="#6366F1" sizeClass="w-4 h-4" label="Ngành UIT (Lớn nhất)" />
+        <LegendDot color="#F59E0B" sizeClass="w-3.5 h-3.5" label="Thể loại (Trung-lớn)" />
+        <LegendDot color="#0EA5E9" sizeClass="w-2.5 h-2.5" label="Sách có sẵn" />
+        <LegendDot color="#EC4899" sizeClass="w-2.5 h-2.5" label="Luận văn UIT" />
+        <LegendDot color="#F97316" sizeClass="w-2.5 h-2.5" label="Đang mượn" />
+        <LegendDot color="#10B981" sizeClass="w-2 h-2" label="Tác giả (Nhỏ)" />
       </div>
 
       <ForceGraph2D
@@ -178,10 +179,21 @@ export function KnowledgeMapCanvas({
   );
 }
 
-function LegendDot({ color, label }: { color: string; label: string }) {
+function LegendDot({
+  color,
+  sizeClass = 'w-2.5 h-2.5',
+  label,
+}: {
+  color: string;
+  sizeClass?: string;
+  label: string;
+}) {
   return (
     <span className="inline-flex items-center gap-1.5">
-      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
+      <span
+        className={`${sizeClass} rounded-full shrink-0 ring-1 ring-white/30`}
+        style={{ backgroundColor: color }}
+      />
       <span>{label}</span>
     </span>
   );

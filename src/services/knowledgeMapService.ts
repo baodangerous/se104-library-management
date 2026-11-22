@@ -28,10 +28,10 @@ export interface KnowledgeGraphData {
 }
 
 export const NODE_COLORS: Record<KnowledgeNodeType, string> = {
-  MAJOR: '#4F46E5',
-  CATEGORY: '#0054A6',
-  BOOK: '#0284C7',
-  AUTHOR: '#0F766E',
+  MAJOR: '#6366F1',
+  CATEGORY: '#F59E0B',
+  BOOK: '#0EA5E9',
+  AUTHOR: '#10B981',
 };
 
 /**
@@ -126,7 +126,7 @@ export function buildKnowledgeGraph(
       label: cat.TenTheLoai,
       type: 'CATEGORY',
       color: NODE_COLORS.CATEGORY,
-      val: 14,
+      val: 22,
       subtitle: 'Thể loại học liệu',
       meta: {
         'Mã thể loại': cat.MaTheLoai,
@@ -141,11 +141,19 @@ export function buildKnowledgeGraph(
     const catId = `CAT:${book.MaTheLoai}`;
     const major = majors.find((m) => m.MaNganh === book.MaNganh);
 
+    const isThesis = book.NguonTaiLieu === 'Luận văn UIT' || book.MaTheLoai === 'C';
+    const bookColor =
+      book.TinhTrang !== 'Có sẵn'
+        ? '#F97316'
+        : isThesis
+          ? '#EC4899'
+          : NODE_COLORS.BOOK;
+
     nodeMap.set(bookId, {
       id: bookId,
       label: book.TenSach,
       type: 'BOOK',
-      color: book.TinhTrang === 'Có sẵn' ? '#0284C7' : '#EA580C',
+      color: bookColor,
       val: 9,
       subtitle: `${book.MaSach} · ${book.TinhTrang}`,
       book,
@@ -175,7 +183,7 @@ export function buildKnowledgeGraph(
           label: major.TenNganh,
           type: 'MAJOR',
           color: NODE_COLORS.MAJOR,
-          val: 13,
+          val: 36,
           subtitle: major.Khoa,
           meta: {
             'Mã ngành': major.MaNganh,
@@ -196,7 +204,7 @@ export function buildKnowledgeGraph(
           label: authorName,
           type: 'AUTHOR',
           color: NODE_COLORS.AUTHOR,
-          val: 6.5,
+          val: 4,
           subtitle: 'Tác giả học liệu',
           meta: {
             'Tác giả': authorName,
