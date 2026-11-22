@@ -6,12 +6,15 @@ import { SurfaceCard, SurfaceCardHeader } from '../../../components/ui/card';
 import { DataTable } from '../../../components/ui/data-table';
 import { ConfirmDialog } from '../../../components/ui/dialog';
 import type { Sach, UserRole } from '../../../types/library';
+import { AuthorsPanel } from './AuthorsPanel';
 import { buildBookColumns } from './bookColumns';
 import { BookFormModal } from './BookFormModal';
 import { useBooks } from './useBooks';
 
 export function BooksPage({ userRole }: { userRole: UserRole }) {
-  const canManage = userRole === 'ADMIN' || userRole === 'LIBRARIAN';
+  const canManage = userRole === 'ADMIN' || userRole === 'HEAD_LIBRARIAN' || userRole === 'LIBRARIAN';
+  const canDelete = userRole === 'ADMIN' || userRole === 'HEAD_LIBRARIAN';
+  const [subTab, setSubTab] = React.useState<'books' | 'authors'>('books');
   const {
     books,
     categories,
@@ -36,13 +39,14 @@ export function BooksPage({ userRole }: { userRole: UserRole }) {
     () =>
       buildBookColumns(
         canManage,
+        canDelete,
         (book) => {
           setEditing(book);
           setModalOpen(true);
         },
         (book) => setDeleteTarget(book)
       ),
-    [canManage]
+    [canManage, canDelete]
   );
 
   async function handleConfirmDelete() {
@@ -75,19 +79,46 @@ export function BooksPage({ userRole }: { userRole: UserRole }) {
           </p>
         </div>
         {canManage ? (
-          <Button
-            onClick={() => {
-              setEditing(null);
-              setModalOpen(true);
-            }}
-          >
-            <Plus className="w-4 h-4" />
-            Tiếp nhận sách mới
-          </Button>
+          <div className="flex items-center gap-2">
+            <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-xs font-medium">
+              <button
+                type="button"
+                onClick={() => setSubTab('books')}
+                className={`px-3 py-1.5 rounded-md transition-colors cursor-pointer ${
+                  subTab === 'books' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Sách &amp; Giáo trình
+              </button>
+              <button
+                type="button"
+                onClick={() => setSubTab('authors')}
+                className={`px-3 py-1.5 rounded-md transition-colors cursor-pointer ${
+                  subTab === 'authors' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Tác giả
+              </button>
+            </div>
+            {subTab === 'books' ? (
+              <Button
+                onClick={() => {
+                  setEditing(null);
+                  setModalOpen(true);
+                }}
+              >
+                <Plus className="w-4 h-4" />
+                Tiếp nhận sách mới
+              </Button>
+            ) : null}
+          </div>
         ) : null}
       </div>
 
-      <SurfaceCard>
+      {subTab === 'authors' && canManage ? (
+        <AuthorsPanel userRole={userRole} />
+      ) : (
+        <SurfaceCard>
         <SurfaceCardHeader
           title={`Danh mục học liệu (${books.length})`}
           description="Tìm theo mã sách, tên sách, tác giả, nhà xuất bản hoặc lọc theo thể loại và tình trạng"
@@ -149,6 +180,7 @@ export function BooksPage({ userRole }: { userRole: UserRole }) {
           emptyDescription="Hãy điều chỉnh bộ lọc hoặc từ khóa tra cứu."
         />
       </SurfaceCard>
+      )}
 
       {canManage ? (
         <BookFormModal

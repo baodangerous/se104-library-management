@@ -26,7 +26,7 @@ export const router = Router();
 router.get(
   '/baocao/bm71',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
   (req, res) => {
     const today = todayIsoDate();
     const thang = Number(req.query.thang) || Number(today.slice(5, 7));
@@ -73,7 +73,7 @@ router.get(
 router.get(
   '/baocao/bm72',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
   (req, res) => {
     const ngay =
       typeof req.query.ngay === 'string' && isValidIsoDate(req.query.ngay)
@@ -183,7 +183,7 @@ const thamSoSchema = z.object({
 router.put(
   '/thamso',
   requireAuth,
-  requireRole('ADMIN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN'),
   (req: AuthenticatedRequest, res) => {
     const parsed = thamSoSchema.safeParse(req.body);
     if (!parsed.success) return sendZodError(res, parsed.error);
@@ -236,7 +236,7 @@ const categorySchema = z.object({
 router.post(
   '/theloai',
   requireAuth,
-  requireRole('ADMIN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN'),
   (req: AuthenticatedRequest, res) => {
     const parsed = categorySchema.safeParse(req.body);
     if (!parsed.success) return sendZodError(res, parsed.error);
@@ -269,7 +269,7 @@ router.post(
 router.put(
   '/theloai/:id',
   requireAuth,
-  requireRole('ADMIN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN'),
   (req: AuthenticatedRequest, res) => {
     const id = req.params.id;
     const schema = z.object({
@@ -303,7 +303,7 @@ router.put(
 router.delete(
   '/theloai/:id',
   requireAuth,
-  requireRole('ADMIN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN'),
   (req: AuthenticatedRequest, res) => {
     const id = req.params.id;
     const existing = db
@@ -344,13 +344,21 @@ router.delete(
  * ADMIN: TAIKHOAN, NHATKY, BACKUP/RESTORE
  * =========================== */
 
-router.get('/taikhoan', requireAuth, requireRole('ADMIN'), (_req, res) => {
-  const rows = db
-    .prepare(
-      `SELECT MaTaiKhoan, TenDangNhap, HoTen, VaiTro, MaDocGia, TrangThai, NgayTao
-       FROM TAIKHOAN ORDER BY MaTaiKhoan ASC`
-    )
-    .all();
+router.get('/taikhoan', requireAuth, requireRole('ADMIN', 'HEAD_LIBRARIAN'), (req: AuthenticatedRequest, res) => {
+  const isHead = req.user!.VaiTro === 'HEAD_LIBRARIAN';
+  const rows = isHead
+    ? db
+        .prepare(
+          `SELECT MaTaiKhoan, TenDangNhap, HoTen, VaiTro, MaDocGia, TrangThai, NgayTao
+           FROM TAIKHOAN WHERE VaiTro IN ('LIBRARIAN', 'READER') ORDER BY MaTaiKhoan ASC`
+        )
+        .all()
+    : db
+        .prepare(
+          `SELECT MaTaiKhoan, TenDangNhap, HoTen, VaiTro, MaDocGia, TrangThai, NgayTao
+           FROM TAIKHOAN ORDER BY MaTaiKhoan ASC`
+        )
+        .all();
   res.json(rows);
 });
 
@@ -358,19 +366,25 @@ const createAccountSchema = z.object({
   TenDangNhap: z.string().trim().min(3, 'Tên đăng nhập tối thiểu 3 ký tự.'),
   MatKhau: z.string().min(6, 'Mật khẩu tối thiểu 6 ký tự.'),
   HoTen: z.string().trim().min(2, 'Họ tên tối thiểu 2 ký tự.'),
-  VaiTro: z.enum(['ADMIN', 'LIBRARIAN', 'READER']),
+  VaiTro: z.enum(['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'READER']),
   MaDocGia: z.string().trim().nullable().optional(),
 });
 
 router.post(
   '/taikhoan',
   requireAuth,
-  requireRole('ADMIN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN'),
   (req: AuthenticatedRequest, res) => {
     const parsed = createAccountSchema.safeParse(req.body);
     if (!parsed.success) return sendZodError(res, parsed.error);
 
     const d = parsed.data;
+    if (req.user!.VaiTro === 'HEAD_LIBRARIAN' && !['LIBRARIAN', 'READER'].includes(d.VaiTro)) {
+      res.status(403).json({
+        error: 'Phụ trách thư viện chỉ được phép tạo tài khoản Chuyên viên thư viện hoặc Độc giả.',
+      });
+      return;
+    }
     const exists = db
       .prepare('SELECT 1 FROM TAIKHOAN WHERE LOWER(TenDangNhap) = LOWER(?)')
       .get(d.TenDangNhap);
@@ -417,7 +431,7 @@ router.post(
 
 const updateAccountSchema = z.object({
   HoTen: z.string().trim().min(2).optional(),
-  VaiTro: z.enum(['ADMIN', 'LIBRARIAN', 'READER']).optional(),
+  VaiTro: z.enum(['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'READER']).optional(),
   MaDocGia: z.string().trim().nullable().optional(),
   TrangThai: z.enum(['ACTIVE', 'LOCKED']).optional(),
   MatKhauMoi: z.string().min(6, 'Mật khẩu mới tối thiểu 6 ký tự.').optional(),
@@ -426,7 +440,7 @@ const updateAccountSchema = z.object({
 router.put(
   '/taikhoan/:id',
   requireAuth,
-  requireRole('ADMIN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN'),
   (req: AuthenticatedRequest, res) => {
     const id = Number(req.params.id);
     const existing = db
@@ -440,6 +454,21 @@ router.put(
     const parsed = updateAccountSchema.safeParse(req.body);
     if (!parsed.success) return sendZodError(res, parsed.error);
     const d = parsed.data;
+
+    if (req.user!.VaiTro === 'HEAD_LIBRARIAN') {
+      if (!['LIBRARIAN', 'READER'].includes(existing.VaiTro)) {
+        res.status(403).json({
+          error: 'Phụ trách thư viện không được chỉnh sửa tài khoản Quản trị viên hoặc Phụ trách khác.',
+        });
+        return;
+      }
+      if (d.VaiTro && !['LIBRARIAN', 'READER'].includes(d.VaiTro)) {
+        res.status(403).json({
+          error: 'Phụ trách thư viện chỉ được phân quyền Chuyên viên thư viện hoặc Độc giả.',
+        });
+        return;
+      }
+    }
 
     if (id === req.user!.MaTaiKhoan && d.TrangThai === 'LOCKED') {
       res.status(400).json({ error: 'Không thể tự khóa tài khoản Quản trị viên đang đăng nhập.' });
@@ -491,7 +520,7 @@ router.put(
 router.delete(
   '/taikhoan/:id',
   requireAuth,
-  requireRole('ADMIN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN'),
   (req: AuthenticatedRequest, res) => {
     const id = Number(req.params.id);
     if (id === req.user!.MaTaiKhoan) {
@@ -503,6 +532,15 @@ router.delete(
       .get(id) as any;
     if (!existing) {
       res.status(404).json({ error: 'Không tìm thấy tài khoản.' });
+      return;
+    }
+    if (
+      req.user!.VaiTro === 'HEAD_LIBRARIAN' &&
+      !['LIBRARIAN', 'READER'].includes(existing.VaiTro)
+    ) {
+      res.status(403).json({
+        error: 'Phụ trách thư viện chỉ được xóa tài khoản Chuyên viên thư viện hoặc Độc giả.',
+      });
       return;
     }
 
@@ -519,7 +557,7 @@ router.delete(
   }
 );
 
-router.get('/nhatky', requireAuth, requireRole('ADMIN'), (req, res) => {
+router.get('/nhatky', requireAuth, requireRole('ADMIN', 'HEAD_LIBRARIAN'), (req, res) => {
   const limit = Math.min(200, Math.max(10, Number(req.query.limit) || 100));
   const rows = db
     .prepare('SELECT * FROM NHATKYTHAOTAC ORDER BY MaNhatKy DESC LIMIT ?')

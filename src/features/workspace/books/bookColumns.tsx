@@ -6,7 +6,8 @@ import { formatDateVn, formatVnd } from '../../../services/rules/dateUtils';
 import type { Sach } from '../../../types/library';
 
 export function buildBookColumns(
-  canManage: boolean,
+  canEdit: boolean,
+  canDelete: boolean,
   onEdit: (book: Sach) => void,
   onDelete: (book: Sach) => void
 ): DataTableColumn<Sach>[] {
@@ -83,7 +84,7 @@ export function buildBookColumns(
     },
   ];
 
-  if (!canManage) return base;
+  if (!canEdit && !canDelete) return base;
 
   return [
     ...base,
@@ -93,22 +94,26 @@ export function buildBookColumns(
       enableSorting: false,
       cell: ({ row }) => (
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={`Sửa sách ${row.original.TenSach}`}
-            onClick={() => onEdit(row.original)}
-          >
-            <Pencil className="w-4 h-4 text-slate-600" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={`Xóa sách ${row.original.TenSach}`}
-            onClick={() => onDelete(row.original)}
-          >
-            <Trash2 className="w-4 h-4 text-red-600" />
-          </Button>
+          {canEdit ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={`Sửa sách ${row.original.TenSach}`}
+              onClick={() => onEdit(row.original)}
+            >
+              <Pencil className="w-4 h-4 text-slate-600" />
+            </Button>
+          ) : null}
+          {canDelete ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={`Xóa sách ${row.original.TenSach}`}
+              onClick={() => onDelete(row.original)}
+            >
+              <Trash2 className="w-4 h-4 text-red-600" />
+            </Button>
+          ) : null}
         </div>
       ),
     },

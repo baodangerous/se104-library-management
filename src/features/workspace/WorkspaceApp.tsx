@@ -8,6 +8,7 @@ import { KnowledgeMapView } from '../portal/KnowledgeMapView';
 import { AccountsPage } from './admin/AccountsPage';
 import { AuditLogPage } from './admin/AuditLogPage';
 import { BackupPage } from './admin/BackupPage';
+import { NewsManagePage } from './admin/NewsManagePage';
 import { ServiceRequestsManagePage } from './admin/ServiceRequestsManagePage';
 import { BooksPage } from './books/BooksPage';
 import { DashboardPage } from './dashboard/DashboardPage';
@@ -107,10 +108,12 @@ export function WorkspaceApp({
         return <FinesPage />;
       case 'reports':
         return <ReportsPage />;
+      case 'news':
+        return <NewsManagePage />;
       case 'regulations':
         return <RegulationsPage />;
       case 'accounts':
-        return <AccountsPage />;
+        return <AccountsPage currentRole={user.VaiTro} />;
       case 'audit':
         return <AuditLogPage />;
       case 'backup':

@@ -6,7 +6,7 @@ export type {
   DashboardSummary,
 } from './reports';
 
-export type UserRole = 'ADMIN' | 'LIBRARIAN' | 'READER';
+export type UserRole = 'ADMIN' | 'HEAD_LIBRARIAN' | 'LIBRARIAN' | 'READER';
 
 export interface AuthUser {
   MaTaiKhoan: number;

@@ -54,7 +54,7 @@ router.get('/public/theloai', (_req, res) => {
 router.get(
   '/dashboard/summary',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
   (_req, res) => {
     const today = todayIsoDate();
     const books = getBooksWithStatus();
@@ -219,9 +219,121 @@ router.get('/theloai', requireAuth, (_req, res) => {
 });
 
 router.get('/tacgia', requireAuth, (_req, res) => {
-  const rows = db.prepare('SELECT * FROM TACGIA ORDER BY TenTacGia ASC').all();
+  const rows = db
+    .prepare(
+      `SELECT tg.*, COUNT(st.MaSach) AS SoLuongSach
+       FROM TACGIA tg
+       LEFT JOIN SACH_TACGIA st ON st.MaTacGia = tg.MaTacGia
+       GROUP BY tg.MaTacGia, tg.TenTacGia
+       ORDER BY tg.TenTacGia ASC`
+    )
+    .all();
   res.json(rows);
 });
+
+const authorBodySchema = z.object({
+  TenTacGia: z.string().trim().min(2, 'Tên tác giả tối thiểu 2 ký tự.'),
+});
+
+router.post(
+  '/tacgia',
+  requireAuth,
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
+  (req: AuthenticatedRequest, res) => {
+    const parsed = authorBodySchema.safeParse(req.body);
+    if (!parsed.success) return sendZodError(res, parsed.error);
+    const name = parsed.data.TenTacGia;
+    const dup = db.prepare('SELECT MaTacGia FROM TACGIA WHERE LOWER(TenTacGia) = LOWER(?)').get(name);
+    if (dup) {
+      res.status(400).json({ error: 'Tác giả này đã tồn tại trong hệ thống.' });
+      return;
+    }
+    const info = db.prepare('INSERT INTO TACGIA (TenTacGia) VALUES (?)').run(name);
+    writeAuditLog({
+      MaTaiKhoan: req.user!.MaTaiKhoan,
+      TenDangNhap: req.user!.TenDangNhap,
+      VaiTro: req.user!.VaiTro,
+      HanhDong: 'THEM_TAC_GIA',
+      BangTacDong: 'TACGIA',
+      ChiTiet: `Thêm tác giả "${name}" (#${info.lastInsertRowid}).`,
+    });
+    res.status(201).json({ MaTacGia: Number(info.lastInsertRowid), TenTacGia: name, SoLuongSach: 0 });
+  }
+);
+
+router.put(
+  '/tacgia/:id',
+  requireAuth,
+  requireRole('ADMIN', 'HEAD_LIBRARIAN'),
+  (req: AuthenticatedRequest, res) => {
+    const id = Number(req.params.id);
+    const existing = db.prepare('SELECT * FROM TACGIA WHERE MaTacGia = ?').get(id) as
+      | { MaTacGia: number; TenTacGia: string }
+      | undefined;
+    if (!existing) {
+      res.status(404).json({ error: 'Không tìm thấy tác giả.' });
+      return;
+    }
+    const parsed = authorBodySchema.safeParse(req.body);
+    if (!parsed.success) return sendZodError(res, parsed.error);
+    const name = parsed.data.TenTacGia;
+    const dup = db
+      .prepare('SELECT MaTacGia FROM TACGIA WHERE LOWER(TenTacGia) = LOWER(?) AND MaTacGia != ?')
+      .get(name, id);
+    if (dup) {
+      res.status(400).json({ error: 'Tên tác giả đã trùng với tác giả khác.' });
+      return;
+    }
+    db.prepare('UPDATE TACGIA SET TenTacGia = ? WHERE MaTacGia = ?').run(name, id);
+    writeAuditLog({
+      MaTaiKhoan: req.user!.MaTaiKhoan,
+      TenDangNhap: req.user!.TenDangNhap,
+      VaiTro: req.user!.VaiTro,
+      HanhDong: 'CAP_NHAT_TAC_GIA',
+      BangTacDong: 'TACGIA',
+      ChiTiet: `Đổi tên tác giả #${id}: "${existing.TenTacGia}" → "${name}".`,
+    });
+    const count = (
+      db.prepare('SELECT COUNT(*) AS cnt FROM SACH_TACGIA WHERE MaTacGia = ?').get(id) as { cnt: number }
+    ).cnt;
+    res.json({ MaTacGia: id, TenTacGia: name, SoLuongSach: count });
+  }
+);
+
+router.delete(
+  '/tacgia/:id',
+  requireAuth,
+  requireRole('ADMIN', 'HEAD_LIBRARIAN'),
+  (req: AuthenticatedRequest, res) => {
+    const id = Number(req.params.id);
+    const existing = db.prepare('SELECT * FROM TACGIA WHERE MaTacGia = ?').get(id) as
+      | { MaTacGia: number; TenTacGia: string }
+      | undefined;
+    if (!existing) {
+      res.status(404).json({ error: 'Không tìm thấy tác giả.' });
+      return;
+    }
+    const used = (
+      db.prepare('SELECT COUNT(*) AS cnt FROM SACH_TACGIA WHERE MaTacGia = ?').get(id) as { cnt: number }
+    ).cnt;
+    if (used > 0) {
+      res.status(400).json({
+        error: `Không thể xóa tác giả đang gắn với ${used} đầu sách. Hãy cập nhật lại sách trước.`,
+      });
+      return;
+    }
+    db.prepare('DELETE FROM TACGIA WHERE MaTacGia = ?').run(id);
+    writeAuditLog({
+      MaTaiKhoan: req.user!.MaTaiKhoan,
+      TenDangNhap: req.user!.TenDangNhap,
+      VaiTro: req.user!.VaiTro,
+      HanhDong: 'XOA_TAC_GIA',
+      BangTacDong: 'TACGIA',
+      ChiTiet: `Xóa tác giả #${id} – "${existing.TenTacGia}".`,
+    });
+    res.json({ success: true });
+  }
+);
 
 router.get('/sach', requireAuth, (req, res) => {
   const q = typeof req.query.q === 'string' ? req.query.q : undefined;
@@ -267,7 +379,7 @@ function upsertBookAuthors(maSach: string, tacGiaNames: string[]): void {
 router.post(
   '/sach',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
   (req: AuthenticatedRequest, res) => {
     const parsed = bookBodySchema.safeParse(req.body);
     if (!parsed.success) return sendZodError(res, parsed.error);
@@ -333,7 +445,7 @@ router.post(
 router.put(
   '/sach/:id',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
   (req: AuthenticatedRequest, res) => {
     const id = req.params.id;
     const existing = db.prepare('SELECT * FROM SACH WHERE MaSach = ?').get(id) as any;
@@ -399,7 +511,7 @@ router.put(
 router.delete(
   '/sach/:id',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN'),
   (req: AuthenticatedRequest, res) => {
     const id = req.params.id;
     const existing = db.prepare('SELECT * FROM SACH WHERE MaSach = ?').get(id) as any;

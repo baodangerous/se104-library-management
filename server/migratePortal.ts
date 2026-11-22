@@ -1,5 +1,7 @@
+import bcrypt from 'bcryptjs';
 import type Database from 'better-sqlite3';
 import { SEED_SACH, SEED_SACH_TACGIA, SEED_TACGIA } from '../src/database/seedBooks';
+import { SEED_TINTUC } from '../src/database/seedPortalData';
 import {
   createSeedBookRequests,
   createSeedBookings,
@@ -163,6 +165,67 @@ export function migrateAndSeedPortalTables(db: Database.Database): void {
       );
       for (const y of createSeedBookRequests(today)) {
         insReq.run(y.MaYeuCau, y.TenTaiLieu, y.TacGia, y.MaNganh, y.NguoiGui, y.Email, y.LyDo, y.NgayGui, y.TrangThai);
+      }
+    }
+
+    // Migrate TAIKHOAN CHECK constraint to allow HEAD_LIBRARIAN and seed phutrach@uit.edu.vn
+    const tkSqlRow = db
+      .prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'TAIKHOAN'")
+      .get() as { sql?: string } | undefined;
+    if (tkSqlRow?.sql && !tkSqlRow.sql.includes('HEAD_LIBRARIAN')) {
+      db.exec(`
+        PRAGMA foreign_keys = OFF;
+        CREATE TABLE TAIKHOAN_NEW (
+          MaTaiKhoan INTEGER PRIMARY KEY AUTOINCREMENT,
+          TenDangNhap TEXT NOT NULL UNIQUE,
+          MatKhauHash TEXT NOT NULL,
+          HoTen TEXT NOT NULL,
+          VaiTro TEXT NOT NULL CHECK (VaiTro IN ('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'READER')),
+          MaDocGia TEXT,
+          TrangThai TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (TrangThai IN ('ACTIVE', 'LOCKED')),
+          NgayTao TEXT NOT NULL,
+          FOREIGN KEY (MaDocGia) REFERENCES DOCGIA(MaDocGia) ON DELETE SET NULL
+        );
+        INSERT INTO TAIKHOAN_NEW (MaTaiKhoan, TenDangNhap, MatKhauHash, HoTen, VaiTro, MaDocGia, TrangThai, NgayTao)
+        SELECT MaTaiKhoan, TenDangNhap, MatKhauHash, HoTen, VaiTro, MaDocGia, TrangThai, NgayTao FROM TAIKHOAN;
+        DROP TABLE TAIKHOAN;
+        ALTER TABLE TAIKHOAN_NEW RENAME TO TAIKHOAN;
+        PRAGMA foreign_keys = ON;
+      `);
+    }
+
+    const hasHead = db
+      .prepare("SELECT 1 FROM TAIKHOAN WHERE TenDangNhap = 'phutrach@uit.edu.vn'")
+      .get();
+    if (!hasHead) {
+      const seedPass = process.env.DEMO_SEED_PASSWORD || 'UitLib@2026';
+      const hash = bcrypt.hashSync(seedPass, 10);
+      db.prepare(
+        `INSERT INTO TAIKHOAN (TenDangNhap, MatKhauHash, HoTen, VaiTro, MaDocGia, TrangThai, NgayTao)
+         VALUES ('phutrach@uit.edu.vn', ?, 'PGS.TS. Trần Minh Tuấn', 'HEAD_LIBRARIAN', NULL, 'ACTIVE', ?)`
+      ).run(hash, todayIsoDate());
+    }
+
+    // Portal News & Events table (CRUD for ADMIN & HEAD_LIBRARIAN)
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS PORTAL_TINTUC (
+        id TEXT PRIMARY KEY,
+        tieuDe TEXT NOT NULL,
+        ngayDang TEXT NOT NULL,
+        chuyenMuc TEXT NOT NULL,
+        hinhAnh TEXT,
+        duongDan TEXT,
+        tomTat TEXT NOT NULL
+      );
+    `);
+    const newsCount = (db.prepare('SELECT COUNT(*) as cnt FROM PORTAL_TINTUC').get() as { cnt: number }).cnt;
+    if (newsCount === 0) {
+      const insNews = db.prepare(
+        `INSERT OR IGNORE INTO PORTAL_TINTUC (id, tieuDe, ngayDang, chuyenMuc, hinhAnh, duongDan, tomTat)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`
+      );
+      for (const n of SEED_TINTUC) {
+        insNews.run(n.id, n.tieuDe, n.ngayDang, n.chuyenMuc, n.hinhAnh ?? null, n.duongDan ?? null, n.tomTat);
       }
     }
   });

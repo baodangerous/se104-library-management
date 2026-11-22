@@ -128,7 +128,7 @@ export function initSchema(): void {
       TenDangNhap TEXT NOT NULL UNIQUE,
       MatKhauHash TEXT NOT NULL,
       HoTen TEXT NOT NULL,
-      VaiTro TEXT NOT NULL CHECK (VaiTro IN ('ADMIN', 'LIBRARIAN', 'READER')),
+      VaiTro TEXT NOT NULL CHECK (VaiTro IN ('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'READER')),
       MaDocGia TEXT,
       TrangThai TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (TrangThai IN ('ACTIVE', 'LOCKED')),
       NgayTao TEXT NOT NULL,

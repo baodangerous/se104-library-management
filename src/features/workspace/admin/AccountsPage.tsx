@@ -11,11 +11,12 @@ import { useAccounts } from './useAccounts';
 
 const ROLE_TEXT: Record<UserRole, string> = {
   ADMIN: 'Quản trị viên',
-  LIBRARIAN: 'Thủ thư',
+  HEAD_LIBRARIAN: 'Phụ trách thư viện',
+  LIBRARIAN: 'Chuyên viên thư viện',
   READER: 'Độc giả UIT',
 };
 
-export function AccountsPage() {
+export function AccountsPage({ currentRole }: { currentRole: UserRole }) {
   const state = useAccounts();
 
   const columns = React.useMemo<DataTableColumn<TaiKhoan>[]>(
@@ -137,6 +138,7 @@ export function AccountsPage() {
         editing={state.editing}
         form={state.form}
         readers={state.readers}
+        currentRole={currentRole}
         saving={state.saving}
         onOpenChange={state.setModalOpen}
         onChangeForm={state.setForm}

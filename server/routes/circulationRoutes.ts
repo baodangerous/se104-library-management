@@ -26,7 +26,7 @@ export const router = Router();
 router.get(
   '/phieumuon',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
   (_req, res) => {
     const loans = db
       .prepare(
@@ -80,7 +80,7 @@ const createLoanSchema = z.object({
 router.post(
   '/phieumuon',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
   (req: AuthenticatedRequest, res) => {
     const parsed = createLoanSchema.safeParse(req.body);
     if (!parsed.success) return sendZodError(res, parsed.error);
@@ -187,7 +187,7 @@ router.post(
 router.get(
   '/docgia/:id/dang-muon',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
   (req, res) => {
     const rows = db
       .prepare(
@@ -215,7 +215,7 @@ router.get(
 router.get(
   '/phieutra',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
   (_req, res) => {
     const returns = db
       .prepare(
@@ -265,7 +265,7 @@ const createReturnSchema = z.object({
 router.post(
   '/phieutra',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
   (req: AuthenticatedRequest, res) => {
     const parsed = createReturnSchema.safeParse(req.body);
     if (!parsed.success) return sendZodError(res, parsed.error);
@@ -407,7 +407,7 @@ router.post(
 router.get(
   '/phieuthu',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
   (_req, res) => {
     const rows = db
       .prepare(
@@ -430,7 +430,7 @@ const createFineReceiptSchema = z.object({
 router.post(
   '/phieuthu',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
   (req: AuthenticatedRequest, res) => {
     const parsed = createFineReceiptSchema.safeParse(req.body);
     if (!parsed.success) return sendZodError(res, parsed.error);

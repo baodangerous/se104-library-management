@@ -39,6 +39,30 @@ export const portalService = {
     return SEED_TINTUC;
   },
 
+  async listNewsAsync(): Promise<TinHoatDong[]> {
+    return apiRequest<TinHoatDong[]>('/public/tintuc');
+  },
+
+  async createNews(payload: Omit<TinHoatDong, 'id'>): Promise<TinHoatDong> {
+    return apiRequest<TinHoatDong>('/tintuc', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async updateNews(id: string, payload: Partial<Omit<TinHoatDong, 'id'>>): Promise<TinHoatDong> {
+    return apiRequest<TinHoatDong>(`/tintuc/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async removeNews(id: string): Promise<{ success: boolean }> {
+    return apiRequest<{ success: boolean }>(`/tintuc/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+  },
+
   listThematicShelves(): TuSachChuyenDe[] {
     return SEED_TUSACHCHUYENDE;
   },

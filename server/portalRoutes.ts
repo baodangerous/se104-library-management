@@ -109,7 +109,7 @@ portalRouter.post('/public/yeucausach', (req, res) => {
 portalRouter.patch(
   '/yeucausach/:id/status',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
   (req: AuthenticatedRequest, res) => {
     const allowed = ['Đang tiếp nhận', 'Đã duyệt mua', 'Đã bổ sung'];
     const trangThai = String(req.body?.TrangThai || '');
@@ -227,7 +227,7 @@ portalRouter.get('/reader/profile', requireAuth, (req: AuthenticatedRequest, res
   res.json({ docGia, lichSuMuon, phieuThuPhat, thamSo });
 });
 
-portalRouter.get('/dashboard/summary', requireAuth, requireRole('ADMIN', 'LIBRARIAN'), (_req, res) => {
+portalRouter.get('/dashboard/summary', requireAuth, requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'), (_req, res) => {
   const today = todayIsoDate();
   const tongSach = (db.prepare('SELECT COUNT(*) as c FROM SACH').get() as { c: number }).c;
   const sachDangMuon = (db.prepare('SELECT COUNT(DISTINCT ct.MaSach) as c FROM CHITIETPHIEUMUON ct LEFT JOIN CHITIETPHIEUTRA tr ON tr.MaChiTietMuon = ct.MaChiTietMuon WHERE tr.MaChiTietTra IS NULL').get() as { c: number }).c;
@@ -274,3 +274,113 @@ portalRouter.get('/dashboard/summary', requireAuth, requireRole('ADMIN', 'LIBRAR
     muonTheoTheLoai: computeCategoryReportPercentages(catRaw).rows, xuHuongMuon6Thang, giaoDichGanDay,
   });
 });
+
+/* ===========================
+ * PORTAL NEWS & EVENTS CRUD (ADMIN & HEAD_LIBRARIAN)
+ * =========================== */
+
+portalRouter.get('/public/tintuc', (_req, res) => {
+  const rows = db.prepare('SELECT * FROM PORTAL_TINTUC ORDER BY rowid DESC').all();
+  res.json(rows);
+});
+
+portalRouter.post(
+  '/tintuc',
+  requireAuth,
+  requireRole('ADMIN', 'HEAD_LIBRARIAN'),
+  (req: AuthenticatedRequest, res) => {
+    const { tieuDe, ngayDang, chuyenMuc, hinhAnh, duongDan, tomTat } = req.body ?? {};
+    if (!tieuDe || String(tieuDe).trim().length < 4) {
+      return res.status(400).json({ error: 'Tiêu đề bài viết phải có ít nhất 4 ký tự.' });
+    }
+    if (!tomTat || String(tomTat).trim().length < 6) {
+      return res.status(400).json({ error: 'Tóm tắt bài viết phải có ít nhất 6 ký tự.' });
+    }
+    const id = `news-${Date.now()}`;
+    const todayParts = todayIsoDate().split('-');
+    const defaultDate = `${todayParts[2]}/${todayParts[1]}/${todayParts[0]}`;
+    const finalDate = String(ngayDang || '').trim() || defaultDate;
+    const cat = String(chuyenMuc || '').trim() || 'Tin hoạt động';
+    const img = hinhAnh ? String(hinhAnh).trim() : null;
+    const link = duongDan ? String(duongDan).trim() : null;
+
+    db.prepare(
+      `INSERT INTO PORTAL_TINTUC (id, tieuDe, ngayDang, chuyenMuc, hinhAnh, duongDan, tomTat)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`
+    ).run(id, String(tieuDe).trim(), finalDate, cat, img, link, String(tomTat).trim());
+
+    writeAuditLog({
+      MaTaiKhoan: req.user!.MaTaiKhoan,
+      TenDangNhap: req.user!.TenDangNhap,
+      VaiTro: req.user!.VaiTro,
+      HanhDong: 'DANG_TIN_TUC',
+      BangTacDong: 'PORTAL_TINTUC',
+      ChiTiet: `Đăng bài "${String(tieuDe).trim()}" (${cat}).`,
+    });
+
+    res.status(201).json(db.prepare('SELECT * FROM PORTAL_TINTUC WHERE id = ?').get(id));
+  }
+);
+
+portalRouter.put(
+  '/tintuc/:id',
+  requireAuth,
+  requireRole('ADMIN', 'HEAD_LIBRARIAN'),
+  (req: AuthenticatedRequest, res) => {
+    const existing = db.prepare('SELECT * FROM PORTAL_TINTUC WHERE id = ?').get(req.params.id) as any;
+    if (!existing) return res.status(404).json({ error: 'Không tìm thấy bài đăng.' });
+
+    const { tieuDe, ngayDang, chuyenMuc, hinhAnh, duongDan, tomTat } = req.body ?? {};
+    const nextTitle = tieuDe !== undefined ? String(tieuDe).trim() : existing.tieuDe;
+    const nextSummary = tomTat !== undefined ? String(tomTat).trim() : existing.tomTat;
+    if (nextTitle.length < 4 || nextSummary.length < 6) {
+      return res.status(400).json({ error: 'Tiêu đề hoặc tóm tắt bài viết quá ngắn.' });
+    }
+
+    db.prepare(
+      `UPDATE PORTAL_TINTUC
+       SET tieuDe = ?, ngayDang = ?, chuyenMuc = ?, hinhAnh = ?, duongDan = ?, tomTat = ?
+       WHERE id = ?`
+    ).run(
+      nextTitle,
+      ngayDang !== undefined ? String(ngayDang).trim() : existing.ngayDang,
+      chuyenMuc !== undefined ? String(chuyenMuc).trim() : existing.chuyenMuc,
+      hinhAnh !== undefined ? (String(hinhAnh).trim() || null) : existing.hinhAnh,
+      duongDan !== undefined ? (String(duongDan).trim() || null) : existing.duongDan,
+      nextSummary,
+      req.params.id
+    );
+
+    writeAuditLog({
+      MaTaiKhoan: req.user!.MaTaiKhoan,
+      TenDangNhap: req.user!.TenDangNhap,
+      VaiTro: req.user!.VaiTro,
+      HanhDong: 'CAP_NHAT_TIN_TUC',
+      BangTacDong: 'PORTAL_TINTUC',
+      ChiTiet: `Cập nhật bài viết ${req.params.id}: "${nextTitle}".`,
+    });
+
+    res.json(db.prepare('SELECT * FROM PORTAL_TINTUC WHERE id = ?').get(req.params.id));
+  }
+);
+
+portalRouter.delete(
+  '/tintuc/:id',
+  requireAuth,
+  requireRole('ADMIN', 'HEAD_LIBRARIAN'),
+  (req: AuthenticatedRequest, res) => {
+    const existing = db.prepare('SELECT * FROM PORTAL_TINTUC WHERE id = ?').get(req.params.id) as any;
+    if (!existing) return res.status(404).json({ error: 'Không tìm thấy bài đăng.' });
+
+    db.prepare('DELETE FROM PORTAL_TINTUC WHERE id = ?').run(req.params.id);
+    writeAuditLog({
+      MaTaiKhoan: req.user!.MaTaiKhoan,
+      TenDangNhap: req.user!.TenDangNhap,
+      VaiTro: req.user!.VaiTro,
+      HanhDong: 'XOA_TIN_TUC',
+      BangTacDong: 'PORTAL_TINTUC',
+      ChiTiet: `Xóa bài viết "${existing.tieuDe}".`,
+    });
+    res.json({ success: true });
+  }
+);

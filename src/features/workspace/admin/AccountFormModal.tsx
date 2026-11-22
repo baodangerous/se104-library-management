@@ -10,6 +10,7 @@ interface AccountFormModalProps {
   editing: TaiKhoan | null;
   form: AccountFormState;
   readers: DocGia[];
+  currentRole: UserRole;
   saving: boolean;
   onOpenChange: (open: boolean) => void;
   onChangeForm: React.Dispatch<React.SetStateAction<AccountFormState>>;
@@ -21,6 +22,7 @@ export function AccountFormModal({
   editing,
   form,
   readers,
+  currentRole,
   saving,
   onOpenChange,
   onChangeForm,
@@ -80,8 +82,13 @@ export function AccountFormModal({
                 onChangeForm((p) => ({ ...p, VaiTro: e.target.value as UserRole }))
               }
             >
-              <option value="ADMIN">ADMIN (Quản trị)</option>
-              <option value="LIBRARIAN">LIBRARIAN (Thủ thư)</option>
+              {currentRole === 'ADMIN' ? (
+                <>
+                  <option value="ADMIN">ADMIN (Quản trị viên)</option>
+                  <option value="HEAD_LIBRARIAN">HEAD_LIBRARIAN (Phụ trách thư viện)</option>
+                </>
+              ) : null}
+              <option value="LIBRARIAN">LIBRARIAN (Chuyên viên thư viện)</option>
               <option value="READER">READER (Độc giả)</option>
             </Select>
           </div>

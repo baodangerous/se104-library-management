@@ -31,7 +31,7 @@ router.get('/loaidocgia', requireAuth, (_req, res) => {
 router.get(
   '/docgia',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
   (req, res) => {
     const today = todayIsoDate();
     const q = typeof req.query.q === 'string' ? req.query.q.trim().toLowerCase() : '';
@@ -90,7 +90,7 @@ const readerBodySchema = z.object({
 router.post(
   '/docgia',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
   (req: AuthenticatedRequest, res) => {
     const parsed = readerBodySchema.safeParse(req.body);
     if (!parsed.success) return sendZodError(res, parsed.error);
@@ -150,7 +150,7 @@ router.post(
 router.put(
   '/docgia/:id',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
   (req: AuthenticatedRequest, res) => {
     const id = req.params.id;
     const existing = db.prepare('SELECT * FROM DOCGIA WHERE MaDocGia = ?').get(id) as any;
@@ -212,7 +212,7 @@ router.put(
 router.delete(
   '/docgia/:id',
   requireAuth,
-  requireRole('ADMIN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
   (req: AuthenticatedRequest, res) => {
     const id = req.params.id;
     const existing = db.prepare('SELECT * FROM DOCGIA WHERE MaDocGia = ?').get(id) as any;

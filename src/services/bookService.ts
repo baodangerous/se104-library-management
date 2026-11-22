@@ -1,5 +1,5 @@
 import { portalService } from './portalService';
-import type { Sach, ThamSo, TheLoai } from '../types/library';
+import type { Sach, TacGia, ThamSo, TheLoai } from '../types/library';
 import type { NgonNguSach, NguonTaiLieu } from '../types/portal';
 import { apiRequest, getAuthToken } from './apiClient';
 import { matchesVietnameseSearch } from './rules/searchUtils';
@@ -121,6 +121,30 @@ export const bookService = {
 
   async remove(maSach: string): Promise<{ success: boolean }> {
     return apiRequest<{ success: boolean }>(`/sach/${encodeURIComponent(maSach)}`, {
+      method: 'DELETE',
+    });
+  },
+
+  async listAuthors(): Promise<(TacGia & { SoLuongSach?: number })[]> {
+    return apiRequest<(TacGia & { SoLuongSach?: number })[]>('/tacgia');
+  },
+
+  async createAuthor(TenTacGia: string): Promise<TacGia & { SoLuongSach?: number }> {
+    return apiRequest<TacGia & { SoLuongSach?: number }>('/tacgia', {
+      method: 'POST',
+      body: JSON.stringify({ TenTacGia }),
+    });
+  },
+
+  async updateAuthor(id: number, TenTacGia: string): Promise<TacGia & { SoLuongSach?: number }> {
+    return apiRequest<TacGia & { SoLuongSach?: number }>(`/tacgia/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ TenTacGia }),
+    });
+  },
+
+  async removeAuthor(id: number): Promise<{ success: boolean }> {
+    return apiRequest<{ success: boolean }>(`/tacgia/${id}`, {
       method: 'DELETE',
     });
   },

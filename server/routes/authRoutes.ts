@@ -74,7 +74,7 @@ router.post('/auth/login', loginLimiter, (req, res) => {
 });
 
 router.post('/auth/demo-login', (req, res) => {
-  const roleSchema = z.object({ role: z.enum(['ADMIN', 'LIBRARIAN', 'READER']) });
+  const roleSchema = z.object({ role: z.enum(['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'READER']) });
   const parsed = roleSchema.safeParse(req.body);
   if (!parsed.success) return sendZodError(res, parsed.error);
 

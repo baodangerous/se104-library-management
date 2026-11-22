@@ -9,6 +9,7 @@ import {
   History,
   LayoutDashboard,
   Network,
+  Newspaper,
   SlidersHorizontal,
   UserCircle2,
   Users,
@@ -25,6 +26,7 @@ export type NavPageId =
   | 'fines'
   | 'service-requests'
   | 'reports'
+  | 'news'
   | 'regulations'
   | 'accounts'
   | 'audit'
@@ -42,7 +44,8 @@ export interface NavItem {
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   ADMIN: 'Quản trị viên',
-  LIBRARIAN: 'Thủ thư',
+  HEAD_LIBRARIAN: 'Phụ trách thư viện',
+  LIBRARIAN: 'Chuyên viên thư viện',
   READER: 'Sinh viên / Độc giả',
 };
 
@@ -51,7 +54,7 @@ export const NAV_ITEMS: NavItem[] = [
     id: 'dashboard',
     label: 'Tổng quan',
     section: 'Hoạt động chính',
-    roles: ['ADMIN', 'LIBRARIAN'],
+    roles: ['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'],
     icon: LayoutDashboard,
   },
   {
@@ -66,77 +69,84 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Kho sách & Tra cứu',
     readerLabel: 'Tra cứu học liệu',
     section: 'Học liệu & Độc giả',
-    roles: ['ADMIN', 'LIBRARIAN', 'READER'],
+    roles: ['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'READER'],
     icon: BookCopy,
   },
   {
     id: 'knowledge-map',
     label: 'Bản đồ tri thức',
     section: 'Học liệu & Độc giả',
-    roles: ['ADMIN', 'LIBRARIAN', 'READER'],
+    roles: ['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'READER'],
     icon: Network,
   },
   {
     id: 'readers',
     label: 'Quản lý độc giả',
     section: 'Học liệu & Độc giả',
-    roles: ['ADMIN', 'LIBRARIAN'],
+    roles: ['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'],
     icon: Users,
   },
   {
     id: 'loans',
     label: 'Cho mượn sách',
     section: 'Lưu thông & Tài chính',
-    roles: ['ADMIN', 'LIBRARIAN'],
+    roles: ['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'],
     icon: BookUp,
   },
   {
     id: 'returns',
     label: 'Nhận trả sách',
     section: 'Lưu thông & Tài chính',
-    roles: ['ADMIN', 'LIBRARIAN'],
+    roles: ['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'],
     icon: BookDown,
   },
   {
     id: 'service-requests',
     label: 'Yêu cầu & Đặt phòng',
     section: 'Lưu thông & Tài chính',
-    roles: ['ADMIN', 'LIBRARIAN'],
+    roles: ['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'],
     icon: SlidersHorizontal,
   },
   {
     id: 'fines',
     label: 'Thu tiền phạt',
     section: 'Lưu thông & Tài chính',
-    roles: ['ADMIN', 'LIBRARIAN'],
+    roles: ['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'],
     icon: CreditCard,
   },
   {
     id: 'reports',
     label: 'Báo cáo thống kê',
     section: 'Thống kê',
-    roles: ['ADMIN', 'LIBRARIAN'],
+    roles: ['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'],
     icon: BarChart3,
+  },
+  {
+    id: 'news',
+    label: 'Tin tức & Sự kiện',
+    section: 'Quản trị hệ thống',
+    roles: ['ADMIN', 'HEAD_LIBRARIAN'],
+    icon: Newspaper,
   },
   {
     id: 'regulations',
     label: 'Quy định thư viện',
     section: 'Quản trị hệ thống',
-    roles: ['ADMIN'],
+    roles: ['ADMIN', 'HEAD_LIBRARIAN'],
     icon: SlidersHorizontal,
   },
   {
     id: 'accounts',
     label: 'Tài khoản & Phân quyền',
     section: 'Quản trị hệ thống',
-    roles: ['ADMIN'],
+    roles: ['ADMIN', 'HEAD_LIBRARIAN'],
     icon: UserCircle2,
   },
   {
     id: 'audit',
     label: 'Nhật ký hoạt động',
     section: 'Quản trị hệ thống',
-    roles: ['ADMIN'],
+    roles: ['ADMIN', 'HEAD_LIBRARIAN'],
     icon: History,
   },
   {

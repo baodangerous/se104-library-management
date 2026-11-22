@@ -15,7 +15,16 @@ export function AboutPage({ books }: AboutPageProps) {
   const [roomCount, setRoomCount] = React.useState(0);
   const majors = React.useMemo(() => portalService.listMajors(), []);
   const portalConfig = React.useMemo(() => portalService.getConfig(), []);
-  const news = React.useMemo(() => portalService.listNews(), []);
+  const [news, setNews] = React.useState(() => portalService.listNews());
+
+  React.useEffect(() => {
+    portalService
+      .listNewsAsync()
+      .then((rows) => {
+        if (rows.length > 0) setNews(rows);
+      })
+      .catch(() => {});
+  }, []);
 
   React.useEffect(() => {
     portalService
