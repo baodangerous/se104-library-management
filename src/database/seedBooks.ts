@@ -3,6 +3,7 @@ import type { SachRow } from './schema';
 import { SEED_SACH_TACGIA } from './seedBookAuthors';
 import { SEED_SACH_MORE } from './seedBooksCatalog';
 import { SEED_SACH_EXTRA } from './seedBooksExtra';
+import { SEED_TEXTBOOK_AUTHORS, SEED_TEXTBOOK_BOOKS } from './seedTextbooks';
 
 export { SEED_SACH_TACGIA };
 
@@ -86,6 +87,7 @@ export const SEED_TACGIA: TacGia[] = [
   { MaTacGia: 71, TenTacGia: 'Jean-Claude Franchitti' },
   { MaTacGia: 72, TenTacGia: 'Udayan Das' },
   { MaTacGia: 73, TenTacGia: 'Shaun V. Ault' },
+  ...SEED_TEXTBOOK_AUTHORS,
 ];
 
 const SEED_SACH_CORE: SachRow[] = [
@@ -209,4 +211,9 @@ const SEED_SACH_CORE: SachRow[] = [
   },
 ];
 
-export const SEED_SACH: SachRow[] = [...SEED_SACH_CORE, ...SEED_SACH_MORE, ...SEED_SACH_EXTRA];
+export const SEED_SACH: SachRow[] = [
+  ...SEED_SACH_CORE,
+  ...SEED_SACH_MORE,
+  ...SEED_SACH_EXTRA,
+  ...SEED_TEXTBOOK_BOOKS,
+];
