@@ -215,10 +215,32 @@ portalRouter.get('/dashboard/summary', requireAuth, requireRole('ADMIN', 'LIBRAR
       soLuotTra: (db.prepare('SELECT COUNT(*) as c FROM CHITIETPHIEUTRA tr JOIN PHIEUTRA pt ON pt.MaPhieuTra = tr.MaPhieuTra WHERE pt.NgayTra LIKE ?').get(`${ym}%`) as { c: number }).c,
     };
   });
+  const recentLoans = db.prepare(
+    `SELECT 'MUON' as loai, pm.MaPhieuMuon as maPhieu, dg.HoTen as tenDocGia, pm.NgayMuon as ngay,
+            ('Mượn ' || (SELECT COUNT(*) FROM CHITIETPHIEUMUON c WHERE c.MaPhieuMuon = pm.MaPhieuMuon) || ' quyển sách') as moTa
+     FROM PHIEUMUON pm JOIN DOCGIA dg ON dg.MaDocGia = pm.MaDocGia
+     ORDER BY pm.NgayMuon DESC, pm.MaPhieuMuon DESC LIMIT 5`
+  ).all() as Array<{ loai: 'MUON'; maPhieu: string; tenDocGia: string; ngay: string; moTa: string }>;
+  const recentReturns = db.prepare(
+    `SELECT 'TRA' as loai, pt.MaPhieuTra as maPhieu, dg.HoTen as tenDocGia, pt.NgayTra as ngay,
+            ('Trả sách · Phạt ' || CAST(ROUND(pt.TongTienPhat) AS INTEGER) || ' đ') as moTa
+     FROM PHIEUTRA pt JOIN DOCGIA dg ON dg.MaDocGia = pt.MaDocGia
+     ORDER BY pt.NgayTra DESC, pt.MaPhieuTra DESC LIMIT 5`
+  ).all() as Array<{ loai: 'TRA'; maPhieu: string; tenDocGia: string; ngay: string; moTa: string }>;
+  const recentFines = db.prepare(
+    `SELECT 'THU_PHAT' as loai, p.MaPhieuThu as maPhieu, dg.HoTen as tenDocGia, p.NgayThu as ngay,
+            ('Thu ' || CAST(ROUND(p.SoTienThu) AS INTEGER) || ' đ · Còn nợ ' || CAST(ROUND(p.ConLai) AS INTEGER) || ' đ') as moTa
+     FROM PHIEUTHUTIENPHAT p JOIN DOCGIA dg ON dg.MaDocGia = p.MaDocGia
+     ORDER BY p.NgayThu DESC, p.MaPhieuThu DESC LIMIT 5`
+  ).all() as Array<{ loai: 'THU_PHAT'; maPhieu: string; tenDocGia: string; ngay: string; moTa: string }>;
+  const giaoDichGanDay = [...recentLoans, ...recentReturns, ...recentFines]
+    .sort((a, b) => b.ngay.localeCompare(a.ngay))
+    .slice(0, 8);
+
   res.json({
     tongSach, sachCoSan: tongSach - sachDangMuon, sachDangMuon, tongDocGia: readers.length,
     docGiaConHan: readers.filter((r) => diffDaysIso(r.NgayHetHan, today) >= 0).length,
     sachQuaHan, tongNoHienHanh: readers.reduce((s, r) => s + r.TongNo, 0), luotMuonThangNay,
-    muonTheoTheLoai: computeCategoryReportPercentages(catRaw).rows, xuHuongMuon6Thang, giaoDichGanDay: [],
+    muonTheoTheLoai: computeCategoryReportPercentages(catRaw).rows, xuHuongMuon6Thang, giaoDichGanDay,
   });
 });

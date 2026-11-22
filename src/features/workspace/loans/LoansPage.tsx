@@ -1,10 +1,33 @@
 import * as React from 'react';
+import { toast } from 'sonner';
+import { reservationService } from '../../../services/reservationService';
+import type { DatTruoc } from '../../../types/portal';
 import { LoanFormCard } from './LoanFormCard';
 import { LoanHistoryList } from './LoanHistoryList';
+import { ReservationsQueueCard } from './ReservationsQueueCard';
 import { useLoans } from './useLoans';
 
 export function LoansPage() {
   const { readers, books, loans, thamSo, loading, createLoan, renewLoanItem } = useLoans();
+  const [reservations, setReservations] = React.useState<DatTruoc[]>([]);
+
+  const loadReservations = React.useCallback(() => {
+    reservationService.list().then(setReservations).catch(() => {});
+  }, []);
+
+  React.useEffect(() => {
+    loadReservations();
+  }, [loadReservations, loans.length]);
+
+  async function handleCancelReservation(maDatTruoc: string) {
+    try {
+      await reservationService.cancel(maDatTruoc);
+      toast.success(`Đã hủy phiếu đặt trước ${maDatTruoc}.`);
+      loadReservations();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Không thể hủy đặt trước.');
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -28,6 +51,11 @@ export function LoansPage() {
         />
         <LoanHistoryList loans={loans} loading={loading} onRenewItem={renewLoanItem} />
       </div>
+
+      <ReservationsQueueCard
+        reservations={reservations}
+        onCancel={handleCancelReservation}
+      />
     </div>
   );
 }

@@ -5,25 +5,41 @@ import { Button } from '../../../components/ui/button';
 import { Card, CardBody } from '../../../components/ui/card';
 import { adminService, type ReaderProfileData } from '../../../services/adminService';
 import { circulationService } from '../../../services/circulationService';
+import { reservationService } from '../../../services/reservationService';
 import { diffDaysIso, formatDateVn, todayIsoDate } from '../../../services/rules/dateUtils';
+import type { DatTruoc } from '../../../types/portal';
 import type { NavPageId } from '../layout/navConfig';
 import { ReaderCardSummary } from './ReaderCardSummary';
 import { ReaderHistoryTables } from './ReaderHistoryTables';
+import { ReaderReservationsCard } from './ReaderReservationsCard';
 
 export function ReaderPortalPage({ onNavigate }: { onNavigate: (page: NavPageId) => void }) {
   const [data, setData] = React.useState<ReaderProfileData | null>(null);
+  const [reservations, setReservations] = React.useState<DatTruoc[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   const loadProfile = React.useCallback(() => {
     setLoading(true);
-    adminService
-      .getReaderProfile()
-      .then(setData)
+    Promise.all([adminService.getReaderProfile(), reservationService.list()])
+      .then(([profile, resList]) => {
+        setData(profile);
+        setReservations(resList);
+      })
       .catch((err) =>
         toast.error(err instanceof Error ? err.message : 'Lỗi tải hồ sơ độc giả')
       )
       .finally(() => setLoading(false));
   }, []);
+
+  async function handleCancelReservation(maDatTruoc: string) {
+    try {
+      await reservationService.cancel(maDatTruoc);
+      toast.success(`Đã hủy phiếu đặt trước ${maDatTruoc}.`);
+      loadProfile();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Không thể hủy đặt trước.');
+    }
+  }
 
   React.useEffect(() => {
     loadProfile();
@@ -97,6 +113,11 @@ export function ReaderPortalPage({ onNavigate }: { onNavigate: (page: NavPageId)
         today={today}
         isCardExpired={isExpired}
         onRenewLoan={handleRenewLoan}
+      />
+
+      <ReaderReservationsCard
+        reservations={reservations}
+        onCancel={handleCancelReservation}
       />
     </div>
   );
