@@ -1,9 +1,8 @@
+import { portalService } from './portalService';
 import type { Sach, ThamSo, TheLoai } from '../types/library';
 import type { NgonNguSach, NguonTaiLieu } from '../types/portal';
-import { hydrateBooks, linkBookAuthors } from './bookHydrator';
-import { validateBookIntake } from './rules/catalogRules';
+import { apiRequest, getAuthToken } from './apiClient';
 import { matchesVietnameseSearch } from './rules/searchUtils';
-import { appendAuditLog, loadDb, mutateDb, nextPrefixedId } from '../database/dbEngine';
 
 export interface BookInput {
   TenSach: string;
@@ -34,134 +33,91 @@ export interface BookSearchFilters {
   hideBorrowerName?: boolean;
 }
 
+function applyClientFilters(books: Sach[], filters?: BookSearchFilters): Sach[] {
+  let rows = books.map((b) => ({
+    ...b,
+    TenNganh: b.TenNganh || portalService.getMajorName(b.MaNganh),
+  }));
+  if (filters?.q?.trim()) {
+    rows = rows.filter((b) =>
+      matchesVietnameseSearch(filters.q!, [
+        b.MaSach,
+        b.TenSach,
+        b.NhaXuatBan,
+        b.TenTheLoai,
+        b.TenNganh,
+        b.MaNganh,
+        b.MoTa,
+        ...b.TacGiaList,
+      ])
+    );
+  }
+  if (filters?.maTheLoai && filters.maTheLoai !== 'ALL') {
+    rows = rows.filter((b) => b.MaTheLoai === filters.maTheLoai);
+  }
+  if (filters?.maNganh && filters.maNganh !== 'ALL') {
+    rows = rows.filter((b) => b.MaNganh === filters.maNganh);
+  }
+  if (filters?.nguon && filters.nguon !== 'ALL') {
+    rows = rows.filter((b) => b.NguonTaiLieu === filters.nguon);
+  }
+  if (filters?.ngonNgu && filters.ngonNgu !== 'ALL') {
+    rows = rows.filter((b) => b.NgonNgu === filters.ngonNgu);
+  }
+  if (filters?.tinhTrang && filters.tinhTrang !== 'ALL') {
+    rows = rows.filter((b) => b.TinhTrang === filters.tinhTrang);
+  }
+  if (filters?.chuDe && filters.chuDe !== 'ALL') {
+    rows = rows.filter((b) => b.ChuDe === filters.chuDe);
+  }
+  if (filters?.noiBat) {
+    rows = rows.filter((b) => b.NoiBat);
+  }
+  return rows;
+}
+
 export const bookService = {
   async list(filters?: BookSearchFilters): Promise<Sach[]> {
-    const db = loadDb();
-    let rows = hydrateBooks(db, Boolean(filters?.hideBorrowerName));
-    if (filters?.q?.trim()) {
-      rows = rows.filter((b) =>
-        matchesVietnameseSearch(filters.q!, [
-          b.MaSach,
-          b.TenSach,
-          b.NhaXuatBan,
-          b.TenTheLoai,
-          b.TenNganh,
-          b.MaNganh,
-          b.MoTa,
-          ...b.TacGiaList,
-        ])
-      );
-    }
-    if (filters?.maTheLoai && filters.maTheLoai !== 'ALL') {
-      rows = rows.filter((b) => b.MaTheLoai === filters.maTheLoai);
-    }
-    if (filters?.maNganh && filters.maNganh !== 'ALL') {
-      rows = rows.filter((b) => b.MaNganh === filters.maNganh);
-    }
-    if (filters?.nguon && filters.nguon !== 'ALL') {
-      rows = rows.filter((b) => b.NguonTaiLieu === filters.nguon);
-    }
-    if (filters?.ngonNgu && filters.ngonNgu !== 'ALL') {
-      rows = rows.filter((b) => b.NgonNgu === filters.ngonNgu);
-    }
-    if (filters?.tinhTrang && filters.tinhTrang !== 'ALL') {
-      rows = rows.filter((b) => b.TinhTrang === filters.tinhTrang);
-    }
-    if (filters?.chuDe && filters.chuDe !== 'ALL') {
-      rows = rows.filter((b) => b.ChuDe === filters.chuDe);
-    }
-    if (filters?.noiBat) {
-      rows = rows.filter((b) => b.NoiBat);
-    }
-    return rows;
+    const endpoint =
+      !filters?.hideBorrowerName && getAuthToken() ? '/sach' : '/public/sach';
+    const raw = await apiRequest<Sach[]>(endpoint);
+    return applyClientFilters(raw, filters);
   },
 
   async listPublic(filters?: BookSearchFilters): Promise<Sach[]> {
-    return this.list({ ...filters, hideBorrowerName: true });
+    const raw = await apiRequest<Sach[]>('/public/sach');
+    return applyClientFilters(raw, { ...filters, hideBorrowerName: true });
   },
 
   async listCategories(): Promise<TheLoai[]> {
-    const db = loadDb();
-    return db.THELOAI.map((tl) => ({
-      ...tl,
-      SoLuongSach: db.SACH.filter((s) => s.MaTheLoai === tl.MaTheLoai).length,
-    }));
+    return apiRequest<TheLoai[]>('/public/theloai');
   },
 
   async listPublicCategories(): Promise<TheLoai[]> {
-    return this.listCategories();
+    return apiRequest<TheLoai[]>('/public/theloai');
   },
 
   async getParams(): Promise<ThamSo> {
-    return loadDb().THAMSO[0];
+    return apiRequest<ThamSo>('/thamso');
   },
 
   async create(payload: BookInput): Promise<Sach> {
-    return mutateDb((db) => {
-      const check = validateBookIntake(payload.NamXuatBan, payload.NgayNhap, payload.TriGia, db.THAMSO[0]);
-      if (!check.valid) throw new Error(check.error);
-      const maSach = nextPrefixedId(db.SACH.map((s) => s.MaSach), 'S');
-      db.SACH.push({
-        MaSach: maSach,
-        TenSach: payload.TenSach.trim(),
-        MaTheLoai: payload.MaTheLoai,
-        NamXuatBan: payload.NamXuatBan,
-        NhaXuatBan: payload.NhaXuatBan.trim(),
-        NgayNhap: payload.NgayNhap,
-        TriGia: payload.TriGia,
-        MaNganh: payload.MaNganh || 'CNTT',
-        NgonNgu: payload.NgonNgu || 'Tiếng Việt',
-        NguonTaiLieu:
-          payload.NguonTaiLieu ||
-          (payload.MaTheLoai === 'A' ? 'Giáo trình UIT' : payload.MaTheLoai === 'C' ? 'Luận văn UIT' : 'Sách Tiếng Việt'),
-        ChuDe: payload.ChuDe,
-        NoiBat: payload.NoiBat,
-        MaKeSach: payload.MaKeSach || 'T1-MOI-01',
-        MoTa: payload.MoTa,
-      });
-      linkBookAuthors(db, maSach, payload.TacGiaList);
-      appendAuditLog(db, 'THEM_SACH', 'SACH', `Tiếp nhận sách mới ${maSach}: ${payload.TenSach}`);
-      return hydrateBooks(db).find((b) => b.MaSach === maSach)!;
+    return apiRequest<Sach>('/sach', {
+      method: 'POST',
+      body: JSON.stringify(payload),
     });
   },
 
   async update(maSach: string, payload: BookInput): Promise<Sach> {
-    return mutateDb((db) => {
-      const idx = db.SACH.findIndex((s) => s.MaSach === maSach);
-      if (idx === -1) throw new Error('Không tìm thấy đầu sách cần cập nhật.');
-      const check = validateBookIntake(payload.NamXuatBan, payload.NgayNhap, payload.TriGia, db.THAMSO[0]);
-      if (!check.valid) throw new Error(check.error);
-      db.SACH[idx] = {
-        ...db.SACH[idx],
-        TenSach: payload.TenSach.trim(),
-        MaTheLoai: payload.MaTheLoai,
-        NamXuatBan: payload.NamXuatBan,
-        NhaXuatBan: payload.NhaXuatBan.trim(),
-        NgayNhap: payload.NgayNhap,
-        TriGia: payload.TriGia,
-        MaNganh: payload.MaNganh || db.SACH[idx].MaNganh,
-        NgonNgu: payload.NgonNgu || db.SACH[idx].NgonNgu,
-        NguonTaiLieu: payload.NguonTaiLieu || db.SACH[idx].NguonTaiLieu,
-        ChuDe: payload.ChuDe !== undefined ? payload.ChuDe : db.SACH[idx].ChuDe,
-        NoiBat: payload.NoiBat !== undefined ? payload.NoiBat : db.SACH[idx].NoiBat,
-        MaKeSach: payload.MaKeSach !== undefined ? payload.MaKeSach : db.SACH[idx].MaKeSach,
-        MoTa: payload.MoTa !== undefined ? payload.MoTa : db.SACH[idx].MoTa,
-      };
-      linkBookAuthors(db, maSach, payload.TacGiaList);
-      appendAuditLog(db, 'SUA_SACH', 'SACH', `Cập nhật thông tin sách ${maSach}.`);
-      return hydrateBooks(db).find((b) => b.MaSach === maSach)!;
+    return apiRequest<Sach>(`/sach/${encodeURIComponent(maSach)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
     });
   },
 
   async remove(maSach: string): Promise<{ success: boolean }> {
-    return mutateDb((db) => {
-      if (db.CHITIETPHIEUMUON.some((c) => c.MaSach === maSach)) {
-        throw new Error('Không thể xóa sách đã phát sinh lịch sử mượn/trả.');
-      }
-      db.SACH = db.SACH.filter((s) => s.MaSach !== maSach);
-      db.SACH_TACGIA = db.SACH_TACGIA.filter((l) => l.MaSach !== maSach);
-      appendAuditLog(db, 'XOA_SACH', 'SACH', `Xóa đầu sách ${maSach}.`);
-      return { success: true };
+    return apiRequest<{ success: boolean }>(`/sach/${encodeURIComponent(maSach)}`, {
+      method: 'DELETE',
     });
   },
 };

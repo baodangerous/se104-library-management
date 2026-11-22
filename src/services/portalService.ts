@@ -1,4 +1,10 @@
-import { loadDb } from '../database/dbEngine';
+import { SEED_HUONGDAN } from '../database/seedGuideData';
+import { SEED_NGANHHOC } from '../database/seedMajors';
+import {
+  SEED_CAUHINHCONG,
+  SEED_TINTUC,
+  SEED_TUSACHCHUYENDE,
+} from '../database/seedPortalData';
 import type {
   LibraryGuideData,
   LibraryPortalConfig,
@@ -6,45 +12,46 @@ import type {
   TinHoatDong,
   TuSachChuyenDe,
 } from '../types/portal';
+import { apiRequest } from './apiClient';
 
-/**
- * Centralized portal data access layer reading exclusively from src/database/dbEngine.ts.
- */
 export const portalService = {
   listMajors(): NganhHoc[] {
-    return loadDb().NGANHHOC;
+    return SEED_NGANHHOC;
   },
 
   getMajorByCode(maNganh?: string): NganhHoc | undefined {
     if (!maNganh) return undefined;
-    return loadDb().NGANHHOC.find((m) => m.MaNganh === maNganh);
+    return SEED_NGANHHOC.find((m) => m.MaNganh === maNganh);
   },
 
   getMajorName(maNganh?: string): string {
     if (!maNganh) return 'Chung';
-    return loadDb().NGANHHOC.find((m) => m.MaNganh === maNganh)?.TenNganh || maNganh;
+    return SEED_NGANHHOC.find((m) => m.MaNganh === maNganh)?.TenNganh || maNganh;
   },
 
   getMajorImage(maNganh?: string): string {
     const code = maNganh || 'CNTT';
-    const major = loadDb().NGANHHOC.find((m) => m.MaNganh === code);
+    const major = SEED_NGANHHOC.find((m) => m.MaNganh === code);
     return major?.HinhAnh || `/resources/majors/${code}.jpg`;
   },
 
   listNews(): TinHoatDong[] {
-    return loadDb().TINTUC;
+    return SEED_TINTUC;
   },
 
   listThematicShelves(): TuSachChuyenDe[] {
-    return loadDb().TUSACHCHUYENDE;
+    return SEED_TUSACHCHUYENDE;
   },
 
   getConfig(): LibraryPortalConfig {
-    return loadDb().CAUHINHCONG;
+    return SEED_CAUHINHCONG;
   },
 
   getGuide(): LibraryGuideData {
-    return loadDb().HUONGDAN;
+    return SEED_HUONGDAN;
+  },
+
+  async getPublicStats(): Promise<{ roomCount: number; readerCount: number }> {
+    return apiRequest<{ roomCount: number; readerCount: number }>('/public/stats');
   },
 };
-

@@ -1,6 +1,5 @@
 import type { LichDatPhong, PhongHop, YeuCauTaiLieu } from '../types/portal';
-import { diffDaysIso, isValidIsoDate, todayIsoDate } from './rules/dateUtils';
-import { appendAuditLog, loadDb, mutateDb, nextPrefixedId } from '../database/dbEngine';
+import { apiRequest } from './apiClient';
 
 export interface RoomBookingInput {
   MaPhong: string;
@@ -23,98 +22,36 @@ export interface BookRequestInput {
 
 export const serviceRequestService = {
   async listRooms(): Promise<PhongHop[]> {
-    return loadDb().PHONGHOP;
+    return apiRequest<PhongHop[]>('/public/rooms');
   },
 
   async listRoomBookings(ngayDat?: string): Promise<LichDatPhong[]> {
-    const db = loadDb();
-    const list = ngayDat
-      ? db.DATPHONG.filter((b) => b.NgayDat === ngayDat)
-      : db.DATPHONG;
-    return [...list].sort((a, b) => b.NgayDat.localeCompare(a.NgayDat));
+    const query = ngayDat ? `?ngayDat=${encodeURIComponent(ngayDat)}` : '';
+    return apiRequest<LichDatPhong[]>(`/public/datphong${query}`);
   },
 
   async createRoomBooking(payload: RoomBookingInput): Promise<LichDatPhong> {
-    return mutateDb((db) => {
-      if (!isValidIsoDate(payload.NgayDat)) {
-        throw new Error('Ngày đặt phòng không hợp lệ.');
-      }
-      if (diffDaysIso(payload.NgayDat, todayIsoDate()) < 0) {
-        throw new Error('Không thể đặt phòng cho ngày trong quá khứ.');
-      }
-      const room = db.PHONGHOP.find((p) => p.MaPhong === payload.MaPhong);
-      if (!room) throw new Error('Không tìm thấy phòng họp nhóm.');
-      if (room.TrangThai !== 'Sẵn sàng') {
-        throw new Error('Phòng họp này hiện đang bảo trì.');
-      }
-      const conflict = db.DATPHONG.some(
-        (b) =>
-          b.TrangThai === 'Đã xác nhận' &&
-          b.MaPhong === payload.MaPhong &&
-          b.NgayDat === payload.NgayDat &&
-          b.KhungGio === payload.KhungGio
-      );
-      if (conflict) {
-        throw new Error(
-          `${room.TenPhong} đã có nhóm đặt trong khung giờ ${payload.KhungGio} ngày ${payload.NgayDat}.`
-        );
-      }
-      const booking: LichDatPhong = {
-        MaDatPhong: nextPrefixedId(db.DATPHONG.map((b) => b.MaDatPhong), 'DP'),
-        MaPhong: room.MaPhong,
-        TenPhong: room.TenPhong,
-        NguoiDat: payload.NguoiDat.trim(),
-        MaSoSV: payload.MaSoSV.trim(),
-        Email: payload.Email.trim(),
-        NgayDat: payload.NgayDat,
-        KhungGio: payload.KhungGio,
-        MucDich: payload.MucDich.trim() || 'Thảo luận nhóm học tập',
-        TrangThai: 'Đã xác nhận',
-      };
-      db.DATPHONG.unshift(booking);
-      appendAuditLog(
-        db,
-        'DAT_PHONG',
-        'PHONGHOP',
-        `${booking.NguoiDat} (${booking.MaSoSV}) đặt ${room.TenPhong} lúc ${booking.KhungGio} ngày ${booking.NgayDat}.`
-      );
-      return booking;
+    return apiRequest<LichDatPhong>('/public/datphong', {
+      method: 'POST',
+      body: JSON.stringify(payload),
     });
   },
 
   async cancelRoomBooking(maDatPhong: string): Promise<{ success: boolean }> {
-    return mutateDb((db) => {
-      const target = db.DATPHONG.find((b) => b.MaDatPhong === maDatPhong);
-      if (!target) throw new Error('Không tìm thấy lịch đặt phòng.');
-      target.TrangThai = 'Đã hủy';
-      appendAuditLog(db, 'HUY_DAT_PHONG', 'PHONGHOP', `Hủy lịch đặt phòng ${maDatPhong}.`);
-      return { success: true };
-    });
+    return apiRequest<{ success: boolean }>(
+      `/public/datphong/${encodeURIComponent(maDatPhong)}/cancel`,
+      { method: 'PATCH' }
+    );
   },
 
   async listBookRequests(): Promise<YeuCauTaiLieu[]> {
-    return [...loadDb().YEUCAUTAILIEU];
+    return apiRequest<YeuCauTaiLieu[]>('/public/yeucausach');
   },
 
   async createBookRequest(payload: BookRequestInput): Promise<YeuCauTaiLieu> {
-    return mutateDb((db) => {
-      if (!payload.TenTaiLieu.trim() || !payload.NguoiGui.trim()) {
-        throw new Error('Vui lòng nhập tên tài liệu và họ tên người yêu cầu.');
-      }
-      const req: YeuCauTaiLieu = {
-        MaYeuCau: nextPrefixedId(db.YEUCAUTAILIEU.map((y) => y.MaYeuCau), 'YC'),
-        TenTaiLieu: payload.TenTaiLieu.trim(),
-        TacGia: payload.TacGia.trim() || 'Chưa rõ tác giả',
-        MaNganh: payload.MaNganh || 'CNTT',
-        NguoiGui: payload.NguoiGui.trim(),
-        Email: payload.Email.trim(),
-        LyDo: payload.LyDo.trim() || 'Phục vụ học tập và nghiên cứu tại UIT',
-        NgayGui: todayIsoDate(),
-        TrangThai: 'Đang tiếp nhận',
-      };
-      db.YEUCAUTAILIEU.unshift(req);
-      appendAuditLog(db, 'YEU_CAU_SACH', 'YEUCAUTAILIEU', `${req.NguoiGui} đề xuất bổ sung "${req.TenTaiLieu}".`);
-      return req;
+    return apiRequest<YeuCauTaiLieu>('/public/yeucausach', {
+      method: 'POST',
+      body: JSON.stringify(payload),
     });
   },
 };

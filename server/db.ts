@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { addDaysIso, addMonthsIso, todayIsoDate } from '../src/lib/businessRules';
+import { migrateAndSeedPortalTables } from './migratePortal';
 
 const DATA_DIR = path.resolve(process.cwd(), 'data');
 fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -608,3 +609,4 @@ export function generateNextId(
 // Initialize schema and seed immediately on module load
 initSchema();
 seedInitialData();
+migrateAndSeedPortalTables(db);

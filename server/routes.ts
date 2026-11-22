@@ -21,8 +21,10 @@ import {
   type AuthenticatedRequest,
 } from './auth';
 import { db, generateNextId, getSeedPassword, writeAuditLog } from './db';
+import { portalRouter } from './portalRoutes';
 
 export const apiRouter = Router();
+apiRouter.use(portalRouter);
 
 function getThamSo(): ThamSo {
   return db.prepare('SELECT * FROM THAMSO WHERE MaThamSo = 1').get() as ThamSo;
@@ -44,6 +46,14 @@ function getBooksWithStatus(filters?: {
         s.NhaXuatBan,
         s.NgayNhap,
         s.TriGia,
+        s.MaNganh,
+        s.NgonNgu,
+        s.NguonTaiLieu,
+        s.ChuDe,
+        s.NoiBat,
+        s.MaKeSach,
+        s.AnhBia,
+        s.MoTa,
         (
           SELECT GROUP_CONCAT(tg.TenTacGia, ', ')
           FROM SACH_TACGIA st
@@ -94,6 +104,14 @@ function getBooksWithStatus(filters?: {
     NhaXuatBan: string;
     NgayNhap: string;
     TriGia: number;
+    MaNganh: string | null;
+    NgonNgu: string | null;
+    NguonTaiLieu: string | null;
+    ChuDe: string | null;
+    NoiBat: number;
+    MaKeSach: string | null;
+    AnhBia: string | null;
+    MoTa: string | null;
     TacGiaJoined: string | null;
     TacGiaIdsJoined: string | null;
     TinhTrang: 'Có sẵn' | 'Đang mượn';
@@ -110,6 +128,14 @@ function getBooksWithStatus(filters?: {
     NhaXuatBan: r.NhaXuatBan,
     NgayNhap: r.NgayNhap,
     TriGia: r.TriGia,
+    MaNganh: r.MaNganh || 'CNTT',
+    NgonNgu: r.NgonNgu || 'Tiếng Việt',
+    NguonTaiLieu: r.NguonTaiLieu || 'Giáo trình UIT',
+    ChuDe: r.ChuDe || undefined,
+    NoiBat: Boolean(r.NoiBat),
+    MaKeSach: r.MaKeSach || 'T1-CNTT-01',
+    AnhBia: r.AnhBia || undefined,
+    MoTa: r.MoTa || undefined,
     TacGiaList: r.TacGiaJoined ? r.TacGiaJoined.split(', ') : [],
     TacGiaIds: r.TacGiaIdsJoined
       ? r.TacGiaIdsJoined.split(',').map((n) => Number(n))
@@ -734,10 +760,11 @@ apiRouter.post(
     }
 
     const maSach = generateNextId('SACH', 'MaSach', 'S');
+    const meta = req.body ?? {};
     const tx = db.transaction(() => {
       db.prepare(
-        `INSERT INTO SACH (MaSach, TenSach, MaTheLoai, NamXuatBan, NhaXuatBan, NgayNhap, TriGia)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO SACH (MaSach, TenSach, MaTheLoai, NamXuatBan, NhaXuatBan, NgayNhap, TriGia, MaNganh, NgonNgu, NguonTaiLieu, ChuDe, NoiBat, MaKeSach, AnhBia, MoTa)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       ).run(
         maSach,
         data.TenSach,
@@ -745,7 +772,15 @@ apiRouter.post(
         data.NamXuatBan,
         data.NhaXuatBan,
         ngayNhap,
-        data.TriGia
+        data.TriGia,
+        meta.MaNganh || 'CNTT',
+        meta.NgonNgu || 'Tiếng Việt',
+        meta.NguonTaiLieu || 'Giáo trình UIT',
+        meta.ChuDe ?? null,
+        meta.NoiBat ? 1 : 0,
+        meta.MaKeSach || 'T1-MOI-01',
+        meta.AnhBia ?? null,
+        meta.MoTa ?? null
       );
       upsertBookAuthors(maSach, data.TacGiaList);
     });
@@ -789,10 +824,14 @@ apiRouter.put(
       return;
     }
 
+    const meta = req.body ?? {};
     const tx = db.transaction(() => {
       db.prepare(
         `UPDATE SACH
-         SET TenSach = ?, MaTheLoai = ?, NamXuatBan = ?, NhaXuatBan = ?, NgayNhap = ?, TriGia = ?
+         SET TenSach = ?, MaTheLoai = ?, NamXuatBan = ?, NhaXuatBan = ?, NgayNhap = ?, TriGia = ?,
+             MaNganh = COALESCE(?, MaNganh), NgonNgu = COALESCE(?, NgonNgu),
+             NguonTaiLieu = COALESCE(?, NguonTaiLieu), ChuDe = COALESCE(?, ChuDe),
+             MaKeSach = COALESCE(?, MaKeSach), MoTa = COALESCE(?, MoTa)
          WHERE MaSach = ?`
       ).run(
         data.TenSach,
@@ -801,6 +840,12 @@ apiRouter.put(
         data.NhaXuatBan,
         ngayNhap,
         data.TriGia,
+        meta.MaNganh ?? null,
+        meta.NgonNgu ?? null,
+        meta.NguonTaiLieu ?? null,
+        meta.ChuDe ?? null,
+        meta.MaKeSach ?? null,
+        meta.MoTa ?? null,
         id
       );
       upsertBookAuthors(id, data.TacGiaList);
@@ -886,6 +931,7 @@ apiRouter.get(
         ct.HanTra,
         pt.NgayTra,
         tr.TienPhat,
+        COALESCE(ct.SoLanGiaHan, 0) AS SoLanGiaHan,
         CASE WHEN tr.MaChiTietTra IS NOT NULL THEN 1 ELSE 0 END AS DaTra
        FROM CHITIETPHIEUMUON ct
        JOIN PHIEUMUON pm ON pm.MaPhieuMuon = ct.MaPhieuMuon
@@ -1185,6 +1231,23 @@ apiRouter.post(
           insertCTPT.run(maPhieuTra, item.MaChiTietMuon, item.TienPhat);
         }
 
+        // Auto-hold returned books for waiting reservations
+        const heldReservations: Array<{ MaSach: string; HoTenDocGia: string }> = [];
+        for (const item of itemsToReturn) {
+          const waiting = db
+            .prepare(
+              `SELECT dt.MaDatTruoc, dg.HoTen
+               FROM DATTRUOC dt JOIN DOCGIA dg ON dg.MaDocGia = dt.MaDocGia
+               WHERE dt.MaSach = ? AND dt.TrangThai = 'Đang chờ'
+               ORDER BY dt.NgayDat ASC, dt.MaDatTruoc ASC LIMIT 1`
+            )
+            .get(item.MaSach) as { MaDatTruoc: string; HoTen: string } | undefined;
+          if (waiting) {
+            db.prepare(`UPDATE DATTRUOC SET TrangThai = 'Đã giữ chỗ' WHERE MaDatTruoc = ?`).run(waiting.MaDatTruoc);
+            heldReservations.push({ MaSach: item.MaSach, HoTenDocGia: waiting.HoTen });
+          }
+        }
+
         // Accumulate fine into DOCGIA.TongNo in the same ACID transaction
         const newTongNo = reader.TongNo + tongTienPhat;
         db.prepare('UPDATE DOCGIA SET TongNo = ? WHERE MaDocGia = ?').run(
@@ -1209,6 +1272,7 @@ apiRouter.post(
           TongTienPhat: tongTienPhat,
           TongNoMoi: newTongNo,
           ChiTiet: itemsToReturn,
+          HeldReservations: heldReservations,
         };
       })();
 

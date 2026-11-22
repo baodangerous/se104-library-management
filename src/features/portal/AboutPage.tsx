@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { BookOpen, CheckCircle2, Clock, DoorOpen, GraduationCap, MapPin, Users } from 'lucide-react';
 import { portalService } from '../../services/portalService';
-import { readerService } from '../../services/readerService';
-import { serviceRequestService } from '../../services/serviceRequestService';
 import type { Sach } from '../../types/library';
 
 interface AboutPageProps {
@@ -16,12 +14,16 @@ export function AboutPage({ books }: AboutPageProps) {
   const portalConfig = React.useMemo(() => portalService.getConfig(), []);
 
   React.useEffect(() => {
-    Promise.all([readerService.list(), serviceRequestService.listRooms()]).then(
-      ([readers, rooms]) => {
-        setReaderCount(readers.length);
-        setRoomCount(rooms.length);
-      }
-    );
+    portalService
+      .getPublicStats()
+      .then((stats) => {
+        setReaderCount(stats.readerCount);
+        setRoomCount(stats.roomCount);
+      })
+      .catch(() => {
+        setReaderCount(0);
+        setRoomCount(0);
+      });
   }, []);
 
   const availableBooks = books.filter((b) => b.TinhTrang === 'Có sẵn').length;

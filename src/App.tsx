@@ -15,6 +15,18 @@ export default function App() {
     return initialSession?.mode ?? 'portal';
   });
 
+  React.useEffect(() => {
+    if (!initialSession?.user) return;
+    authService.verifySession().then((verified) => {
+      if (!verified) {
+        setUser(null);
+        setMode('portal');
+      } else {
+        setUser(verified);
+      }
+    });
+  }, [initialSession]);
+
   function updateMode(nextMode: 'portal' | 'workspace') {
     setMode(nextMode);
     if (user) {

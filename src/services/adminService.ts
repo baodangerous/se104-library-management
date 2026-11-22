@@ -1,93 +1,60 @@
 import type {
+  ChiTietPhieuMuon,
+  DocGia,
   NhatKyThaoTac,
+  PhieuThuTienPhat,
   TaiKhoan,
   ThamSo,
   TheLoai,
   UserRole,
 } from '../types/library';
-import {
-  applyBackupSnapshot,
-  buildBackupSnapshot,
-  buildReaderProfile,
-  type ReaderProfileData,
-} from './readerProfileService';
-import { validateRegulationParams } from './rules/catalogRules';
-import { todayIsoDate } from './rules/dateUtils';
-import {
-  appendAuditLog,
-  getCurrentActor,
-  loadDb,
-  mutateDb,
-  nextNumericId,
-} from '../database/dbEngine';
+import { apiRequest } from './apiClient';
 
-export type { ReaderProfileData };
+export interface ReaderProfileData {
+  docGia: DocGia | null;
+  lichSuMuon: ChiTietPhieuMuon[];
+  phieuThuPhat: PhieuThuTienPhat[];
+  thamSo: ThamSo;
+}
 
 export const adminService = {
   async getParams(): Promise<ThamSo> {
-    return loadDb().THAMSO[0];
+    return apiRequest<ThamSo>('/thamso');
   },
 
   async updateParams(payload: Omit<ThamSo, 'MaThamSo'>): Promise<ThamSo> {
-    return mutateDb((db) => {
-      const check = validateRegulationParams(payload);
-      if (!check.valid) throw new Error(check.error);
-      db.THAMSO[0] = { MaThamSo: 1, ...payload };
-      appendAuditLog(
-        db,
-        'CAP_NHAT_QUY_DINH',
-        'THAMSO',
-        `Cập nhật tham số: tuổi ${payload.TuoiToiThieu}-${payload.TuoiToiDa}, thẻ ${payload.ThoiHanThe} tháng, mượn tối đa ${payload.SoSachMuonToiDa} quyển/${payload.SoNgayMuonToiDa} ngày.`
-      );
-      return db.THAMSO[0];
+    return apiRequest<ThamSo>('/thamso', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
     });
   },
 
   async listCategories(): Promise<TheLoai[]> {
-    const db = loadDb();
-    return db.THELOAI.map((tl) => ({
-      ...tl,
-      SoLuongSach: db.SACH.filter((s) => s.MaTheLoai === tl.MaTheLoai).length,
-    }));
+    return apiRequest<TheLoai[]>('/theloai');
   },
 
   async createCategory(payload: { MaTheLoai: string; TenTheLoai: string }): Promise<TheLoai> {
-    return mutateDb((db) => {
-      const code = payload.MaTheLoai.trim().toUpperCase();
-      if (db.THELOAI.some((c) => c.MaTheLoai === code)) {
-        throw new Error(`Mã thể loại "${code}" đã tồn tại.`);
-      }
-      const created: TheLoai = { MaTheLoai: code, TenTheLoai: payload.TenTheLoai.trim(), SoLuongSach: 0 };
-      db.THELOAI.push(created);
-      appendAuditLog(db, 'THEM_THELOAI', 'THELOAI', `Thêm thể loại ${code} – ${created.TenTheLoai}.`);
-      return created;
+    return apiRequest<TheLoai>('/theloai', {
+      method: 'POST',
+      body: JSON.stringify(payload),
     });
   },
 
   async updateCategory(maTheLoai: string, tenTheLoai: string): Promise<TheLoai> {
-    return mutateDb((db) => {
-      const cat = db.THELOAI.find((c) => c.MaTheLoai === maTheLoai);
-      if (!cat) throw new Error('Không tìm thấy thể loại.');
-      cat.TenTheLoai = tenTheLoai.trim();
-      appendAuditLog(db, 'SUA_THELOAI', 'THELOAI', `Đổi tên thể loại ${maTheLoai} thành "${cat.TenTheLoai}".`);
-      return cat;
+    return apiRequest<TheLoai>(`/theloai/${encodeURIComponent(maTheLoai)}`, {
+      method: 'PUT',
+      body: JSON.stringify({ TenTheLoai: tenTheLoai }),
     });
   },
 
   async deleteCategory(maTheLoai: string): Promise<{ success: boolean }> {
-    return mutateDb((db) => {
-      const refCount = db.SACH.filter((s) => s.MaTheLoai === maTheLoai).length;
-      if (refCount > 0) {
-        throw new Error(`Không thể xóa thể loại này vì đang có ${refCount} đầu sách thuộc thể loại.`);
-      }
-      db.THELOAI = db.THELOAI.filter((c) => c.MaTheLoai !== maTheLoai);
-      appendAuditLog(db, 'XOA_THELOAI', 'THELOAI', `Xóa thể loại ${maTheLoai}.`);
-      return { success: true };
+    return apiRequest<{ success: boolean }>(`/theloai/${encodeURIComponent(maTheLoai)}`, {
+      method: 'DELETE',
     });
   },
 
   async listAccounts(): Promise<TaiKhoan[]> {
-    return loadDb().TAIKHOAN.map(({ MatKhauDemo: _pw, ...acc }) => acc);
+    return apiRequest<TaiKhoan[]>('/taikhoan');
   },
 
   async createAccount(payload: {
@@ -97,24 +64,9 @@ export const adminService = {
     VaiTro: UserRole;
     MaDocGia: string | null;
   }): Promise<TaiKhoan> {
-    return mutateDb((db) => {
-      if (db.TAIKHOAN.some((a) => a.TenDangNhap.toLowerCase() === payload.TenDangNhap.trim().toLowerCase())) {
-        throw new Error('Tên đăng nhập đã tồn tại.');
-      }
-      const row = {
-        MaTaiKhoan: nextNumericId(db.TAIKHOAN.map((a) => a.MaTaiKhoan)),
-        TenDangNhap: payload.TenDangNhap.trim(),
-        HoTen: payload.HoTen.trim(),
-        VaiTro: payload.VaiTro,
-        MaDocGia: payload.VaiTro === 'READER' ? payload.MaDocGia : null,
-        TrangThai: 'ACTIVE' as const,
-        NgayTao: todayIsoDate(),
-        MatKhauDemo: payload.MatKhau,
-      };
-      db.TAIKHOAN.push(row);
-      appendAuditLog(db, 'TAO_TAIKHOAN', 'TAIKHOAN', `Tạo tài khoản ${row.TenDangNhap} (${row.VaiTro}).`);
-      const { MatKhauDemo: _pw, ...safe } = row;
-      return safe;
+    return apiRequest<TaiKhoan>('/taikhoan', {
+      method: 'POST',
+      body: JSON.stringify(payload),
     });
   },
 
@@ -128,45 +80,34 @@ export const adminService = {
       MatKhauMoi?: string;
     }
   ): Promise<TaiKhoan> {
-    return mutateDb((db) => {
-      const row = db.TAIKHOAN.find((a) => a.MaTaiKhoan === maTaiKhoan);
-      if (!row) throw new Error('Không tìm thấy tài khoản.');
-      if (payload.HoTen) row.HoTen = payload.HoTen.trim();
-      if (payload.VaiTro) row.VaiTro = payload.VaiTro;
-      if (payload.TrangThai) row.TrangThai = payload.TrangThai;
-      if (payload.MaDocGia !== undefined) row.MaDocGia = payload.MaDocGia;
-      if (payload.MatKhauMoi) row.MatKhauDemo = payload.MatKhauMoi;
-      appendAuditLog(db, 'SUA_TAIKHOAN', 'TAIKHOAN', `Cập nhật tài khoản ${row.TenDangNhap}.`);
-      const { MatKhauDemo: _pw, ...safe } = row;
-      return safe;
+    return apiRequest<TaiKhoan>(`/taikhoan/${maTaiKhoan}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
     });
   },
 
   async deleteAccount(maTaiKhoan: number): Promise<{ success: boolean }> {
-    return mutateDb((db) => {
-      const actor = getCurrentActor();
-      if (actor?.MaTaiKhoan === maTaiKhoan) {
-        throw new Error('Không thể tự xóa tài khoản đang đăng nhập.');
-      }
-      db.TAIKHOAN = db.TAIKHOAN.filter((a) => a.MaTaiKhoan !== maTaiKhoan);
-      appendAuditLog(db, 'XOA_TAIKHOAN', 'TAIKHOAN', `Xóa tài khoản #${maTaiKhoan}.`);
-      return { success: true };
+    return apiRequest<{ success: boolean }>(`/taikhoan/${maTaiKhoan}`, {
+      method: 'DELETE',
     });
   },
 
   async listAuditLogs(limit = 150): Promise<NhatKyThaoTac[]> {
-    return loadDb().NHATKYTHAOTAC.slice(0, limit);
+    return apiRequest<NhatKyThaoTac[]>(`/nhatky?limit=${limit}`);
   },
 
   async exportBackup(): Promise<Record<string, unknown>> {
-    return buildBackupSnapshot();
+    return apiRequest<Record<string, unknown>>('/hethong/backup');
   },
 
   async restoreBackup(snapshot: Record<string, unknown>): Promise<{ success: boolean }> {
-    return applyBackupSnapshot(snapshot);
+    return apiRequest<{ success: boolean }>('/hethong/restore', {
+      method: 'POST',
+      body: JSON.stringify(snapshot),
+    });
   },
 
   async getReaderProfile(): Promise<ReaderProfileData> {
-    return buildReaderProfile();
+    return apiRequest<ReaderProfileData>('/reader/profile');
   },
 };
