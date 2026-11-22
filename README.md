@@ -1,7 +1,57 @@
-# HỆ THỐNG QUẢN LÝ THƯ VIỆN
+<div align="center">
+  <img src="public/images/uit-library-logo.png" alt="Logo Thư viện UIT" width="110" />
 
-**Đồ án môn học SE104.R11 – Nhập môn Công nghệ phần mềm**  
-Trường Đại học Công nghệ Thông tin – Đại học Quốc gia TP. Hồ Chí Minh (UIT – ĐHQG-HCM)
+  <h1>HỆ THỐNG QUẢN LÝ &amp; CỔNG THÔNG TIN THƯ VIỆN UIT</h1>
+
+  <p>
+    <strong>Đồ án môn học SE104.R11 – Nhập môn Công nghệ phần mềm</strong><br/>
+    Trường Đại học Công nghệ Thông tin – Đại học Quốc gia TP. Hồ Chí Minh (UIT – ĐHQG-HCM)<br/>
+    <em>Toà nhà A, Khu phố 34, Phường Linh Xuân, TP. Hồ Chí Minh</em>
+  </p>
+
+  <p>
+    <img src="https://img.shields.io/badge/React-19-1556d6?style=for-the-badge&logo=react&logoColor=white" alt="React 19" />
+    <img src="https://img.shields.io/badge/TypeScript-5+-0a2b86?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+    <img src="https://img.shields.io/badge/Tailwind_CSS-4-0284c7?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS 4" />
+    <img src="https://img.shields.io/badge/Express_%2B_SQLite-WAL-0b7a4b?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite" />
+    <img src="https://img.shields.io/badge/Auth-JWT_%2B_Bcrypt-f2b84a?style=for-the-badge&logoColor=0a1f4d" alt="JWT Auth" />
+  </p>
+
+  <p>
+    <a href="#1-thông-tin-chung">Thông tin đồ án</a> •
+    <a href="#2-tính-năng--phân-quyền-hệ-thống">Tính năng &amp; Phân quyền</a> •
+    <a href="#3-kiến-trúc--công-nghệ">Kiến trúc</a> •
+    <a href="#4-cấu-trúc-thư-mục">Cấu trúc thư mục</a> •
+    <a href="#5-cài-đặt--khởi-chạy">Cài đặt &amp; Kiểm thử</a>
+  </p>
+</div>
+
+---
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="50%">
+        <img src="public/resources/library/welcome-uit-lens.jpg" alt="Welcome to UIT" width="100%" /><br/>
+        <sub><strong>Cổng tra cứu &amp; Khám phá tri thức UIT</strong></sub>
+      </td>
+      <td align="center" width="50%">
+        <img src="public/resources/library/floor2-study-window.jpg" alt="Không gian đọc tầng 2" width="100%" /><br/>
+        <sub><strong>Không gian đọc tại chỗ &amp; kho mở Tầng 2</strong></sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" width="50%">
+        <img src="public/resources/library/ground-pair-collab.jpg" alt="Khu tự học tầng trệt" width="100%" /><br/>
+        <sub><strong>Khu vực tự học tự do Tầng trệt</strong></sub>
+      </td>
+      <td align="center" width="50%">
+        <img src="public/resources/library/room-a201.jpg" alt="Phòng học nhóm A2.01" width="100%" /><br/>
+        <sub><strong>Phòng học nhóm A2.01 – Đặt lịch trực tuyến</strong></sub>
+      </td>
+    </tr>
+  </table>
+</div>
 
 ---
 
@@ -9,129 +59,135 @@ Trường Đại học Công nghệ Thông tin – Đại học Quốc gia TP. H
 
 | Hạng mục | Nội dung |
 | :--- | :--- |
-| **Đề tài** | Quản lý Thư viện |
-| **Môn học** | SE104.R11 – Nhập môn Công nghệ phần mềm |
-| **Giảng viên hướng dẫn** | TS. Đỗ Thị Thanh Tuyền |
-| **Nhóm thực hiện** | Nhóm 19 |
+| **Đề tài** | Hệ thống Quản lý &amp; Cổng thông tin Thư viện UIT |
+| **Môn học** | SE104.R11 – Nhập môn Công nghệ phần mềm (4 tín chỉ: 3 LT · 1 TH) |
+| **Môn học trước** | IT002, IT004 (Hệ số điểm: Quá trình `0.3` · Đồ án `0.7`) |
+| **Giảng viên hướng dẫn** | **TS. Đỗ Thị Thanh Tuyền** |
+| **Đơn vị thực tế tham chiếu** | Phòng Đảm bảo chất lượng, Thư viện và Pháp chế – UIT |
 
-### Danh sách thành viên Nhóm 19
-
+### Thành viên thực hiện (Nhóm 19)
 
 | STT | Họ và tên | MSSV |
 | :---: | :--- | :---: |
-| 1 | Lâm Chí Dĩnh | 23520291 |
-| 2 | Nguyễn Lê Bảo Đăng | 23520230 |
-| 3 | Nguyễn Hoàng Lộc | 23520858 |
-| 4 | Nguyễn Thị Minh Thư | 23521543 |
-| 5 | Nguyễn Trường Vũ | 23521812 |
+| 1 | **Lâm Chí Dĩnh** | `23520291` |
+| 2 | **Nguyễn Lê Bảo Đăng** | `23520230` |
+| 3 | **Nguyễn Hoàng Lộc** | `23520858` |
+| 4 | **Nguyễn Thị Minh Thư** | `23521543` |
+| 5 | **Nguyễn Trường Vũ** | `23521812` |
 
 ---
 
-## 2. Thông tin học phần và Mục tiêu môn học
+## 2. Tính năng &amp; Phân quyền hệ thống
 
-### Thông tin học phần
+Hệ thống kết hợp **Cổng bạn đọc công khai (Public Portal)** và **Không gian làm việc phân quyền (Workspace)** đồng bộ dữ liệu trực tiếp qua REST API &amp; SQLite.
 
-| Thuộc tính | Giá trị |
+### Phân quyền theo tác nhân (RBAC)
+
+| Vai trò | Quyền hạn &amp; Chức năng chính |
 | :--- | :--- |
-| **Số tín chỉ** | 4 (Lý thuyết: 3 · Thực hành: 1) |
-| **Môn học trước** | IT002, IT004 |
-| **Môn học tiên quyết** | Không |
-| **Hệ số điểm** | Quá trình: `0.3` · Đồ án: `0.7` (Lý thuyết, Thực hành, Đồ án) |
+| **Khách / Bạn đọc vô danh** | Tra cứu danh mục không dấu (`Ctrl+K`), lọc theo 12 ngành UIT, xem Bản đồ Tri thức, đặt phòng họp nhóm, gửi đề xuất bổ sung tài liệu, tra cứu quy tắc tài khoản 13 số, xem giờ mở cửa realtime và hỏi **UIT LibBot**. |
+| **Độc giả (`READER`)** | Toàn bộ quyền khách + Đặt trước / giữ chỗ sách, theo dõi trạng thái thẻ, xem sách đang mượn, gia hạn trực tuyến, xem lịch sử trả và công nợ tiền phạt cá nhân. |
+| **Thủ thư (`LIBRARIAN`)** | Tiếp nhận sách, quản lý hồ sơ độc giả &amp; gia hạn thẻ, lập phiếu mượn – nhận trả (tự động giữ chỗ cho người đặt trước), thu tiền phạt, xử lý yêu cầu sách &amp; lịch đặt phòng, xem báo cáo BM7.1/BM7.2. |
+| **Quản trị viên (`ADMIN`)** | Toàn bộ quyền Thủ thư + Quản lý thể loại, điều chỉnh tham số quy định, cấp/khóa tài khoản, xem nhật ký thao tác hệ thống (`NHATKYTHAOTAC`) và sao lưu/khôi phục dữ liệu JSON. |
 
-### Mục tiêu môn học
+### Điểm nổi bật về giao diện &amp; nghiệp vụ
 
-1. Tổng quan về Công nghệ phần mềm.
-2. Xác định và mô hình hóa yêu cầu phần mềm.
-3. Thiết kế phần mềm.
-4. Cài đặt phần mềm.
-5. Kiểm thử và bảo trì.
-6. Thực hiện đồ án môn học theo quy trình kỹ nghệ phần mềm chuẩn.
+- **Cổng thông tin tối giản chuẩn 60/30/10:** Bố cục rộng `1120px`, Hero tìm kiếm tập trung, lưới **12 ngành đào tạo UIT** kèm ảnh chính thức, **Bản đồ Tri thức** tương tác 2D (`react-force-graph-2d`), hỗ trợ Light/Dark mode.
+- **Trạng thái mở cửa Realtime:** Tự động tính giờ mở cửa theo múi giờ Việt Nam (`T2–T6: 07:30–18:00`, `T7: 08:00–16:00`), hiển thị đồng hồ từng giây và đếm ngược đóng/mở cửa.
+- **Hướng dẫn không gian tương tác &amp; Dữ liệu thật UIT:** Tích hợp ảnh thực tế Tầng trệt, Tầng 2, phòng A2.01–A2.02, cơ cấu nhân sự, thống kê chính thức đến 28/08/2026 và sự kiện nổi bật của Thư viện UIT.
+- **Trợ lý ảo UIT LibBot:** Mini-RAG kết hợp Gemini API (`gemini-2.5-flash`) và Local Smart Engine tra cứu sách trực tiếp, giải đáp tài khoản 13 số, quy định mượn–trả và giờ phục vụ.
 
 ---
 
-## 3. Giới thiệu bài toán và Quy trình thực hiện
+## 3. Kiến trúc &amp; Công nghệ
 
-### 3.1. Bài toán cần giải quyết
+```mermaid
+flowchart LR
+  UI["React 19 + Tailwind CSS 4\n(Portal & Workspace)"] -->|"JWT Bearer Token"| API["Express REST API\n(server/routes.ts, portalRoutes.ts)"]
+  UI -->|"Mini-RAG Context"| BOT["UIT LibBot\n(server/chatbotRoute.ts)"]
+  API -->|"ACID Transactions (WAL)"| DB[("SQLite\n(data/uit_library.sqlite)")]
+  BOT -->|"Optional"| GEMINI["Google Gemini API"]
+```
 
-Hệ thống được xây dựng nhằm tin học hóa toàn diện quy trình nghiệp vụ tại thư viện đại học, giải quyết các bài toán cốt lõi:
-
-- **Quản lý độc giả và thẻ thư viện:** Lập thẻ mới, kiểm tra điều kiện độ tuổi hợp lệ, tự động tính ngày hết hạn thẻ, hỗ trợ gia hạn thẻ và theo dõi công nợ cá nhân.
-- **Quản lý kho sách và tra cứu học liệu:** Tiếp nhận sách mới theo quy định khoảng cách năm xuất bản, chuẩn hóa tác giả – thể loại – ngành học, xác định trạng thái sách (`Có sẵn` / `Đang mượn`) động từ dữ liệu lưu thông thay vì lưu cứng.
-- **Quản lý lưu thông (Mượn – Trả – Gia hạn – Thu phạt):** Kiểm tra đồng thời các điều kiện cho mượn (hạn thẻ, tình trạng sách, sách quá hạn, số lượng mượn tối đa), hỗ trợ gia hạn trực tuyến khi chưa quá hạn, tính tiền phạt trả trễ theo ngày, lập biên lai thu tiền phạt và cập nhật công nợ nhất quán.
-- **Thống kê và báo cáo:** Tổng hợp tình hình mượn sách theo thể loại (tháng/năm), thống kê sách trả trễ theo ngày và hỗ trợ xuất/in biểu mẫu.
-- **Cổng tra cứu và dịch vụ trực tuyến:** Hỗ trợ sinh viên tra cứu không dấu (`Ctrl+K`), khám phá bản đồ tri thức liên kết ngành học – thể loại – sách – tác giả, đặt phòng học nhóm theo khung giờ và đề xuất bổ sung tài liệu.
-
-### 3.2. Quy trình thực hiện các công việc chính
-
-1. **Xác định và mô hình hóa yêu cầu phần mềm:** Khảo sát nghiệp vụ quản lý thư viện, phân tích tác nhân (`ADMIN`, `LIBRARIAN`, `READER`, khách tra cứu), xây dựng danh sách yêu cầu chức năng và phi chức năng, mô hình hóa Use Case và luồng nghiệp vụ.
-2. **Thiết kế hệ thống:** Phân tách kiến trúc phân lớp rõ ràng giữa tầng giao diện (`features/`), tầng dịch vụ nghiệp vụ (`services/`), tầng quy tắc (`services/rules/`) và tầng lưu trữ (`database/`), đảm bảo khả năng bảo trì và mở rộng sang kiến trúc client–server.
-3. **Thiết kế dữ liệu:** Chuẩn hóa mô hình dữ liệu quan hệ gồm 12 bảng nghiệp vụ cốt lõi và các bảng mở rộng hệ thống:
-   - *12 bảng cốt lõi:* `LOAIDOCGIA`, `DOCGIA`, `THELOAI`, `TACGIA`, `SACH` (không lưu cột `TinhTrang`), `SACH_TACGIA`, `PHIEUMUON`, `CHITIETPHIEUMUON`, `PHIEUTRA`, `CHITIETPHIEUTRA`, `PHIEUTHUTIENPHAT`, `THAMSO`.
-   - *Bảng mở rộng:* `TAIKHOAN`, `NHATKYTHAOTAC`, `NGANHHOC`, `PHONGHOP`, `DATPHONG`, `YEUCAUTAILIEU`, `TINTUC`, `TUSACHCHUYENDE`, `CAUHINHCONG`.
-4. **Thiết kế giao diện:** Thiết kế giao diện 2 lớp gồm Cổng thông tin công khai (Public Portal) và Không gian làm việc phân quyền (Workspace), đảm bảo tính nhất quán, trực quan và khả năng truy cập theo vai trò.
-5. **Cài đặt:** Hiện thực mã nguồn bằng TypeScript, React, Tailwind CSS, Vite và Express; tập trung toàn bộ dữ liệu vào `src/database/dbEngine.ts` và `src/database/seedData.ts`, tách module theo nguyên tắc đơn trách nhiệm.
-6. **Kiểm chứng:** Kiểm tra kiểu tĩnh (`tsc --noEmit`), kiểm thử đóng gói sản phẩm (`vite build`) và viết kiểm thử đơn vị (`node:test`) cho toàn bộ quy tắc nghiệp vụ (lập thẻ, tiếp nhận sách, điều kiện mượn, gia hạn sách/thẻ, tính phạt, thu phạt, báo cáo, đặt phòng).
-
----
-
-## 4. Công nghệ sử dụng
-
-| Thành phần | Công nghệ |
+| Tầng | Công nghệ sử dụng |
 | :--- | :--- |
-| **Giao diện người dùng** | React 19, TypeScript, Tailwind CSS 4, Radix UI, Lucide Icons |
-| **Biểu đồ & Đồ thị** | Recharts, React Force Graph 2D |
-| **Bảng dữ liệu & Validation** | TanStack React Table, Zod |
-| **Công cụ đóng gói & Máy chủ** | Vite 8, Express, Better-SQLite3 (backend API) |
-| **Kiểm thử** | `node:test`, `tsx` |
+| **Frontend** | React 19, TypeScript, Tailwind CSS 4, Radix UI, Lucide Icons, Sonner |
+| **Trực quan hóa** | Recharts (biểu đồ lưu thông &amp; báo cáo), React Force Graph 2D (Bản đồ tri thức) |
+| **Bảng &amp; Validation** | TanStack React Table, Zod |
+| **Backend &amp; DB** | Express 4, Better-SQLite3 (WAL mode), `jsonwebtoken`, `bcryptjs` |
+| **AI &amp; Build** | `@google/genai`, Vite 8, `tsx`, `node:test` |
 
 ---
 
-## 5. Cấu trúc thư mục dự án
+## 4. Cấu trúc thư mục
 
 ```text
-src/
-├── database/          # Cơ sở dữ liệu tập trung (schema.ts, dbEngine.ts, seedData.ts, ...)
-├── services/          # Tầng dịch vụ nghiệp vụ và truy xuất dữ liệu
-│   └── rules/         # Các hàm kiểm tra quy tắc nghiệp vụ thuần (pure functions)
-├── features/
-│   ├── portal/        # Cổng tra cứu công khai, 12 ngành đào tạo, Knowledge Map, Dịch vụ
-│   ├── workspace/     # Không gian làm việc phân quyền (Dashboard, Độc giả, Sách, Mượn/Trả, Phạt, Báo cáo, Hệ thống)
-│   └── chatbot/       # Trợ lý tra cứu học liệu và quy định thư viện
-├── components/ui/     # Hệ thống thành phần giao diện dùng chung
-├── types/             # Định nghĩa kiểu dữ liệu TypeScript
-└── lib/               # Tiện ích và bộ kiểm thử quy tắc nghiệp vụ
+├── server.ts                  # Điểm khởi chạy Express + Vite middleware
+├── server/
+│   ├── auth.ts                # Xác thực JWT & middleware phân quyền RBAC
+│   ├── db.ts                  # Kết nối SQLite WAL, schema & seed cốt lõi
+│   ├── migratePortal.ts       # Migration cột mở rộng, 21 đầu sách & phòng họp
+│   ├── routes.ts              # API nghiệp vụ lưu thông, độc giả, sách, báo cáo, hệ thống
+│   ├── portalRoutes.ts        # API đặt trước, đặt phòng, yêu cầu sách, dashboard, gia hạn
+│   └── chatbotRoute.ts        # Endpoint UIT LibBot (/api/chatbot/ask)
+├── public/
+│   ├── images/                # Logo chính thức Thư viện UIT
+│   └── resources/             # Ảnh bìa sách, 12 ngành UIT, sự kiện & không gian Tầng trệt/Tầng 2
+├── data/
+│   └── uit_library.sqlite     # Cơ sở dữ liệu SQLite cục bộ
+└── src/
+    ├── features/
+    │   ├── portal/            # Trang chủ, Tra cứu, 12 Ngành học, Bản đồ tri thức, Dịch vụ, Giới thiệu
+    │   ├── workspace/         # Dashboard, Độc giả, Sách, Mượn/Trả, Phạt, Báo cáo, Quản trị
+    │   └── chatbot/           # UIT LibBot widget & Local Smart Engine
+    ├── services/              # Tầng giao tiếp REST API (apiClient.ts & domain services)
+    ├── database/              # Dữ liệu tham chiếu cổng thông tin & định nghĩa schema
+    ├── components/ui/         # Thành phần UI dùng chung (Button, Card, ThemeToggle, LiveLibraryHours)
+    └── lib/                   # Tiện ích, hash router & quy tắc nghiệp vụ thuần
 ```
 
 ---
 
-## 6. Hướng dẫn cài đặt và kiểm chứng
+## 5. Cài đặt &amp; Khởi chạy
 
 ### Yêu cầu môi trường
 
-- Node.js phiên bản `>= 20`
-- npm
+- **Node.js** `>= 20`
+- **npm**
 
-### Cài đặt và khởi chạy
+### Bước 1: Cài đặt &amp; Cấu hình
 
 ```bash
 # Cài đặt các gói phụ thuộc
 npm install --legacy-peer-deps
 
-# Khởi chạy môi trường phát triển
+# (Tùy chọn) Tạo file .env nếu muốn kích hoạt Gemini AI cho chatbot & cố định JWT secret
+cp .env.example .env
+```
+
+Các biến môi trường hỗ trợ trong `.env`:
+- `PORT`: Cổng chạy server (mặc định `3000`).
+- `JWT_SECRET`: Chuỗi bí mật ký JWT (`>= 16` ký tự).
+- `GEMINI_API_KEY`: API key Google Gemini (nếu bỏ trống, UIT LibBot tự dùng Local Smart Engine).
+
+### Bước 2: Khởi chạy ứng dụng
+
+```bash
+# Chạy đồng thời Backend Express + Frontend Vite tại http://localhost:3000
 npm run dev
 ```
 
-Truy cập ứng dụng tại địa chỉ `http://localhost:3000`.
+> Trong giao diện **Đăng nhập**, bạn có thể chọn đăng nhập nhanh theo 3 vai trò trải nghiệm: **Quản trị viên (`ADMIN`)**, **Thủ thư (`LIBRARIAN`)** hoặc **Độc giả (`READER`)**.
 
-### Kiểm tra mã nguồn và chạy kiểm thử
+### Bước 3: Kiểm tra &amp; Đóng gói
 
 ```bash
 # Kiểm tra kiểu tĩnh TypeScript
 npm run lint
 
-# Đóng gói bản production
+# Đóng gói bản production (thư mục dist/)
 npm run build
 
-# Chạy bộ kiểm thử đơn vị
-npx tsx --test src/lib/businessRules.test.ts src/features/chatbot/libBotEngine.test.ts src/services/knowledgeMapService.test.ts
+# Chạy bộ kiểm thử đơn vị quy tắc nghiệp vụ & chatbot
+npx tsx --test src/lib/businessRules.test.ts src/features/chatbot/libBotEngine.test.ts
 ```
