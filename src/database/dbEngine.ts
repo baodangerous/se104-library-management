@@ -2,7 +2,7 @@ import type { AuthUser, NhatKyThaoTac } from '../types/library';
 import type { LibraryDatabase } from './schema';
 import { createInitialDatabase } from './seedData';
 
-const STORAGE_KEY = 'uit_library_portal_db_v12';
+const STORAGE_KEY = 'uit_library_portal_db_v13';
 let memoryFallbackDb: LibraryDatabase | null = null;
 let currentActor: AuthUser | null = null;
 
@@ -27,20 +27,12 @@ function hydrateMissingTables(parsed: Partial<LibraryDatabase>): LibraryDatabase
   return {
     ...seed,
     ...parsed,
-    NGANHHOC:
-      Array.isArray(parsed.NGANHHOC) && parsed.NGANHHOC.length > 0
-        ? parsed.NGANHHOC
-        : seed.NGANHHOC,
-    TINTUC:
-      Array.isArray(parsed.TINTUC) && parsed.TINTUC.length > 0
-        ? parsed.TINTUC
-        : seed.TINTUC,
-    TUSACHCHUYENDE:
-      Array.isArray(parsed.TUSACHCHUYENDE) && parsed.TUSACHCHUYENDE.length > 0
-        ? parsed.TUSACHCHUYENDE
-        : seed.TUSACHCHUYENDE,
-    CAUHINHCONG: parsed.CAUHINHCONG ?? seed.CAUHINHCONG,
-    HUONGDAN: parsed.HUONGDAN ?? seed.HUONGDAN,
+    // Always sync static portal reference tables so resource/photo updates appear immediately
+    NGANHHOC: seed.NGANHHOC,
+    TINTUC: seed.TINTUC,
+    TUSACHCHUYENDE: seed.TUSACHCHUYENDE,
+    CAUHINHCONG: seed.CAUHINHCONG,
+    HUONGDAN: seed.HUONGDAN,
     DATTRUOC: Array.isArray(parsed.DATTRUOC) ? parsed.DATTRUOC : seed.DATTRUOC,
   };
 }
