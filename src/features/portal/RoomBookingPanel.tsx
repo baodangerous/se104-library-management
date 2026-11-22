@@ -125,7 +125,7 @@ export function RoomBookingPanel({ user }: { user: AuthUser | null }) {
                       src={
                         room.MaPhong === 'P202'
                           ? '/resources/library/room-a202.jpg'
-                          : '/resources/library/floor2-group.jpg'
+                          : '/resources/library/room-a201.jpg'
                       }
                       alt={room.TenPhong}
                       className="w-full h-full object-cover"
