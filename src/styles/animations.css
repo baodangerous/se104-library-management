@@ -1,0 +1,57 @@
+.uit-light-strip {
+  background: linear-gradient(90deg, #4de1ff 0%, #2d7bff 50%, #7a5cff 100%);
+}
+
+.uit-gradient-text {
+  background: linear-gradient(90deg, #0f3fa8 0%, #1d5fd6 55%, #a35a00 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.dark .uit-gradient-text,
+.uit-hero-gradient-text {
+  background: linear-gradient(90deg, #8fe9ff 0%, #4da3ff 55%, #ffe08a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@keyframes uit-glow-breathe {
+  0%, 100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes uit-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.uit-glow-breathe {
+  animation: uit-glow-breathe 5.5s ease-in-out infinite;
+}
+
+.uit-float {
+  animation: uit-float 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .uit-glow-breathe,
+  .uit-float {
+    animation: none !important;
+  }
+  * {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

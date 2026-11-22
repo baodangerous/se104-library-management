@@ -35,3 +35,4 @@ export function usePortalHashSync(
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [setPaletteOpen]);
 }
+

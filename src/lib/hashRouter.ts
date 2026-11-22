@@ -62,3 +62,4 @@ export function setHashRoute(path: string): void {
     window.location.hash = target;
   }
 }
+
