@@ -69,7 +69,7 @@ export function ServiceRequestsManagePage() {
           Xử lý Biểu mẫu &amp; Đặt phòng (A7)
         </h2>
         <p className="text-sm text-slate-500 mt-0.5">
-          Duyệt đề xuất bổ sung tài liệu từ bạn đọc và theo dõi lịch sử dụng phòng học nhóm tầng 2–3.
+          Duyệt đề xuất bổ sung tài liệu từ bạn đọc và theo dõi lịch sử dụng phòng học nhóm tầng 2.
         </p>
       </div>
 

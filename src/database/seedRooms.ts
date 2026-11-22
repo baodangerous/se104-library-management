@@ -18,22 +18,6 @@ export const SEED_PHONGHOP: PhongHop[] = [
     TrangThietBi: 'Máy chiếu HD, bảng trắng, ổ cắm âm bàn',
     TrangThai: 'Sẵn sàng',
   },
-  {
-    MaPhong: 'P301',
-    TenPhong: 'Phòng Seminar Nghiên cứu A3.01',
-    Tang: 'Tầng 3 – Khu Sau Đại học',
-    SucChua: 12,
-    TrangThietBi: 'Màn hình tương tác 75", micro hội thảo, cách âm',
-    TrangThai: 'Sẵn sàng',
-  },
-  {
-    MaPhong: 'P302',
-    TenPhong: 'Phòng thảo luận Đồ án A3.02',
-    Tang: 'Tầng 3 – Khu Đọc mở',
-    SucChua: 6,
-    TrangThietBi: 'Màn hình trình chiếu HDMI/USB-C, bảng viết',
-    TrangThai: 'Sẵn sàng',
-  },
 ];
 
 export function createSeedBookings(today: string): LichDatPhong[] {

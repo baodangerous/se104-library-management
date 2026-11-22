@@ -139,7 +139,7 @@ export function buildLocalBotReply(
       text: [
         `**Thông tin phục vụ Thư viện UIT:**`,
         `• Giờ mở cửa: **T2–T6 (07:30–18:00)**, **T7 (08:00–16:00)** | Địa chỉ: **${portalService.getConfig().diaChi}**.`,
-        `• Phòng học nhóm: hiện có **${readyRooms} phòng sẵn sàng** tại tầng 2–3 (đăng ký trực tuyến và trình thẻ tại tầng 2).`,
+        `• Phòng học nhóm: hiện có **${readyRooms} phòng sẵn sàng** tại tầng 2 (A2.01 & A2.02 — đăng ký trực tuyến và trình thẻ tại tầng 2).`,
         `• Liên hệ: **${portalService.getConfig().hotline}** (máy lẻ **128** phục vụ quầy, **154** kỹ thuật/tài khoản) · ${portalService.getConfig().email}.`,
       ].join('\n'),
     };

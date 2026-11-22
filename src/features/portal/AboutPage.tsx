@@ -72,7 +72,7 @@ export function AboutPage({ books }: AboutPageProps) {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatTile icon={BookOpen} label="Đầu sách lưu thông" value={`${availableBooks} / ${books.length}`} sub="Sẵn sàng tại kho mở" />
         <StatTile icon={GraduationCap} label="Ngành đào tạo liên kết" value={String(majors.length)} sub="Chương trình ĐH & Sau ĐH" />
-        <StatTile icon={DoorOpen} label="Phòng học nhóm" value={String(roomCount)} sub="Đặt lịch trực tuyến tầng 2–3" />
+        <StatTile icon={DoorOpen} label="Phòng học nhóm" value={String(roomCount)} sub="Đặt lịch trực tuyến tầng 2" />
         <StatTile icon={Users} label="Độc giả đang hoạt động" value={String(readerCount)} sub="Sinh viên & Giảng viên UIT" />
       </div>
 

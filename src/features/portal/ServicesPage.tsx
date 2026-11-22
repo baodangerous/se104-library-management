@@ -23,7 +23,7 @@ export function ServicesPage({ user }: ServicesPageProps) {
       <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
         <h1 className="text-xl font-bold text-slate-900">Dịch vụ Thư viện trực tuyến</h1>
         <p className="text-xs text-slate-500 mt-1">
-          Đặt phòng học nhóm tầng 2–3, gửi đề xuất bổ sung tài liệu mới và tra cứu chính sách thẻ
+          Đặt phòng học nhóm tầng 2, gửi đề xuất bổ sung tài liệu mới và tra cứu chính sách thẻ
           mượn sách hiện hành của Thư viện UIT.
         </p>
       </div>

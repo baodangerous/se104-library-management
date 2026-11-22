@@ -140,6 +140,7 @@ export function migrateAndSeedPortalTables(db: Database.Database): void {
       }
     }
 
+    db.prepare(`DELETE FROM PHONGHOP WHERE MaPhong IN ('P301', 'P302')`).run();
     const roomCount = (db.prepare('SELECT COUNT(*) as cnt FROM PHONGHOP').get() as { cnt: number }).cnt;
     if (roomCount === 0) {
       const insRoom = db.prepare(
