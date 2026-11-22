@@ -6,10 +6,15 @@ export const SEED_HUONGDAN: LibraryGuideData = {
       id: 'ground',
       tenTang: 'Tầng trệt',
       tieuDe: 'Khu vực vào học tự do',
-      anhChinh: '/resources/library/floor-ground.png',
+      anhChinh: '/resources/library/ground-pair-collab.jpg',
       boSuuTap: [
-        { src: '/resources/library/floor-ground.png', caption: 'Khu vực tự học tự do tầng trệt' },
-        { src: '/resources/library/uit-lib-space-1.jpg', caption: 'Không gian học tập mở UIT' },
+        { src: '/resources/library/ground-pair-collab.jpg', caption: 'Không gian học tập tự do & trao đổi nhóm tầng trệt' },
+        { src: '/resources/library/ground-group-laptop.jpg', caption: 'Nhóm sinh viên cùng lập trình & làm đồ án' },
+        { src: '/resources/library/ground-carrel-study.jpg', caption: 'Dãy bàn tự học có vách ngăn riêng tư' },
+        { src: '/resources/library/ground-window-study.jpg', caption: 'Góc tự học yên tĩnh bên cửa sổ sáng' },
+        { src: '/resources/library/ground-solo-focus.jpg', caption: 'Khu vực ôn tập cá nhân tập trung cao độ' },
+        { src: '/resources/library/ground-open-space.jpg', caption: 'Bàn học mở trang bị ổ điện cho laptop' },
+        { src: '/resources/library/ground-discussion.jpg', caption: 'Khu vực sinh hoạt học thuật gần quầy tiếp đón' },
       ],
       khuVuc: [
         {
