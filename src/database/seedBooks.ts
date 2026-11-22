@@ -1,5 +1,5 @@
 import type { TacGia, TheLoai } from '../types/library';
-import type { SachRow } from './dbSchema';
+import type { SachRow } from './schema';
 import { SEED_SACH_MORE, SEED_SACH_TACGIA } from './seedBooksCatalog';
 
 export { SEED_SACH_TACGIA };

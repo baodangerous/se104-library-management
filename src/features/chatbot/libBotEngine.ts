@@ -1,5 +1,4 @@
-import { UIT_MAJORS } from '../../constants/majors';
-import { UIT_LIBRARY_INFO } from '../../constants/portalContent';
+import { portalService } from '../../services/portalService';
 import {
   matchesVietnameseSearch,
   removeVietnameseTones,
@@ -26,7 +25,7 @@ export function extractSearchQuery(rawQuery: string): string {
 }
 
 function findMatchingMajor(normQuery: string) {
-  return UIT_MAJORS.find((m) => {
+  return portalService.listMajors().find((m) => {
     const code = normalize(m.MaNganh);
     const name = normalize(m.TenNganh);
     return (
@@ -124,7 +123,7 @@ export function buildLocalBotReply(
         `• Thứ 2 – Thứ 6: **07:30 – 18:00** (mở xuyên trưa).`,
         `• Thứ 7: **08:00 – 16:00** | Chủ nhật & Lễ: nghỉ phục vụ.`,
         `• Phòng học nhóm: hiện có **${readyRooms} phòng sẵn sàng** tại tầng 2–3, hỗ trợ đặt lịch trực tuyến.`,
-        `• Liên hệ: **${UIT_LIBRARY_INFO.hotline}** · ${UIT_LIBRARY_INFO.email}.`,
+        `• Liên hệ: **${portalService.getConfig().hotline}** · ${portalService.getConfig().email}.`,
       ].join('\n'),
     };
   }

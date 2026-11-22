@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { RotateCcw } from 'lucide-react';
 import { Button } from '../../components/ui/button';
-import { UIT_MAJORS } from '../../constants/majors';
+import { portalService } from '../../services/portalService';
 import {
   buildKnowledgeGraph,
   knowledgeMapService,
@@ -22,6 +22,7 @@ export function KnowledgeMapView({
   initialBookId = null,
   onOpenBookDetail,
 }: KnowledgeMapViewProps) {
+  const UIT_MAJORS = React.useMemo(() => portalService.listMajors(), []);
   const [books, setBooks] = React.useState<Sach[]>([]);
   const [categories, setCategories] = React.useState<TheLoai[]>([]);
   const [majorFilter, setMajorFilter] = React.useState<string>(initialMajor);

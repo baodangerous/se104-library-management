@@ -4,19 +4,16 @@ import { toast } from 'sonner';
 import { Button } from '../../components/ui/button';
 import { ConfirmDialog } from '../../components/ui/dialog';
 import { FieldLabel, SelectInput, TextInput } from '../../components/ui/input';
-import { ROOM_TIME_SLOTS } from '../../constants/portalContent';
 import { formatDateVN } from '../../lib/utils';
+import { portalService } from '../../services/portalService';
 import { todayIsoDate } from '../../services/rules/dateUtils';
 import { serviceRequestService } from '../../services/serviceRequestService';
 import type { AuthUser } from '../../types/library';
 import type { LichDatPhong, PhongHop } from '../../types/portal';
 import { RoomBookingList } from './RoomBookingList';
 
-interface RoomBookingPanelProps {
-  user: AuthUser | null;
-}
-
-export function RoomBookingPanel({ user }: RoomBookingPanelProps) {
+export function RoomBookingPanel({ user }: { user: AuthUser | null }) {
+  const ROOM_TIME_SLOTS = React.useMemo(() => portalService.getConfig().khungGioDatPhong, []);
   const [rooms, setRooms] = React.useState<PhongHop[]>([]);
   const [bookings, setBookings] = React.useState<LichDatPhong[]>([]);
   const [maPhong, setMaPhong] = React.useState('');

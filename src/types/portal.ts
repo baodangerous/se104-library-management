@@ -20,6 +20,9 @@ export interface NganhHoc {
   MaNganh: string;
   TenNganh: string;
   Khoa: string;
+  BacDaoTao?: string;
+  MauSac?: string;
+  Icon?: string;
   ChuongTrinh: ChuongTrinhDaoTao[];
   MoTaNgan: string;
 }
@@ -72,4 +75,16 @@ export interface TuSachChuyenDe {
   moTa: string;
   soTaiLieuMinhHoa: number;
   accentColor: string;
+}
+
+export interface LibraryPortalConfig {
+  tenDonVi: string;
+  tenNgan: string;
+  hotline: string;
+  email: string;
+  diaChi: string;
+  gioMoCuaNgan: string;
+  gioMoCuaChiTiet: Array<{ thu: string; gio: string; ghiChu: string }>;
+  khungGioDatPhong: string[];
+  noiQuyThuVien: string[];
 }

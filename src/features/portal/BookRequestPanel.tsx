@@ -3,8 +3,8 @@ import { BookPlus, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../../components/ui/button';
 import { FieldLabel, SelectInput, TextInput } from '../../components/ui/input';
-import { getMajorName, UIT_MAJORS } from '../../constants/majors';
 import { formatDateVN } from '../../lib/utils';
+import { portalService } from '../../services/portalService';
 import { serviceRequestService } from '../../services/serviceRequestService';
 import type { AuthUser } from '../../types/library';
 import type { YeuCauTaiLieu } from '../../types/portal';
@@ -14,6 +14,8 @@ interface BookRequestPanelProps {
 }
 
 export function BookRequestPanel({ user }: BookRequestPanelProps) {
+  const UIT_MAJORS = React.useMemo(() => portalService.listMajors(), []);
+  const getMajorName = React.useCallback((code?: string) => portalService.getMajorName(code), []);
   const [requests, setRequests] = React.useState<YeuCauTaiLieu[]>([]);
   const [tenTaiLieu, setTenTaiLieu] = React.useState('');
   const [tacGia, setTacGia] = React.useState('');

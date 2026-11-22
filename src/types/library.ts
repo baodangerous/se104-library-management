@@ -70,6 +70,7 @@ export interface Sach {
   NoiBat?: boolean;
   MaKeSach?: string;
   MoTa?: string;
+  AnhBia?: string;
 }
 
 export interface ChiTietPhieuMuon {

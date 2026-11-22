@@ -1,5 +1,5 @@
 import type { LichDatPhong, PhongHop, YeuCauTaiLieu } from '../types/portal';
-import { addDaysIso } from './rules/dateUtils';
+import { addDaysIso } from '../services/rules/dateUtils';
 
 export const SEED_PHONGHOP: PhongHop[] = [
   {

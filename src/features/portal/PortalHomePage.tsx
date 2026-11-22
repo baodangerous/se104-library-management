@@ -1,5 +1,5 @@
 import { ArrowRight, BookOpen, Calendar, DoorOpen, GraduationCap, Library, Network } from 'lucide-react';
-import { PORTAL_NEWS, THEMATIC_SHELVES } from '../../constants/portalContent';
+import { portalService } from '../../services/portalService';
 import type { Sach, TheLoai } from '../../types/library';
 import type { PortalTabId } from '../../types/portal';
 import { FeaturedBooksCarousel } from './FeaturedBooksCarousel';
@@ -22,6 +22,8 @@ export function PortalHomePage({
   onSelectTheme,
   onNavigateTab,
 }: PortalHomePageProps) {
+  const PORTAL_NEWS = portalService.listNews();
+  const THEMATIC_SHELVES = portalService.listThematicShelves();
   const availableCount = books.filter((b) => b.TinhTrang === 'Có sẵn').length;
   const featuredBooks = books.filter((b) => b.NoiBat);
   const carouselBooks = featuredBooks.length >= 4 ? featuredBooks : books.slice(0, 8);

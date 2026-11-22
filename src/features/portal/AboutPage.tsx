@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { BookOpen, CheckCircle2, Clock, DoorOpen, GraduationCap, MapPin, Users } from 'lucide-react';
-import { UIT_MAJORS } from '../../constants/majors';
-import { LIBRARY_RULES, UIT_LIBRARY_INFO } from '../../constants/portalContent';
+import { portalService } from '../../services/portalService';
 import { readerService } from '../../services/readerService';
 import { serviceRequestService } from '../../services/serviceRequestService';
 import type { Sach } from '../../types/library';
@@ -13,6 +12,8 @@ interface AboutPageProps {
 export function AboutPage({ books }: AboutPageProps) {
   const [readerCount, setReaderCount] = React.useState(0);
   const [roomCount, setRoomCount] = React.useState(0);
+  const majors = React.useMemo(() => portalService.listMajors(), []);
+  const portalConfig = React.useMemo(() => portalService.getConfig(), []);
 
   React.useEffect(() => {
     Promise.all([readerService.list(), serviceRequestService.listRooms()]).then(
@@ -29,7 +30,7 @@ export function AboutPage({ books }: AboutPageProps) {
     <div className="space-y-6">
       <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-2">
         <h1 className="text-xl font-bold text-slate-900">
-          Giới thiệu {UIT_LIBRARY_INFO.tenDonVi}
+          Giới thiệu {portalConfig.tenDonVi}
         </h1>
         <p className="text-sm text-slate-600 leading-relaxed max-w-3xl">
           Thư viện UIT cung cấp không gian đọc hiện đại, phòng thảo luận nhóm tiện nghi và hệ thống
@@ -41,7 +42,7 @@ export function AboutPage({ books }: AboutPageProps) {
       {/* Public Live Statistics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatTile icon={BookOpen} label="Đầu sách lưu thông" value={`${availableBooks} / ${books.length}`} sub="Sẵn sàng tại kho mở" />
-        <StatTile icon={GraduationCap} label="Ngành đào tạo liên kết" value={String(UIT_MAJORS.length)} sub="Chương trình ĐH & Sau ĐH" />
+        <StatTile icon={GraduationCap} label="Ngành đào tạo liên kết" value={String(majors.length)} sub="Chương trình ĐH & Sau ĐH" />
         <StatTile icon={DoorOpen} label="Phòng học nhóm" value={String(roomCount)} sub="Đặt lịch trực tuyến tầng 2–3" />
         <StatTile icon={Users} label="Độc giả đang hoạt động" value={String(readerCount)} sub="Sinh viên & Giảng viên UIT" />
       </div>
@@ -55,7 +56,7 @@ export function AboutPage({ books }: AboutPageProps) {
           </div>
 
           <div className="divide-y divide-slate-100">
-            {UIT_LIBRARY_INFO.gioMoCuaChiTiet.map((row) => (
+            {portalConfig.gioMoCuaChiTiet.map((row) => (
               <div key={row.thu} className="py-3 first:pt-0 last:pb-0">
                 <div className="flex items-center justify-between gap-2 text-sm">
                   <span className="font-semibold text-slate-900">{row.thu}</span>
@@ -68,7 +69,7 @@ export function AboutPage({ books }: AboutPageProps) {
 
           <div className="pt-3 border-t border-slate-100 text-xs text-slate-600 flex items-start gap-2">
             <MapPin className="w-4 h-4 text-[#0054A6] shrink-0 mt-0.5" />
-            <span>{UIT_LIBRARY_INFO.diaChi}</span>
+            <span>{portalConfig.diaChi}</span>
           </div>
         </div>
 
@@ -76,7 +77,7 @@ export function AboutPage({ books }: AboutPageProps) {
         <div className="lg:col-span-7 bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
           <h2 className="text-base font-bold text-slate-900">Nội quy phòng đọc &amp; mượn tài liệu</h2>
           <ul className="space-y-3">
-            {LIBRARY_RULES.map((rule) => (
+            {portalConfig.noiQuyThuVien.map((rule) => (
               <li key={rule} className="flex items-start gap-2.5 text-sm text-slate-700 leading-relaxed">
                 <CheckCircle2 className="w-4 h-4 text-[#0054A6] shrink-0 mt-1" />
                 <span>{rule}</span>

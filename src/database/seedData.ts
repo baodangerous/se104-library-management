@@ -1,6 +1,12 @@
-import type { LibraryDatabase } from './dbSchema';
-import { addDaysIso, addMonthsIso, todayIsoDate } from './rules/dateUtils';
+import type { LibraryDatabase } from './schema';
+import { addDaysIso, addMonthsIso, todayIsoDate } from '../services/rules/dateUtils';
 import { SEED_SACH, SEED_SACH_TACGIA, SEED_TACGIA, SEED_THELOAI } from './seedBooks';
+import {
+  SEED_CAUHINHCONG,
+  SEED_NGANHHOC,
+  SEED_TINTUC,
+  SEED_TUSACHCHUYENDE,
+} from './seedPortalData';
 import { createSeedBookRequests, createSeedBookings, SEED_PHONGHOP } from './seedRooms';
 
 export function createInitialDatabase(): LibraryDatabase {
@@ -164,8 +170,12 @@ export function createInitialDatabase(): LibraryDatabase {
         ChiTiet: 'Khởi tạo dữ liệu Cổng Thư viện UIT.',
       },
     ],
+    NGANHHOC: SEED_NGANHHOC,
     PHONGHOP: SEED_PHONGHOP,
     DATPHONG: createSeedBookings(today),
     YEUCAUTAILIEU: createSeedBookRequests(today),
+    TINTUC: SEED_TINTUC,
+    TUSACHCHUYENDE: SEED_TUSACHCHUYENDE,
+    CAUHINHCONG: SEED_CAUHINHCONG,
   };
 }

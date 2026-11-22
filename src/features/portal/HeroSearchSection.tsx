@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { BookOpen, Search, Sparkles } from 'lucide-react';
 import { Button } from '../../components/ui/button';
-import { UIT_MAJORS } from '../../constants/majors';
+import { portalService } from '../../services/portalService';
 import type { TheLoai } from '../../types/library';
 
 export interface HeroSearchQuery {
@@ -27,6 +27,7 @@ export function HeroSearchSection({
   onSearch,
   onOpenKnowledgeMap,
 }: HeroSearchSectionProps) {
+  const UIT_MAJORS = React.useMemo(() => portalService.listMajors(), []);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [q, setQ] = React.useState('');
   const [maTheLoai, setMaTheLoai] = React.useState('ALL');

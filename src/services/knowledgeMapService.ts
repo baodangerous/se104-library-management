@@ -1,6 +1,6 @@
-import { UIT_MAJORS } from '../constants/majors';
 import type { Sach, TheLoai } from '../types/library';
 import { bookService } from './bookService';
+import { portalService } from './portalService';
 
 export type KnowledgeNodeType = 'MAJOR' | 'CATEGORY' | 'BOOK' | 'AUTHOR';
 
@@ -73,10 +73,11 @@ export function buildKnowledgeGraph(
     });
   }
 
+  const majors = portalService.listMajors();
   for (const book of filteredBooks) {
     const bookId = `BOOK:${book.MaSach}`;
     const catId = `CAT:${book.MaTheLoai}`;
-    const major = UIT_MAJORS.find((m) => m.MaNganh === book.MaNganh);
+    const major = majors.find((m) => m.MaNganh === book.MaNganh);
 
     nodeMap.set(bookId, {
       id: bookId,

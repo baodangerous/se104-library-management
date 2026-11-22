@@ -1,7 +1,6 @@
-import { getMajorName } from '../constants/majors';
 import type { Sach } from '../types/library';
-import type { LibraryDatabase } from './dbSchema';
-import { nextNumericId } from './storage';
+import type { LibraryDatabase } from '../database/schema';
+import { nextNumericId } from '../database/dbEngine';
 
 export function hydrateBooks(db: LibraryDatabase, hideBorrowerName = false): Sach[] {
   const returnedIds = new Set(db.CHITIETPHIEUTRA.map((t) => t.MaChiTietMuon));
@@ -26,10 +25,11 @@ export function hydrateBooks(db: LibraryDatabase, hideBorrowerName = false): Sac
       borrowerName = db.DOCGIA.find((d) => d.MaDocGia === pm?.MaDocGia)?.HoTen ?? null;
     }
 
+    const major = db.NGANHHOC.find((m) => m.MaNganh === s.MaNganh);
     return {
       ...s,
       TenTheLoai: cat?.TenTheLoai || s.MaTheLoai,
-      TenNganh: getMajorName(s.MaNganh),
+      TenNganh: major?.TenNganh || s.MaNganh || 'Chung',
       TacGiaList: authors.map((a) => a.TenTacGia),
       TacGiaIds: authors.map((a) => a.MaTacGia),
       TinhTrang: active ? 'Đang mượn' : 'Có sẵn',

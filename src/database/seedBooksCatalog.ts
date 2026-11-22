@@ -1,4 +1,4 @@
-import type { SachRow, SachTacGiaRow } from './dbSchema';
+import type { SachRow, SachTacGiaRow } from './schema';
 
 export const SEED_SACH_MORE: SachRow[] = [
   {

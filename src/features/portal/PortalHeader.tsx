@@ -11,8 +11,8 @@ import {
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { UitLogo } from '../../components/ui/uit-logo';
-import { UIT_LIBRARY_INFO } from '../../constants/portalContent';
 import { cn } from '../../lib/utils';
+import { portalService } from '../../services/portalService';
 import type { AuthUser } from '../../types/library';
 import type { PortalTabId } from '../../types/portal';
 
@@ -43,6 +43,7 @@ export function PortalHeader({
   onLogout,
 }: PortalHeaderProps) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const UIT_LIBRARY_INFO = React.useMemo(() => portalService.getConfig(), []);
 
   const handleSelect = (tab: PortalTabId) => {
     onSelectTab(tab);

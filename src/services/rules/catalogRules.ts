@@ -25,7 +25,7 @@ export function validateReaderCard(
     return {
       valid: false,
       tuoi,
-      error: `Tuổi độc giả tại ngày lập thẻ (${tuoi} tuổi) phải từ ${thamSo.TuoiToiThieu} đến ${thamSo.TuoiToiDa} tuổi theo quy định QĐ1.`,
+      error: `Tuổi độc giả tại ngày lập thẻ (${tuoi} tuổi) phải từ ${thamSo.TuoiToiThieu} đến ${thamSo.TuoiToiDa} tuổi theo quy định thư viện.`,
     };
   }
   return {

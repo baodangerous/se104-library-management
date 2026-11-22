@@ -1,6 +1,6 @@
 import { Clock, Mail, MapPin, Phone } from 'lucide-react';
 import { UitLogo } from '../../components/ui/uit-logo';
-import { UIT_LIBRARY_INFO } from '../../constants/portalContent';
+import { portalService } from '../../services/portalService';
 import type { PortalTabId } from '../../types/portal';
 
 interface PortalFooterProps {
@@ -8,6 +8,7 @@ interface PortalFooterProps {
 }
 
 export function PortalFooter({ onSelectTab }: PortalFooterProps) {
+  const UIT_LIBRARY_INFO = portalService.getConfig();
   return (
     <footer className="bg-slate-900 text-slate-300 border-t border-slate-800 mt-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 grid grid-cols-1 md:grid-cols-12 gap-8">

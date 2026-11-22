@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { UIT_MAJORS } from '../../constants/majors';
 import { cn } from '../../lib/utils';
+import { portalService } from '../../services/portalService';
 import type { Sach } from '../../types/library';
 import type { ChuongTrinhDaoTao } from '../../types/portal';
 import { MajorBooksPanel } from './MajorBooksPanel';
@@ -23,6 +23,7 @@ export function MajorsCatalogPage({
   onSelectBook,
   onExploreMajorInMap,
 }: MajorsCatalogPageProps) {
+  const UIT_MAJORS = React.useMemo(() => portalService.listMajors(), []);
   const [program, setProgram] = React.useState<'ALL' | ChuongTrinhDaoTao>('ALL');
   const [selectedMajor, setSelectedMajor] = React.useState<string>('ATTT');
 
@@ -31,7 +32,7 @@ export function MajorsCatalogPage({
       program === 'ALL'
         ? UIT_MAJORS
         : UIT_MAJORS.filter((m) => m.ChuongTrinh.includes(program)),
-    [program]
+    [program, UIT_MAJORS]
   );
 
   React.useEffect(() => {
