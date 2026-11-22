@@ -13,11 +13,9 @@ Trường Đại học Công nghệ Thông tin – Đại học Quốc gia TP. H
 | **Môn học** | SE104.R11 – Nhập môn Công nghệ phần mềm |
 | **Giảng viên hướng dẫn** | TS. Đỗ Thị Thanh Tuyền |
 | **Nhóm thực hiện** | Nhóm 19 |
-| **Thời gian thực hiện** | 8 tuần |
 
 ### Danh sách thành viên Nhóm 19
 
-*(Sắp xếp theo thứ tự bảng chữ cái Tiếng Việt)*
 
 | STT | Họ và tên | MSSV |
 | :---: | :--- | :---: |
