@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { MapPin } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { portalService } from '../../services/portalService';
 import type { Sach } from '../../types/library';
 
 interface CatalogBookCardProps {
@@ -10,11 +11,11 @@ interface CatalogBookCardProps {
 
 export function CatalogBookCard({ book, onSelect }: CatalogBookCardProps) {
   const isAvailable = book.TinhTrang === 'Có sẵn';
-  const majorArtwork = `/resources/majors/${book.MaNganh || 'CNTT'}.svg`;
+  const majorArtwork = portalService.getMajorImage(book.MaNganh);
   const [imgSrc, setImgSrc] = React.useState(book.AnhBia || majorArtwork);
 
   React.useEffect(() => {
-    setImgSrc(book.AnhBia || `/resources/majors/${book.MaNganh || 'CNTT'}.svg`);
+    setImgSrc(book.AnhBia || portalService.getMajorImage(book.MaNganh));
   }, [book.AnhBia, book.MaNganh]);
 
   return (

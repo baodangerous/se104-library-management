@@ -92,9 +92,9 @@ export function MajorsCatalogPage({
                   : 'bg-white text-slate-900 border-slate-200 hover:border-[#0054A6]/50 hover:shadow-sm'
               )}
             >
-              <div className="relative h-24 w-full overflow-hidden">
+              <div className="relative h-28 w-full overflow-hidden">
                 <img
-                  src={`/resources/majors/${major.MaNganh}.svg`}
+                  src={major.HinhAnh || `/resources/majors/${major.MaNganh}.svg`}
                   alt={major.TenNganh}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />

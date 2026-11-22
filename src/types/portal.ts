@@ -23,6 +23,7 @@ export interface NganhHoc {
   BacDaoTao?: string;
   MauSac?: string;
   Icon?: string;
+  HinhAnh?: string;
   ChuongTrinh: ChuongTrinhDaoTao[];
   MoTaNgan: string;
 }

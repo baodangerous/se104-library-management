@@ -24,6 +24,12 @@ export const portalService = {
     return loadDb().NGANHHOC.find((m) => m.MaNganh === maNganh)?.TenNganh || maNganh;
   },
 
+  getMajorImage(maNganh?: string): string {
+    const code = maNganh || 'CNTT';
+    const major = loadDb().NGANHHOC.find((m) => m.MaNganh === code);
+    return major?.HinhAnh || `/resources/majors/${code}.svg`;
+  },
+
   listNews(): TinHoatDong[] {
     return loadDb().TINTUC;
   },

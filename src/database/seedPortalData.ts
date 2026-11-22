@@ -8,6 +8,7 @@ export const SEED_NGANHHOC: NganhHoc[] = [
     BacDaoTao: 'Đại học & Sau đại học',
     MauSac: '#7C3AED',
     Icon: 'Cpu',
+    HinhAnh: '/resources/majors/TKVM.jpg',
     ChuongTrinh: ['ĐH chính quy', 'Sau ĐH'],
     MoTaNgan: 'Thiết kế mạch tích hợp số/tương tự, FPGA, SoC và kiểm chứng vi mạch bán dẫn.',
   },
@@ -78,6 +79,7 @@ export const SEED_NGANHHOC: NganhHoc[] = [
     BacDaoTao: 'Đại học & Sau đại học',
     MauSac: '#EA580C',
     Icon: 'CircuitBoard',
+    HinhAnh: '/resources/majors/KTMT.jpg',
     ChuongTrinh: ['ĐH chính quy', 'CT Tiếng Anh', 'Sau ĐH'],
     MoTaNgan: 'Hệ thống nhúng, kiến trúc máy tính, IoT và lập trình phần cứng thời gian thực.',
   },
@@ -108,6 +110,7 @@ export const SEED_NGANHHOC: NganhHoc[] = [
     BacDaoTao: 'Đại học',
     MauSac: '#DB2777',
     Icon: 'Palette',
+    HinhAnh: '/resources/majors/TTDPT.jpg',
     ChuongTrinh: ['ĐH chính quy'],
     MoTaNgan: 'Thiết kế tương tác UI/UX, đồ họa 3D, xử lý âm thanh hình ảnh và sản xuất nội dung số.',
   },
@@ -122,7 +125,6 @@ export const SEED_NGANHHOC: NganhHoc[] = [
     MoTaNgan: 'Hạ tầng mạng doanh nghiệp, điện toán biên, mạng không dây 5G và ảo hóa hệ thống.',
   },
 ];
-
 export const SEED_TINTUC: TinHoatDong[] = [
   {
     id: 'news-1',
@@ -152,7 +154,6 @@ export const SEED_TINTUC: TinHoatDong[] = [
     tomTat: 'Chủ đề “Thực học, thực hành, làm chủ công nghệ số và trí tuệ nhân tạo” cùng bộ sách Embedded, 5G và Computer Vision.',
   },
 ];
-
 export const SEED_TUSACHCHUYENDE: TuSachChuyenDe[] = [
   {
     id: 'ho-chi-minh',
@@ -176,7 +177,6 @@ export const SEED_TUSACHCHUYENDE: TuSachChuyenDe[] = [
     accentColor: '#0F766E',
   },
 ];
-
 export const SEED_CAUHINHCONG: LibraryPortalConfig = {
   tenDonVi: 'Thư viện Trường Đại học Công nghệ Thông tin – ĐHQG-HCM',
   tenNgan: 'Thư viện UIT',

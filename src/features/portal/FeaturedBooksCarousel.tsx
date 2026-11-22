@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { ArrowRight, BookMarked, ChevronLeft, ChevronRight } from 'lucide-react';
+import { portalService } from '../../services/portalService';
 import type { Sach } from '../../types/library';
 
 interface FeaturedBooksCarouselProps {
@@ -64,7 +65,7 @@ export function FeaturedBooksCarousel({
       >
         {books.map((book) => {
           const isAvailable = book.TinhTrang === 'Có sẵn';
-          const coverSrc = book.AnhBia || `/resources/majors/${book.MaNganh || 'CNTT'}.svg`;
+          const coverSrc = book.AnhBia || portalService.getMajorImage(book.MaNganh);
           return (
             <button
               key={book.MaSach}
