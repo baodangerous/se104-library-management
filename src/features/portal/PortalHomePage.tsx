@@ -14,7 +14,6 @@ interface PortalHomePageProps {
   onSelectTheme: (themeId: string) => void;
   onNavigateTab: (tab: PortalTabId) => void;
 }
-
 export function PortalHomePage({
   books,
   categories,
@@ -39,22 +38,25 @@ export function PortalHomePage({
         onOpenKnowledgeMap={() => onNavigateTab('knowledge-map')}
       />
 
-      {/* Quick Utility Strip */}
+      {/* Quick Utility Strip — Multi-tone UIT Blue */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <QuickShortcut
           icon={GraduationCap}
+          tone="from-[#002B5C] to-[#0054A6]"
           title="CSDL 12 ngành đào tạo UIT"
           description="Lọc giáo trình, sách tham khảo và luận văn theo từng ngành học."
           onClick={() => onNavigateTab('majors')}
         />
         <QuickShortcut
           icon={Network}
+          tone="from-[#0054A6] to-[#0284C7]"
           title="Bản đồ Tri thức Học liệu"
           description="Khám phá trực quan mạng lưới liên kết Ngành học – Thể loại – Sách – Tác giả."
           onClick={() => onNavigateTab('knowledge-map')}
         />
         <QuickShortcut
           icon={DoorOpen}
+          tone="from-[#0284C7] to-[#0EA5E9]"
           title="Đặt phòng họp nhóm & Dịch vụ"
           description="Đăng ký phòng thảo luận tầng 2–3 và gửi đề xuất bổ sung sách mới."
           onClick={() => onNavigateTab('services')}
@@ -165,11 +167,13 @@ export function PortalHomePage({
 
 function QuickShortcut({
   icon: Icon,
+  tone,
   title,
   description,
   onClick,
 }: {
   icon: React.ComponentType<{ className?: string }>;
+  tone: string;
   title: string;
   description: string;
   onClick: () => void;
@@ -178,9 +182,11 @@ function QuickShortcut({
     <button
       type="button"
       onClick={onClick}
-      className="text-left bg-white border border-slate-200 hover:border-[#0054A6]/50 rounded-xl p-5 shadow-xs hover:shadow-md transition-all cursor-pointer flex items-start gap-4 group"
+      className="text-left bg-white border border-slate-200 hover:border-[#0284C7]/60 rounded-xl p-5 shadow-xs hover:shadow-md transition-all cursor-pointer flex items-start gap-4 group"
     >
-      <div className="w-10 h-10 rounded-xl bg-[#0054A6]/10 text-[#0054A6] flex items-center justify-center shrink-0 group-hover:bg-[#0054A6] group-hover:text-white transition-colors">
+      <div
+        className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tone} text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform`}
+      >
         <Icon className="w-5 h-5" />
       </div>
       <div className="min-w-0">

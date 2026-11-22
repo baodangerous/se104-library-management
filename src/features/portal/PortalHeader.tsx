@@ -52,9 +52,9 @@ export function PortalHeader({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
       {/* Topbar */}
-      <div className="bg-[#003B73] text-sky-100 text-xs">
+      <div className="bg-gradient-to-r from-[#001B3A] via-[#002B5C] to-[#003B73] text-sky-100 text-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-9 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4 sm:gap-6 truncate">
             <span className="inline-flex items-center gap-1.5">
@@ -102,10 +102,10 @@ export function PortalHeader({
                 type="button"
                 onClick={() => handleSelect(item.id)}
                 className={cn(
-                  'px-3 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer whitespace-nowrap',
+                  'px-3 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer whitespace-nowrap',
                   active
-                    ? 'text-[#0054A6] bg-[#0054A6]/8 font-semibold'
-                    : 'text-slate-700 hover:text-[#0054A6] hover:bg-slate-100'
+                    ? 'bg-gradient-to-r from-[#0054A6] to-[#0284C7] text-white font-semibold shadow-xs'
+                    : 'text-slate-700 hover:text-[#0054A6] hover:bg-[#EFF6FF]'
                 )}
               >
                 {item.label}

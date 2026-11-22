@@ -74,16 +74,16 @@ export function Sidebar({
                     onClick={() => onSelect(item.id)}
                     aria-current={isActive ? 'page' : undefined}
                     className={cn(
-                      'w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer text-left',
+                      'w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer text-left',
                       isActive
-                        ? 'bg-[#EFF6FF] text-[#0054A6]'
+                        ? 'bg-gradient-to-r from-[#0054A6] to-[#0284C7] text-white shadow-xs'
                         : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900'
                     )}
                   >
                     <Icon
                       className={cn(
                         'w-4 h-4 shrink-0',
-                        isActive ? 'text-[#0054A6]' : 'text-slate-400'
+                        isActive ? 'text-white' : 'text-slate-400'
                       )}
                     />
                     <span className="truncate">{label}</span>
