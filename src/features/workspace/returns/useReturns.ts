@@ -95,6 +95,11 @@ export function useReturns() {
       toast.success(
         `Đã lập phiếu trả ${res.MaPhieuTra}. Tiền phạt kỳ này: ${formatVnd(res.TongTienPhat)}.`
       );
+      if (res.HeldReservations?.length > 0) {
+        for (const held of res.HeldReservations) {
+          toast.info(`Đã tự giữ sách ${held.MaSach} cho độc giả đặt trước ${held.HoTenDocGia}.`);
+        }
+      }
       await loadBase();
       await loadActiveForReader(selectedReaderId);
     } catch (err) {

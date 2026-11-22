@@ -40,7 +40,12 @@ export function createReturnSync(payload: {
   MaDocGia: string;
   NgayTra: string;
   MaChiTietMuonList: number[];
-}): { MaPhieuTra: string; TongTienPhat: number; TongNoMoi: number } {
+}): {
+  MaPhieuTra: string;
+  TongTienPhat: number;
+  TongNoMoi: number;
+  HeldReservations: Array<{ MaSach: string; HoTenDocGia: string }>;
+} {
   return mutateDb((db) => {
     if (!isValidIsoDate(payload.NgayTra)) {
       throw new Error('Ngày trả không hợp lệ.');
@@ -89,13 +94,39 @@ export function createReturnSync(payload: {
       });
     }
     reader.TongNo += tongPhat;
+
+    // Auto-hold returned books for waiting reservations
+    const heldReservations: Array<{ MaSach: string; HoTenDocGia: string }> = [];
+    for (const d of details) {
+      const ct = db.CHITIETPHIEUMUON.find((c) => c.MaChiTietMuon === d.MaChiTietMuon);
+      if (!ct) continue;
+      const waiting = [...db.DATTRUOC]
+        .reverse()
+        .find((r) => r.MaSach === ct.MaSach && r.TrangThai === 'Đang chờ');
+      if (waiting) {
+        waiting.TrangThai = 'Đã giữ chỗ';
+        heldReservations.push({ MaSach: ct.MaSach, HoTenDocGia: waiting.HoTenDocGia });
+        appendAuditLog(
+          db,
+          'GIU_CHO_TU_DONG',
+          'DATTRUOC',
+          `Tự động giữ sách ${ct.MaSach} cho độc giả đặt trước ${waiting.HoTenDocGia}.`
+        );
+      }
+    }
+
     appendAuditLog(
       db,
       'NHAN_TRA',
       'PHIEUTRA',
       `Lập phiếu trả ${maPhieuTra} (${details.length} sách, phạt ${formatVnd(tongPhat)}).`
     );
-    return { MaPhieuTra: maPhieuTra, TongTienPhat: tongPhat, TongNoMoi: reader.TongNo };
+    return {
+      MaPhieuTra: maPhieuTra,
+      TongTienPhat: tongPhat,
+      TongNoMoi: reader.TongNo,
+      HeldReservations: heldReservations,
+    };
   });
 }
 

@@ -9,6 +9,7 @@ import type {
   TheLoai,
 } from '../types/library';
 import type {
+  DatTruoc,
   LichDatPhong,
   LibraryGuideData,
   LibraryPortalConfig,
@@ -102,6 +103,7 @@ export interface LibraryDatabase {
   NGANHHOC: NganhHoc[];
   PHONGHOP: PhongHop[];
   DATPHONG: LichDatPhong[];
+  DATTRUOC: DatTruoc[];
   YEUCAUTAILIEU: YeuCauTaiLieu[];
   TINTUC: TinHoatDong[];
   TUSACHCHUYENDE: TuSachChuyenDe[];

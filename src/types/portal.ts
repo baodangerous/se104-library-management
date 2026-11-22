@@ -103,6 +103,16 @@ export interface LibraryGuideData {
   lienKetDatPhong: Array<{ id: string; tieuDe: string; moTa: string; url: string; loai: 'internal' | 'external' }>;
 }
 
+export interface DatTruoc {
+  MaDatTruoc: string;
+  MaSach: string;
+  TenSach: string;
+  MaDocGia: string;
+  HoTenDocGia: string;
+  NgayDat: string;
+  TrangThai: 'Đang chờ' | 'Đã giữ chỗ' | 'Đã nhận' | 'Đã hủy';
+}
+
 export interface LibraryPortalConfig {
   tenDonVi: string;
   tenNgan: string;

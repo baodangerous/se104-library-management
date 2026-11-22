@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { parseHashRoute, setHashRoute } from '../../lib/hashRouter';
 import { bookService } from '../../services/bookService';
 import type { AuthUser, Sach, TheLoai } from '../../types/library';
 import type { PortalTabId } from '../../types/portal';
@@ -7,6 +8,8 @@ import type { ChatAction } from '../chatbot/types';
 import { AboutPage } from './AboutPage';
 import { BookDetailDrawer } from './BookDetailDrawer';
 import { CatalogSearchPage, type CatalogFilterState } from './CatalogSearchPage';
+import { CommandPaletteModal } from './CommandPaletteModal';
+import { usePortalHashSync } from './usePortalRouting';
 import type { HeroSearchQuery } from './HeroSearchSection';
 import { KnowledgeMapView } from './KnowledgeMapView';
 import { LoginModal } from './LoginModal';
@@ -39,7 +42,10 @@ export function PublicPortalShell({
   onEnterWorkspace,
   onLogout,
 }: PublicPortalShellProps) {
-  const [activeTab, setActiveTab] = React.useState<PortalTabId>('home');
+  const [activeTab, setActiveTab] = React.useState<PortalTabId>(() => {
+    const parsed = parseHashRoute(typeof window !== 'undefined' ? window.location.hash : '');
+    return parsed.area === 'portal' ? parsed.tab : 'home';
+  });
   const [books, setBooks] = React.useState<Sach[]>([]);
   const [categories, setCategories] = React.useState<TheLoai[]>([]);
   const [catalogFilters, setCatalogFilters] = React.useState<CatalogFilterState>(
@@ -49,19 +55,22 @@ export function PublicPortalShell({
   const [mapFocusBookId, setMapFocusBookId] = React.useState<string | null>(null);
   const [selectedBook, setSelectedBook] = React.useState<Sach | null>(null);
   const [loginOpen, setLoginOpen] = React.useState(false);
-
+  const [paletteOpen, setPaletteOpen] = React.useState(false);
   const loadCatalog = React.useCallback(async () => {
-    const [b, c] = await Promise.all([
-      bookService.listPublic(),
-      bookService.listPublicCategories(),
-    ]);
+    const [b, c] = await Promise.all([bookService.listPublic(), bookService.listPublicCategories()]);
     setBooks(b);
     setCategories(c);
   }, []);
-
   React.useEffect(() => {
     loadCatalog();
   }, [loadCatalog, activeTab]);
+
+  usePortalHashSync(books, setActiveTab, setSelectedBook, setPaletteOpen);
+
+  const openBookWithHash = (book: Sach | null) => {
+    setSelectedBook(book);
+    setHashRoute(book ? `book/${book.MaSach}` : activeTab === 'home' ? '' : activeTab);
+  };
 
   const handleHeroSearch = (query: HeroSearchQuery) => {
     setCatalogFilters({ ...DEFAULT_CATALOG_FILTERS, ...query });
@@ -92,6 +101,7 @@ export function PublicPortalShell({
       setMapFocusBookId(null);
     }
     setActiveTab(tab);
+    setHashRoute(tab === 'home' ? '' : tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -155,8 +165,21 @@ export function PublicPortalShell({
 
       <BookDetailDrawer
         book={selectedBook}
-        onClose={() => setSelectedBook(null)}
+        user={user}
+        onClose={() => openBookWithHash(null)}
         onOpenKnowledgeMap={handleOpenBookInMap}
+        onRequireLogin={() => {
+          openBookWithHash(null);
+          setLoginOpen(true);
+        }}
+      />
+
+      <CommandPaletteModal
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        books={books}
+        onSelectBook={(b) => openBookWithHash(b)}
+        onSelectTab={handleSelectTab}
       />
 
       <LoginModal

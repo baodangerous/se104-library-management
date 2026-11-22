@@ -4,6 +4,7 @@ import { bookService } from './bookService';
 import { circulationService } from './circulationService';
 import { buildKnowledgeGraph } from './knowledgeMapService';
 import { readerService } from './readerService';
+import { reservationService } from './reservationService';
 import { removeVietnameseTones } from './rules/searchUtils';
 import { serviceRequestService } from './serviceRequestService';
 import { resetDb } from '../database/dbEngine';
@@ -158,4 +159,15 @@ test('CirculationService supports loan renewal, return validation, and card rene
   const before = (await readerService.list('DG002'))[0];
   const renewed = await readerService.renewCard('DG002');
   assert.ok(renewed.NgayHetHan > before.NgayHetHan);
+
+  // Reservation while S002 is borrowed -> 'Đang chờ', then auto-hold on return -> 'Đã giữ chỗ'
+  const res = await reservationService.create('S002', 'DG001');
+  assert.equal(res.TrangThai, 'Đang chờ');
+  const ret = await circulationService.createReturn({
+    MaDocGia: 'DG002',
+    NgayTra: '2026-11-29',
+    MaChiTietMuonList: [ctId],
+  });
+  assert.equal(ret.HeldReservations.length, 1);
+  assert.equal(ret.HeldReservations[0].MaSach, 'S002');
 });

@@ -66,6 +66,7 @@
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     background-color: var(--background);
     color: var(--foreground);
+    transition: background-color 250ms ease, color 250ms ease;
   }
 
   h1,
@@ -231,6 +232,17 @@
   background-color: #030a24 !important;
   color: #eef5ff !important;
   border-color: #1f5fe0 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .uit-glow-breathe,
+  .uit-float {
+    animation: none !important;
+  }
+  * {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 @media print {

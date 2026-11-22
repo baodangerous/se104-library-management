@@ -133,7 +133,12 @@ export const circulationService = {
     MaDocGia: string;
     NgayTra: string;
     MaChiTietMuonList: number[];
-  }): Promise<{ MaPhieuTra: string; TongTienPhat: number; TongNoMoi: number }> {
+  }): Promise<{
+    MaPhieuTra: string;
+    TongTienPhat: number;
+    TongNoMoi: number;
+    HeldReservations: Array<{ MaSach: string; HoTenDocGia: string }>;
+  }> {
     return createReturnSync(payload);
   },
 

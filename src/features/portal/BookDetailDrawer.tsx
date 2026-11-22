@@ -1,22 +1,58 @@
-import { BookOpen, Building2, Calendar, Globe, MapPin, Network, User, X } from 'lucide-react';
+import * as React from 'react';
+import { BookmarkPlus, BookOpen, Building2, Calendar, Globe, MapPin, Network, User, X } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '../../components/ui/button';
 import { formatDateVN, formatVnd } from '../../lib/utils';
-import type { Sach } from '../../types/library';
+import { reservationService } from '../../services/reservationService';
+import type { AuthUser, Sach } from '../../types/library';
 
 interface BookDetailDrawerProps {
   book: Sach | null;
+  user?: AuthUser | null;
   onClose: () => void;
   onOpenKnowledgeMap: (book: Sach) => void;
+  onRequireLogin?: () => void;
 }
 
 export function BookDetailDrawer({
   book,
+  user,
   onClose,
   onOpenKnowledgeMap,
+  onRequireLogin,
 }: BookDetailDrawerProps) {
+  const [reserving, setReserving] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!book) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [book, onClose]);
+
   if (!book) return null;
 
   const isAvailable = book.TinhTrang === 'Có sẵn';
+
+  async function handleReserve() {
+    if (!book) return;
+    if (!user?.MaDocGia) {
+      toast.info('Vui lòng đăng nhập tài khoản Độc giả để đặt trước sách.');
+      onRequireLogin?.();
+      return;
+    }
+    setReserving(true);
+    try {
+      const res = await reservationService.create(book.MaSach, user.MaDocGia);
+      toast.success(`Đã đặt trước ${book.MaSach} (${res.TrangThai}).`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Không thể đặt trước sách.');
+    } finally {
+      setReserving(false);
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -94,33 +130,26 @@ export function BookDetailDrawer({
             </div>
           ) : null}
 
-          <div className="grid grid-cols-1 gap-3 text-sm">
-            <InfoRow icon={BookOpen} label="Thể loại" value={book.TenTheLoai} />
-            <InfoRow
-              icon={Building2}
-              label="Ngành học liên kết"
-              value={book.TenNganh || 'Công nghệ thông tin'}
-            />
-            <InfoRow
-              icon={User}
-              label="Tác giả"
-              value={book.TacGiaList.join(', ')}
-            />
-            <InfoRow
-              icon={Calendar}
-              label="Xuất bản"
-              value={`${book.NhaXuatBan} · Năm ${book.NamXuatBan}`}
-            />
-            <InfoRow
-              icon={Globe}
-              label="Ngôn ngữ"
-              value={book.NgonNgu || 'Tiếng Việt'}
-            />
-            <InfoRow
-              icon={MapPin}
-              label="Vị trí kệ sách"
-              value={book.MaKeSach || 'Tầng 1 – Kho đọc mở'}
-            />
+          <div className="grid grid-cols-1 gap-2.5 text-sm">
+            {[
+              { icon: BookOpen, label: 'Thể loại', value: book.TenTheLoai },
+              { icon: Building2, label: 'Ngành học liên kết', value: book.TenNganh || 'Công nghệ thông tin' },
+              { icon: User, label: 'Tác giả', value: book.TacGiaList.join(', ') },
+              { icon: Calendar, label: 'Xuất bản', value: `${book.NhaXuatBan} · Năm ${book.NamXuatBan}` },
+              { icon: Globe, label: 'Ngôn ngữ', value: book.NgonNgu || 'Tiếng Việt' },
+              { icon: MapPin, label: 'Vị trí kệ sách', value: book.MaKeSach || 'Tầng 1 – Kho đọc mở' },
+            ].map((row) => {
+              const Icon = row.icon;
+              return (
+                <div key={row.label} className="flex items-start gap-3 py-2 border-b border-slate-100 last:border-0">
+                  <Icon className="w-4 h-4 text-[#0054A6] shrink-0 mt-0.5" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-slate-500">{row.label}</p>
+                    <p className="text-sm font-medium text-slate-900 mt-0.5 break-words">{row.value}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
@@ -130,40 +159,29 @@ export function BookDetailDrawer({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center gap-2.5">
+        <div className="p-4 border-t border-slate-200 bg-slate-50 flex flex-wrap items-center gap-2">
           <Button
             variant="primary"
-            className="flex-1 gap-2"
+            className="flex-1 gap-1.5"
+            disabled={reserving}
+            onClick={handleReserve}
+          >
+            <BookmarkPlus className="w-4 h-4" />
+            {reserving ? 'Đang đặt...' : 'Đặt trước sách'}
+          </Button>
+          <Button
+            variant="outline"
+            className="gap-1.5"
             onClick={() => onOpenKnowledgeMap(book)}
           >
             <Network className="w-4 h-4" />
-            Xem trên Bản đồ Tri thức
+            Bản đồ
           </Button>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="ghost" onClick={onClose}>
             Đóng
           </Button>
         </div>
       </aside>
-    </div>
-  );
-}
-
-function InfoRow({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="flex items-start gap-3 py-2 border-b border-slate-100 last:border-0">
-      <Icon className="w-4 h-4 text-[#0054A6] shrink-0 mt-0.5" />
-      <div className="min-w-0 flex-1">
-        <p className="text-xs text-slate-500">{label}</p>
-        <p className="text-sm font-medium text-slate-900 mt-0.5 break-words">{value}</p>
-      </div>
     </div>
   );
 }

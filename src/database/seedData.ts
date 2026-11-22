@@ -174,6 +174,10 @@ export function createInitialDatabase(): LibraryDatabase {
     NGANHHOC: SEED_NGANHHOC,
     PHONGHOP: SEED_PHONGHOP,
     DATPHONG: createSeedBookings(today),
+    DATTRUOC: [
+      { MaDatTruoc: 'DT001', MaSach: 'S001', TenSach: 'CompTIA Security+ Study Guide (SY0-701)', MaDocGia: 'DG002', HoTenDocGia: 'Trần Thị Bảo Ngọc', NgayDat: addDaysIso(today, -1), TrangThai: 'Đang chờ' },
+      { MaDatTruoc: 'DT002', MaSach: 'S003', TenSach: 'Cryptography and Network Security: Principles and Practice', MaDocGia: 'DG001', HoTenDocGia: 'Nguyễn Minh Khôi', NgayDat: today, TrangThai: 'Đang chờ' },
+    ],
     YEUCAUTAILIEU: createSeedBookRequests(today),
     TINTUC: SEED_TINTUC,
     TUSACHCHUYENDE: SEED_TUSACHCHUYENDE,
