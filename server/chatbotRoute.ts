@@ -85,7 +85,7 @@ chatbotRouter.post('/ask', async (req, res) => {
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-4-hydrogen',
+      model: 'gemini-2.5-flash',
       contents: query,
       config: {
         systemInstruction,

@@ -84,7 +84,26 @@ export function buildLocalBotReply(
   const norm = normalize(rawQuery);
   const { books, params, rooms } = context;
 
-  // 1. Regulations / Borrowing policy / Fines / Card age
+  // 1. Account 13-digit / Electronic card / LDAP / VNU-HCM CSDL fee
+  const isAccountOrCsdl =
+    /(tai khoan|13 so|dang nhap|mat khau|ldap|the dien tu|vnuhcm|csdl|co so du lieu|zalo|gia han)/.test(
+      norm
+    );
+  if (isAccountOrCsdl && !/(muon|sach|giao trinh)/.test(norm)) {
+    return {
+      intent: 'REGULATIONS',
+      books: [],
+      actions: [{ label: 'Tra cứu tài khoản 13 số & Chính sách', targetTab: 'services' }],
+      text: [
+        `**Tài khoản 13 số & Thẻ điện tử Thư viện UIT:**`,
+        `• Sinh viên: **15000 + MSSV** | CB-GV: **15000000 + Mã cán bộ** (dùng chung cho OPAC, ứng dụng **VNUHCM Libraries**, kho số IR).`,
+        `• Quên mật khẩu: đặt lại tại **ldap.vnulib.edu.vn** hoặc gọi máy lẻ **154**.`,
+        `• Gia hạn trực tuyến: trước ngày hết hạn 1–2 ngày (tối đa 2 lần). Đăng ký CSDL ĐHQG-HCM qua Zalo **vnulib.edu.vn** (SV miễn phí năm đầu, từ năm 2 là 25.000đ/năm; CB-GV miễn phí).`,
+      ].join('\n'),
+    };
+  }
+
+  // 2. Regulations / Borrowing policy / Fines / Card age
   const isRegQuery =
     /(quy dinh|phat|tre han|qua han|toi da|may cuon|may quyen|bao nhieu ngay|tuoi|lap the|han the|nam xuat ban|chinh sach)/.test(
       norm
@@ -95,18 +114,17 @@ export function buildLocalBotReply(
       books: [],
       actions: [{ label: 'Xem Chính sách & Dịch vụ', targetTab: 'services' }],
       text: [
-        `Theo quy định hiện hành của Thư viện UIT:`,
-        `• Định mức mượn: tối đa **${params.SoSachMuonToiDa} quyển** trong vòng **${params.SoNgayMuonToiDa} ngày**.`,
-        `• Phí trả trễ hạn: **1.000đ / ngày** cho mỗi quyển quá hạn.`,
-        `• Điều kiện lập thẻ: độ tuổi từ **${params.TuoiToiThieu} đến ${params.TuoiToiDa} tuổi**, thời hạn thẻ **${params.ThoiHanThe} tháng**.`,
-        `• Tiêu chuẩn tiếp nhận sách: xuất bản trong vòng **${params.KhoangCachNamXuatBan} năm** gần đây.`,
+        `**Chính sách mượn trả chuẩn Thư viện UIT:**`,
+        `• **Giáo trình** (mã vạch #5 = 2): tối đa **5 cuốn / 90 ngày**, gia hạn 2 lần (+15 ngày/lần).`,
+        `• **Tài liệu tham khảo** (mã vạch #5 = 1): **3 cuốn / 21 ngày**, gia hạn 2 lần (+7 ngày/lần).`,
+        `• **Luận án, luận văn, khóa luận**: chỉ đọc tại chỗ | Phí trễ hạn: **1.000đ/ngày** | Hệ thống trên cổng: tối đa ${params.SoSachMuonToiDa} quyển/${params.SoNgayMuonToiDa} ngày.`,
       ].join('\n'),
     };
   }
 
-  // 2. Opening hours, contact, or group study room services
+  // 3. Opening hours, contact, or group study room services
   const isHoursOrService =
-    /(gio mo cua|lich phuc vu|may gio|mo cua|dong cua|phong hop|phong hoc nhom|dat phong|yeu cau sach|de xuat sach|hotline|lien he|dia chi|dich vu)/.test(
+    /(gio mo cua|lich phuc vu|may gio|mo cua|dong cua|phong hop|phong hoc nhom|dat phong|yeu cau sach|de xuat sach|hotline|lien he|dia chi|dich vu|co cau|nhan su|may le)/.test(
       norm
     );
   if (isHoursOrService) {
@@ -116,14 +134,13 @@ export function buildLocalBotReply(
       books: [],
       actions: [
         { label: 'Đặt phòng & Dịch vụ ngay', targetTab: 'services' },
-        { label: 'Xem Giới thiệu & Nội quy', targetTab: 'about' },
+        { label: 'Xem Giới thiệu & Tổ chức', targetTab: 'about' },
       ],
       text: [
-        `**Lịch phục vụ Thư viện UIT:**`,
-        `• Thứ 2 – Thứ 6: **07:30 – 18:00** (mở xuyên trưa).`,
-        `• Thứ 7: **08:00 – 16:00** | Chủ nhật & Lễ: nghỉ phục vụ.`,
-        `• Phòng học nhóm: hiện có **${readyRooms} phòng sẵn sàng** tại tầng 2–3, hỗ trợ đặt lịch trực tuyến.`,
-        `• Liên hệ: **${portalService.getConfig().hotline}** · ${portalService.getConfig().email}.`,
+        `**Thông tin phục vụ Thư viện UIT:**`,
+        `• Giờ mở cửa: **T2–T6 (07:30–18:00)**, **T7 (08:00–16:00)** | Địa chỉ: **${portalService.getConfig().diaChi}**.`,
+        `• Phòng học nhóm: hiện có **${readyRooms} phòng sẵn sàng** tại tầng 2–3 (đăng ký trực tuyến và trình thẻ tại tầng 2).`,
+        `• Liên hệ: **${portalService.getConfig().hotline}** (máy lẻ **128** phục vụ quầy, **154** kỹ thuật/tài khoản) · ${portalService.getConfig().email}.`,
       ].join('\n'),
     };
   }

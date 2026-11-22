@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { bookService } from '../../services/bookService';
 import { serviceRequestService } from '../../services/serviceRequestService';
-import { settingsService } from '../../services/settingsService';
 import { buildLocalBotReply } from './libBotEngine';
 import type { ChatMessage } from './types';
 
@@ -39,10 +38,10 @@ export function useLibBot() {
     setThinking(true);
 
     try {
-      // 1. Always retrieve real-time data from bookService, settingsService (THAMSO), and rooms
+      // 1. Always retrieve real-time public data from API (works for both guests and logged-in users)
       const [books, params, rooms] = await Promise.all([
         bookService.listPublic(),
-        settingsService.getParams(),
+        bookService.getPublicParams(),
         serviceRequestService.listRooms(),
       ]);
 
@@ -102,6 +101,16 @@ export function useLibBot() {
         source,
       };
       setMessages((prev) => [...prev, botMsg]);
+    } catch {
+      const errMsg: ChatMessage = {
+        id: `b-err-${Date.now()}`,
+        role: 'assistant',
+        text: 'Xin lỗi, kết nối tra cứu tạm thời gián đoạn. Bạn vui lòng thử lại hoặc mở mục **Tra cứu** để xem trực tiếp danh mục sách nhé!',
+        actions: [{ label: 'Mở trang Tra cứu', targetTab: 'catalog' }],
+        timestamp: nowTimeLabel(),
+        source: 'local',
+      };
+      setMessages((prev) => [...prev, errMsg]);
     } finally {
       setThinking(false);
     }
