@@ -84,16 +84,33 @@
 }
 
 /* Global Dark Mode surface & contrast adaptation */
-.dark .bg-white {
+.dark .bg-white,
+.dark .bg-white\/95,
+.dark .bg-white\/90,
+.dark .hover\:bg-white:hover {
   background-color: #111827 !important;
 }
 .dark .bg-slate-50,
 .dark .bg-slate-50\/60,
-.dark .bg-slate-50\/70 {
-  background-color: #0b1120 !important;
+.dark .bg-slate-50\/70,
+.dark .hover\:bg-slate-50:hover {
+  background-color: #0f172a !important;
 }
-.dark .bg-slate-100 {
+.dark .bg-slate-100,
+.dark .hover\:bg-slate-100:hover,
+.dark .hover\:bg-slate-100\/80:hover,
+.dark .hover\:bg-slate-200\/70:hover {
   background-color: #1e293b !important;
+}
+.dark .bg-\[\#EFF6FF\],
+.dark .bg-blue-50\/60,
+.dark .hover\:bg-\[\#EFF6FF\]:hover {
+  background-color: rgba(30, 58, 138, 0.35) !important;
+}
+.dark .bg-\[\#0054A6\]\/5,
+.dark .bg-\[\#0054A6\]\/8,
+.dark .bg-\[\#0054A6\]\/10 {
+  background-color: rgba(59, 130, 246, 0.16) !important;
 }
 .dark .text-slate-900 {
   color: #f8fafc !important;
@@ -105,10 +122,53 @@
   color: #cbd5e1 !important;
 }
 .dark .text-slate-600,
-.dark .text-slate-500 {
+.dark .text-slate-500,
+.dark .text-slate-400 {
   color: #94a3b8 !important;
 }
-.dark .border-slate-200 {
+.dark .text-\[\#0054A6\] {
+  color: #60a5fa !important;
+}
+.dark .hover\:text-\[\#0054A6\]:hover {
+  color: #93c5fd !important;
+}
+.dark .bg-emerald-50,
+.dark .bg-emerald-50\/70 {
+  background-color: rgba(6, 78, 59, 0.45) !important;
+}
+.dark .text-emerald-700,
+.dark .text-emerald-900 {
+  color: #6ee7b7 !important;
+}
+.dark .border-emerald-200 {
+  border-color: #065f46 !important;
+}
+.dark .bg-amber-50,
+.dark .bg-amber-50\/70 {
+  background-color: rgba(120, 53, 15, 0.45) !important;
+}
+.dark .text-amber-700,
+.dark .text-amber-900 {
+  color: #fcd34d !important;
+}
+.dark .border-amber-200 {
+  border-color: #92400e !important;
+}
+.dark .bg-rose-50,
+.dark .bg-red-50 {
+  background-color: rgba(127, 29, 29, 0.45) !important;
+}
+.dark .text-rose-700,
+.dark .text-rose-800,
+.dark .text-red-700 {
+  color: #fca5a5 !important;
+}
+.dark .border-rose-200,
+.dark .border-red-200 {
+  border-color: #991b1b !important;
+}
+.dark .border-slate-200,
+.dark .border-slate-200\/80 {
   border-color: #1f2937 !important;
 }
 .dark .border-slate-100 {
@@ -120,9 +180,9 @@
 .dark input,
 .dark select,
 .dark textarea {
-  background-color: #0f172a;
-  color: #f1f5f9;
-  border-color: #334155;
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+  border-color: #334155 !important;
 }
 
 @media print {

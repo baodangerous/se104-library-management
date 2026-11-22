@@ -52,7 +52,7 @@ export function PortalHeader({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
+    <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-xs">
       {/* Topbar */}
       <div className="bg-gradient-to-r from-[#001B3A] via-[#002B5C] to-[#003B73] text-sky-100 text-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-9 flex items-center justify-between gap-4">
