@@ -44,6 +44,7 @@ export function CatalogBookCard({ book, onSelect }: CatalogBookCardProps) {
           author={book.TacGiaList[0]}
           year={book.NamXuatBan}
           majorCode={book.MaNganh}
+          sourceLabel={book.NgonNgu === 'Tiếng Anh' ? 'Ngoại văn' : 'Sách UIT'}
         />
         <span
           className={cn(

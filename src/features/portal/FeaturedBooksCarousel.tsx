@@ -86,6 +86,12 @@ export function FeaturedBooksCarousel({
                   src={book.AnhBia}
                   alt={book.TenSach}
                   fallbackGradient={grad}
+                  fallbackTitle={book.TenSach}
+                  isThesis={book.NguonTaiLieu === 'Luận văn UIT' || book.MaTheLoai === 'C'}
+                  author={book.TacGiaList[0]}
+                  year={book.NamXuatBan}
+                  majorCode={book.MaNganh}
+                  sourceLabel={book.NgonNgu === 'Tiếng Anh' ? 'Ngoại văn' : 'Sách UIT'}
                 />
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-950/90 via-slate-950/45 to-transparent z-[2]" />
                 <div className="absolute top-2.5 inset-x-3 z-[3] flex items-center justify-between gap-2 text-[11px]">
