@@ -23,6 +23,7 @@ export type NavPageId =
   | 'loans'
   | 'returns'
   | 'fines'
+  | 'service-requests'
   | 'reports'
   | 'regulations'
   | 'accounts'
@@ -95,6 +96,13 @@ export const NAV_ITEMS: NavItem[] = [
     section: 'Lưu thông & Tài chính',
     roles: ['ADMIN', 'LIBRARIAN'],
     icon: BookDown,
+  },
+  {
+    id: 'service-requests',
+    label: 'Yêu cầu & Đặt phòng',
+    section: 'Lưu thông & Tài chính',
+    roles: ['ADMIN', 'LIBRARIAN'],
+    icon: SlidersHorizontal,
   },
   {
     id: 'fines',

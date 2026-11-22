@@ -28,6 +28,10 @@ portalRouter.get('/public/stats', (_req, res) => {
   res.json({ roomCount: rooms, readerCount: readers });
 });
 
+portalRouter.get('/public/thamso', (_req, res) => {
+  res.json(db.prepare('SELECT * FROM THAMSO WHERE MaThamSo = 1').get());
+});
+
 portalRouter.get('/public/rooms', (_req, res) => {
   res.json(db.prepare('SELECT * FROM PHONGHOP ORDER BY MaPhong ASC').all());
 });
@@ -101,6 +105,32 @@ portalRouter.post('/public/yeucausach', (req, res) => {
     LyDo: String(LyDo || '').trim() || 'Phục vụ học tập và nghiên cứu tại UIT', NgayGui: ngayGui, TrangThai: 'Đang tiếp nhận',
   });
 });
+
+portalRouter.patch(
+  '/yeucausach/:id/status',
+  requireAuth,
+  requireRole('ADMIN', 'LIBRARIAN'),
+  (req: AuthenticatedRequest, res) => {
+    const allowed = ['Đang tiếp nhận', 'Đã duyệt mua', 'Đã bổ sung'];
+    const trangThai = String(req.body?.TrangThai || '');
+    if (!allowed.includes(trangThai)) {
+      return res.status(400).json({ error: 'Trạng thái không hợp lệ.' });
+    }
+    const info = db
+      .prepare('UPDATE YEUCAUTAILIEU SET TrangThai = ? WHERE MaYeuCau = ?')
+      .run(trangThai, req.params.id);
+    if (info.changes === 0) return res.status(404).json({ error: 'Không tìm thấy yêu cầu.' });
+    writeAuditLog({
+      MaTaiKhoan: req.user?.MaTaiKhoan ?? null,
+      TenDangNhap: req.user?.TenDangNhap ?? 'system',
+      VaiTro: req.user?.VaiTro ?? 'LIBRARIAN',
+      HanhDong: 'DUYET_YEU_CAU_SACH',
+      BangTacDong: 'YEUCAUTAILIEU',
+      ChiTiet: `Cập nhật trạng thái yêu cầu ${req.params.id} → "${trangThai}".`,
+    });
+    res.json({ success: true, TrangThai: trangThai });
+  }
+);
 
 portalRouter.get('/dattruoc', requireAuth, (req: AuthenticatedRequest, res) => {
   const rows = db.prepare(

@@ -101,6 +101,10 @@ export const bookService = {
     return apiRequest<ThamSo>('/thamso');
   },
 
+  async getPublicParams(): Promise<ThamSo> {
+    return apiRequest<ThamSo>('/public/thamso');
+  },
+
   async create(payload: BookInput): Promise<Sach> {
     return apiRequest<Sach>('/sach', {
       method: 'POST',

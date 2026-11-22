@@ -54,4 +54,14 @@ export const serviceRequestService = {
       body: JSON.stringify(payload),
     });
   },
+
+  async updateBookRequestStatus(
+    maYeuCau: string,
+    trangThai: YeuCauTaiLieu['TrangThai']
+  ): Promise<{ success: boolean; TrangThai: YeuCauTaiLieu['TrangThai'] }> {
+    return apiRequest(`/yeucausach/${encodeURIComponent(maYeuCau)}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ TrangThai: trangThai }),
+    });
+  },
 };

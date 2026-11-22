@@ -8,6 +8,7 @@ import { KnowledgeMapView } from '../portal/KnowledgeMapView';
 import { AccountsPage } from './admin/AccountsPage';
 import { AuditLogPage } from './admin/AuditLogPage';
 import { BackupPage } from './admin/BackupPage';
+import { ServiceRequestsManagePage } from './admin/ServiceRequestsManagePage';
 import { BooksPage } from './books/BooksPage';
 import { DashboardPage } from './dashboard/DashboardPage';
 import { FinesPage } from './fines/FinesPage';
@@ -100,6 +101,8 @@ export function WorkspaceApp({
         return <LoansPage />;
       case 'returns':
         return <ReturnsPage />;
+      case 'service-requests':
+        return <ServiceRequestsManagePage />;
       case 'fines':
         return <FinesPage />;
       case 'reports':
