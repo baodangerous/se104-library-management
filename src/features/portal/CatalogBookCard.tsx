@@ -10,15 +10,18 @@ interface CatalogBookCardProps {
 }
 
 const BOOK_GRADIENTS: Record<string, string> = {
-  ATTT: 'from-[#7f1d1d] via-[#b91c1c] to-[#0a1f4d]',
-  KTPM: 'from-[#0a1f4d] via-[#1556d6] to-[#3a86ff]',
-  TTNT: 'from-[#4c1d95] via-[#7c3aed] to-[#1e1b4b]',
-  KHMT: 'from-[#1e3a8a] via-[#2563eb] to-[#0a1f4d]',
-  KHDL: 'from-[#164e63] via-[#0891b2] to-[#0a1f4d]',
-  TKVM: 'from-[#581c87] via-[#7e22ce] to-[#0a1f4d]',
-  KTMT: 'from-[#7c2d12] via-[#c2410c] to-[#0a1f4d]',
-  MMT: 'from-[#064e3b] via-[#059669] to-[#0a1f4d]',
-  TTDPT: 'from-[#831843] via-[#be185d] to-[#0a1f4d]',
+  ATTT: 'from-[#7f1d1d] via-[#b91c1c] to-[#450a0a]',
+  KTPM: 'from-[#0a2458] via-[#1d4ed8] to-[#081a40]',
+  TTNT: 'from-[#4c1d95] via-[#7c3aed] to-[#2e1065]',
+  KHMT: 'from-[#1e3a8a] via-[#0284c7] to-[#0c4a6e]',
+  KHDL: 'from-[#155e75] via-[#0891b2] to-[#083344]',
+  HTTT: 'from-[#0f766e] via-[#0d9488] to-[#042f2e]',
+  TKVM: 'from-[#581c87] via-[#9333ea] to-[#3b0764]',
+  KTMT: 'from-[#7c2d12] via-[#c2410c] to-[#431407]',
+  MMT: 'from-[#065f46] via-[#059669] to-[#022c22]',
+  TMDT: 'from-[#92400e] via-[#d97706] to-[#451a03]',
+  TTDPT: 'from-[#831843] via-[#db2777] to-[#500724]',
+  CNTT: 'from-[#334155] via-[#475569] to-[#0f172a]',
 };
 
 export function CatalogBookCard({ book, onSelect }: CatalogBookCardProps) {
@@ -40,6 +43,7 @@ export function CatalogBookCard({ book, onSelect }: CatalogBookCardProps) {
           isThesis={book.NguonTaiLieu === 'Luận văn UIT' || book.MaTheLoai === 'C'}
           author={book.TacGiaList[0]}
           year={book.NamXuatBan}
+          majorCode={book.MaNganh}
         />
         <span
           className={cn(

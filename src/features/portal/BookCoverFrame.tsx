@@ -9,6 +9,7 @@ interface BookCoverFrameProps {
   isThesis?: boolean;
   author?: string;
   year?: number;
+  majorCode?: string;
 }
 
 export function BookCoverFrame({
@@ -19,6 +20,7 @@ export function BookCoverFrame({
   isThesis,
   author,
   year,
+  majorCode,
 }: BookCoverFrameProps) {
   const [failed, setFailed] = React.useState(false);
   const hasImage = Boolean(src && !failed);
@@ -34,13 +36,18 @@ export function BookCoverFrame({
             backgroundSize: '14px 14px',
           }}
         />
-        <div className="relative z-[1] w-[54%] h-[86%] rounded-r-md rounded-l-[2px] bg-gradient-to-br from-[#0b2559] via-[#133b85] to-[#081a40] border-l-4 border-amber-400/90 shadow-[0_10px_22px_rgba(15,23,42,0.35)] p-2.5 flex flex-col justify-between text-white group-hover:scale-[1.03] transition-transform duration-300">
-          <div className="flex items-center justify-between gap-1 border-b border-white/15 pb-1">
-            <span className="text-[9px] font-bold tracking-wider uppercase text-amber-300">
-              Luận văn UIT
+        <div
+          className={cn(
+            'relative z-[1] w-[54%] h-[86%] rounded-r-md rounded-l-[2px] bg-gradient-to-br border-l-4 border-amber-300/90 shadow-[0_10px_22px_rgba(15,23,42,0.35)] p-2.5 flex flex-col justify-between text-white group-hover:scale-[1.03] transition-transform duration-300',
+            fallbackGradient
+          )}
+        >
+          <div className="flex items-center justify-between gap-1 border-b border-white/20 pb-1">
+            <span className="text-[9px] font-bold tracking-wider uppercase text-amber-200">
+              {majorCode ? `LV · ${majorCode}` : 'Luận văn UIT'}
             </span>
             {year ? (
-              <span className="text-[9px] font-mono text-sky-200">{year}</span>
+              <span className="text-[9px] font-mono text-white/85">{year}</span>
             ) : null}
           </div>
           <p className="text-[10.5px] font-semibold leading-snug line-clamp-4 text-white/95 my-auto">
