@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { ArrowRight, BookMarked, ChevronLeft, ChevronRight } from 'lucide-react';
-import { portalService } from '../../services/portalService';
 import type { Sach } from '../../types/library';
 
 interface FeaturedBooksCarouselProps {
@@ -8,6 +7,13 @@ interface FeaturedBooksCarouselProps {
   onSelectBook: (book: Sach) => void;
   onViewAll: () => void;
 }
+
+const BOOK_SPINE_GRADIENTS = [
+  'from-[#0a1f4d] via-[#1556d6] to-[#3a86ff]',
+  'from-[#06164a] via-[#0284c7] to-[#38bdf8]',
+  'from-[#1e1b4b] via-[#4338ca] to-[#6366f1]',
+  'from-[#064e3b] via-[#0b7a4b] to-[#10b981]',
+];
 
 export function FeaturedBooksCarousel({
   books,
@@ -63,9 +69,9 @@ export function FeaturedBooksCarousel({
         ref={scrollerRef}
         className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth"
       >
-        {books.map((book) => {
+        {books.map((book, idx) => {
           const isAvailable = book.TinhTrang === 'Có sẵn';
-          const coverSrc = book.AnhBia || portalService.getMajorImage(book.MaNganh);
+          const grad = BOOK_SPINE_GRADIENTS[idx % BOOK_SPINE_GRADIENTS.length];
           return (
             <button
               key={book.MaSach}
@@ -73,14 +79,20 @@ export function FeaturedBooksCarousel({
               onClick={() => onSelectBook(book)}
               className="snap-start shrink-0 w-64 text-left bg-slate-50/70 hover:bg-white border border-slate-200 hover:border-[#0054A6]/50 rounded-xl overflow-hidden transition-all hover:shadow-md cursor-pointer flex flex-col group"
             >
-              {/* Visual Cover */}
+              {/* Book Cover: real image if available, otherwise CSS gradient spine */}
               <div className="w-full aspect-[35/24] relative overflow-hidden bg-slate-900">
-                <img
-                  src={coverSrc}
-                  alt={book.TenSach}
-                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent" />
+                {book.AnhBia ? (
+                  <>
+                    <img
+                      src={book.AnhBia}
+                      alt={book.TenSach}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent" />
+                  </>
+                ) : (
+                  <div className={`w-full h-full bg-gradient-to-br ${grad}`} />
+                )}
                 <div className="absolute top-2.5 inset-x-3 flex items-center justify-between gap-2 text-[11px]">
                   <span className="font-mono font-semibold px-2 py-0.5 rounded bg-slate-900/75 text-white backdrop-blur-xs">
                     {book.MaSach}
