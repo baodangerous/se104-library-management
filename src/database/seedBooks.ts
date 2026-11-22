@@ -2,6 +2,7 @@ import type { TacGia, TheLoai } from '../types/library';
 import type { SachRow } from './schema';
 import { SEED_SACH_TACGIA } from './seedBookAuthors';
 import { SEED_SACH_MORE } from './seedBooksCatalog';
+import { SEED_SACH_EXTRA } from './seedBooksExtra';
 
 export { SEED_SACH_TACGIA };
 
@@ -35,6 +36,56 @@ export const SEED_TACGIA: TacGia[] = [
   { MaTacGia: 21, TenTacGia: 'Ramesh Jain' },
   { MaTacGia: 22, TenTacGia: 'Enrico Pontelli' },
   { MaTacGia: 23, TenTacGia: 'Virginia Evans' },
+  { MaTacGia: 24, TenTacGia: 'Christopher D. Manning' },
+  { MaTacGia: 25, TenTacGia: 'Prabhakar Raghavan' },
+  { MaTacGia: 26, TenTacGia: 'Hinrich Schütze' },
+  { MaTacGia: 27, TenTacGia: 'Alfred V. Aho' },
+  { MaTacGia: 28, TenTacGia: 'Ravi Sethi' },
+  { MaTacGia: 29, TenTacGia: 'Jeffrey D. Ullman' },
+  { MaTacGia: 30, TenTacGia: 'Timothy J. Ross' },
+  { MaTacGia: 31, TenTacGia: 'Christophe Bobda' },
+  { MaTacGia: 32, TenTacGia: 'Mike Chapple' },
+  { MaTacGia: 33, TenTacGia: 'James Michael Stewart' },
+  { MaTacGia: 34, TenTacGia: 'Darril Gibson' },
+  { MaTacGia: 35, TenTacGia: 'Venkat Ankam' },
+  { MaTacGia: 36, TenTacGia: 'Michael Ligh' },
+  { MaTacGia: 37, TenTacGia: 'Steven Adair' },
+  { MaTacGia: 38, TenTacGia: 'Behzad Razavi' },
+  { MaTacGia: 39, TenTacGia: 'Richard C. Jaeger' },
+  { MaTacGia: 40, TenTacGia: 'Kenneth C. Laudon' },
+  { MaTacGia: 41, TenTacGia: 'Jane P. Laudon' },
+  { MaTacGia: 42, TenTacGia: 'Lawrie Brown' },
+  { MaTacGia: 43, TenTacGia: 'Stuart J. Russell' },
+  { MaTacGia: 44, TenTacGia: 'Peter Norvig' },
+  { MaTacGia: 45, TenTacGia: 'Jennifer Niederst Robbins' },
+  { MaTacGia: 46, TenTacGia: 'Wes McKinney' },
+  { MaTacGia: 47, TenTacGia: 'Aurélien Géron' },
+  { MaTacGia: 48, TenTacGia: 'Chip Huyen' },
+  { MaTacGia: 49, TenTacGia: 'Dave Chaffey' },
+  { MaTacGia: 50, TenTacGia: 'Fiona Ellis-Chadwick' },
+  { MaTacGia: 51, TenTacGia: 'Hector Garcia-Molina' },
+  { MaTacGia: 52, TenTacGia: 'Jennifer Widom' },
+  { MaTacGia: 53, TenTacGia: 'Thomas Erl' },
+  { MaTacGia: 54, TenTacGia: 'James Kurose' },
+  { MaTacGia: 55, TenTacGia: 'Keith Ross' },
+  { MaTacGia: 56, TenTacGia: 'Wayne C. Booth' },
+  { MaTacGia: 57, TenTacGia: 'Michael Sikorski' },
+  { MaTacGia: 58, TenTacGia: 'Andrew Honig' },
+  { MaTacGia: 59, TenTacGia: 'Ovidiu Vermesan' },
+  { MaTacGia: 60, TenTacGia: 'Peter Friess' },
+  { MaTacGia: 61, TenTacGia: 'Wajid Hassan' },
+  { MaTacGia: 62, TenTacGia: 'TS. Trần Thị Điểm' },
+  { MaTacGia: 63, TenTacGia: 'TS. Phạm Hoài Luân' },
+  { MaTacGia: 64, TenTacGia: 'TS. Lê Thị Phương' },
+  { MaTacGia: 65, TenTacGia: 'GS.TSKH. Hoàng Văn Kiếm' },
+  { MaTacGia: 66, TenTacGia: 'TS. Bùi Hải Phong' },
+  { MaTacGia: 67, TenTacGia: 'Bernard Marr' },
+  { MaTacGia: 68, TenTacGia: 'Đặng Văn Thìn' },
+  { MaTacGia: 69, TenTacGia: 'Thái Huy Tân' },
+  { MaTacGia: 70, TenTacGia: 'Nguyễn Thanh Hòa' },
+  { MaTacGia: 71, TenTacGia: 'Jean-Claude Franchitti' },
+  { MaTacGia: 72, TenTacGia: 'Udayan Das' },
+  { MaTacGia: 73, TenTacGia: 'Shaun V. Ault' },
 ];
 
 const SEED_SACH_CORE: SachRow[] = [
@@ -158,4 +209,4 @@ const SEED_SACH_CORE: SachRow[] = [
   },
 ];
 
-export const SEED_SACH: SachRow[] = [...SEED_SACH_CORE, ...SEED_SACH_MORE];
+export const SEED_SACH: SachRow[] = [...SEED_SACH_CORE, ...SEED_SACH_MORE, ...SEED_SACH_EXTRA];

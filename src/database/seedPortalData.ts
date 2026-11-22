@@ -46,6 +46,24 @@ export const SEED_TINTUC: TinHoatDong[] = [
     duongDan: 'https://thuvien.uit.edu.vn/bai-viet/3092026-gioi-thieu-webinar-tang-toc-nghien-cuu-cung-leapspace-ai-research-solutions-tu-nxb-elsevier',
     tomTat: 'Giới thiệu giải pháp AI hỗ trợ tìm kiếm và tổng hợp tài liệu nghiên cứu khoa học từ NXB Elsevier.',
   },
+  {
+    id: 'news-6',
+    tieuDe: 'Gần 300 sinh viên UIT tham gia tập huấn “Khai thác hiệu quả Thư viện UIT và Hệ thống Thư viện ĐHQG-HCM”',
+    ngayDang: '10/10/2026',
+    chuyenMuc: 'Tập huấn bạn đọc',
+    hinhAnh: '/resources/events/van-hoa-doc.jpg',
+    duongDan: 'https://thuvien.uit.edu.vn/su-kien',
+    tomTat: 'Hướng dẫn tân sinh viên K2026 sử dụng tài khoản OPAC, truy cập từ xa EDS và các CSDL học thuật.',
+  },
+  {
+    id: 'news-7',
+    tieuDe: 'Cập nhật Bộ sưu tập Tài liệu đáp ứng môn học & CSDL IEEE Xplore / SACHWEB 2026',
+    ngayDang: '25/09/2026',
+    chuyenMuc: 'Học liệu số',
+    hinhAnh: '/resources/events/ban-doc-thong-minh.jpg',
+    duongDan: 'https://thuvien.uit.edu.vn/page/csdl-nguon-mo',
+    tomTat: 'Bổ sung 35+ đầu sách chuyên ngành mới cho 12 ngành đào tạo UIT, giáo trình đại cương và kho eBook OpenStax.',
+  },
 ];
 export const SEED_TUSACHCHUYENDE: TuSachChuyenDe[] = [
   {
