@@ -21,7 +21,7 @@ export function GuideFloorViewer({
         <img
           src={activePhoto}
           alt={activeCaption}
-          className="w-full h-full object-cover transition-all duration-300"
+          className="w-full h-full object-cover object-[center_25%] transition-all duration-300"
         />
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 via-slate-950/35 to-transparent p-4 flex items-end justify-between gap-2">
           <div>

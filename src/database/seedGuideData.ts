@@ -35,10 +35,13 @@ export const SEED_HUONGDAN: LibraryGuideData = {
       anhChinh: '/resources/library/floor2-main.jpg',
       boSuuTap: [
         { src: '/resources/library/floor2-main.jpg', caption: 'Toàn cảnh không gian Thư viện Tầng 2' },
-        { src: '/resources/library/floor2-reading.jpg', caption: 'Khu vực đọc tài liệu tại chỗ' },
+        { src: '/resources/library/floor2-study-window.jpg', caption: 'Khu vực đọc tại chỗ & tự học yên tĩnh bên cửa sổ' },
+        { src: '/resources/library/floor2-shelf-read.jpg', caption: 'Sinh viên tra cứu giáo trình ngay tại giá sách' },
+        { src: '/resources/library/floor2-shelf-pick.jpg', caption: 'Kệ sách chuyên ngành kho đọc mở tầng 2' },
+        { src: '/resources/library/floor2-english-shelf.jpg', caption: 'Khu vực tài liệu ngoại văn & ôn luyện TOEIC' },
+        { src: '/resources/library/floor2-student-browse.jpg', caption: 'Không gian tìm kiếm học liệu đa ngành tại tầng 2' },
         { src: '/resources/library/floor2-group.jpg', caption: 'Phòng học & thảo luận nhóm' },
         { src: '/resources/library/floor2-counter.png', caption: 'Quầy mượn trả sách & hỗ trợ bạn đọc' },
-        { src: '/resources/library/floor2-zone.png', caption: 'Kệ sách chuyên ngành & khu tra cứu' },
       ],
       khuVuc: [
         {

@@ -73,17 +73,75 @@ export function AboutPage({ books }: AboutPageProps) {
           </div>
         </div>
 
-        {/* Nội quy thư viện */}
-        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
-          <h2 className="text-base font-bold text-slate-900">Nội quy phòng đọc &amp; mượn tài liệu</h2>
-          <ul className="space-y-3">
-            {portalConfig.noiQuyThuVien.map((rule) => (
-              <li key={rule} className="flex items-start gap-2.5 text-sm text-slate-700 leading-relaxed">
-                <CheckCircle2 className="w-4 h-4 text-[#0054A6] shrink-0 mt-1" />
-                <span>{rule}</span>
-              </li>
-            ))}
-          </ul>
+        {/* Nội quy thư viện + Hình ảnh thực tế tầng 2 */}
+        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-5">
+          <div className="space-y-4">
+            <h2 className="text-base font-bold text-slate-900">Nội quy phòng đọc &amp; mượn tài liệu</h2>
+            <ul className="space-y-3">
+              {portalConfig.noiQuyThuVien.map((rule) => (
+                <li key={rule} className="flex items-start gap-2.5 text-sm text-slate-700 leading-relaxed">
+                  <CheckCircle2 className="w-4 h-4 text-[#0054A6] shrink-0 mt-1" />
+                  <span>{rule}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="pt-4 border-t border-slate-100 space-y-3">
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Không gian thực tế &amp; văn hóa đọc tại Tầng 2
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <figure className="rounded-lg overflow-hidden border border-slate-200 bg-slate-50">
+                <div className="aspect-[3/2] overflow-hidden">
+                  <img
+                    src="/resources/library/floor2-study-window.jpg"
+                    alt="Giữ trật tự và xếp ghế gọn gàng tại khu đọc tầng 2"
+                    className="w-full h-full object-cover object-[center_25%]"
+                  />
+                </div>
+                <figcaption className="px-2.5 py-1.5 text-[11px] font-medium text-slate-600">
+                  Giữ trật tự &amp; xếp ghế gọn tại khu đọc yên tĩnh
+                </figcaption>
+              </figure>
+              <figure className="rounded-lg overflow-hidden border border-slate-200 bg-slate-50">
+                <div className="aspect-[3/2] overflow-hidden">
+                  <img
+                    src="/resources/library/floor2-shelf-read.jpg"
+                    alt="Đọc và bảo quản sách nguyên vẹn tại kệ"
+                    className="w-full h-full object-cover object-[center_20%]"
+                  />
+                </div>
+                <figcaption className="px-2.5 py-1.5 text-[11px] font-medium text-slate-600">
+                  Tra cứu &amp; bảo quản nguyên vẹn giáo trình
+                </figcaption>
+              </figure>
+              <figure className="rounded-lg overflow-hidden border border-slate-200 bg-slate-50">
+                <div className="aspect-[3/2] overflow-hidden">
+                  <img
+                    src="/resources/library/floor2-shelf-pick.jpg"
+                    alt="Lấy sách nhẹ nhàng trên giá sách tầng 2"
+                    className="w-full h-full object-cover object-[center_20%]"
+                  />
+                </div>
+                <figcaption className="px-2.5 py-1.5 text-[11px] font-medium text-slate-600">
+                  Kho mở đa ngành phục vụ mượn đọc trực tiếp
+                </figcaption>
+              </figure>
+              <figure className="rounded-lg overflow-hidden border border-slate-200 bg-slate-50">
+                <div className="aspect-[3/2] overflow-hidden">
+                  <img
+                    src="/resources/library/floor2-english-shelf.jpg"
+                    alt="Khu vực sách ngoại văn tại tầng 2"
+                    className="w-full h-full object-cover object-[center_20%]"
+                  />
+                </div>
+                <figcaption className="px-2.5 py-1.5 text-[11px] font-medium text-slate-600">
+                  Tài liệu ngoại văn &amp; tham khảo chuyên sâu
+                </figcaption>
+              </figure>
+            </div>
+          </div>
         </div>
       </div>
     </div>
