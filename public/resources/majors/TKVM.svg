@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="300" height="150">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4C1D95"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ffffff" stroke-opacity="0.06" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="300" height="150" fill="url(#g)"/>
+  <rect width="300" height="150" fill="url(#grid)"/>
+  <circle cx="260" cy="24" r="56" fill="#ffffff" fill-opacity="0.06"/>
+  <rect x="110" y="35" width="80" height="80" rx="10" fill="none" stroke="#DDD6FE" stroke-width="2.5"/><rect x="128" y="53" width="44" height="44" rx="4" fill="#DDD6FE" fill-opacity="0.22" stroke="#EDE9FE" stroke-width="2"/><path d="M90 55h20M90 75h20M90 95h20M190 55h20M190 75h20M190 95h20M130 15v20M150 15v20M170 15v20M130 115v20M150 115v20M170 115v20" stroke="#C4B5FD" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="16" y="136" fill="#ffffff" fill-opacity="0.72" font-family="ui-monospace, monospace" font-size="10" font-weight="700" letter-spacing="1.2">TKVM · VLSI · FPGA · SoC</text>
+</svg>

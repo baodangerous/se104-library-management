@@ -86,26 +86,28 @@ export function MajorsCatalogPage({
               type="button"
               onClick={() => setSelectedMajor(major.MaNganh)}
               className={cn(
-                'text-left p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-2.5',
+                'text-left rounded-xl border overflow-hidden transition-all cursor-pointer flex flex-col justify-between group',
                 active
-                  ? 'bg-[#0054A6] text-white border-[#0054A6] shadow-md'
-                  : 'bg-white text-slate-900 border-slate-200 hover:border-[#0054A6]/50 hover:shadow-xs'
+                  ? 'bg-[#0054A6] text-white border-[#0054A6] shadow-md ring-2 ring-[#0284C7]/40'
+                  : 'bg-white text-slate-900 border-slate-200 hover:border-[#0054A6]/50 hover:shadow-sm'
               )}
             >
-              <div className="flex items-start justify-between gap-2">
-                <span
-                  className={cn(
-                    'text-[11px] font-mono font-bold px-2 py-0.5 rounded',
-                    active ? 'bg-white/20 text-white' : 'bg-slate-100 text-[#0054A6]'
-                  )}
-                >
-                  {major.MaNganh}
-                </span>
-                <span className={cn('text-xs font-medium', active ? 'text-sky-100' : 'text-slate-500')}>
-                  {count} học liệu
-                </span>
+              <div className="relative h-24 w-full overflow-hidden">
+                <img
+                  src={`/resources/majors/${major.MaNganh}.svg`}
+                  alt={major.TenNganh}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute top-2 inset-x-2.5 flex items-center justify-between gap-2">
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-950/65 text-white backdrop-blur-xs">
+                    {major.MaNganh}
+                  </span>
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-white/20 text-white backdrop-blur-xs">
+                    {count} học liệu
+                  </span>
+                </div>
               </div>
-              <div>
+              <div className="p-3.5">
                 <h2 className="text-sm font-bold leading-snug">{major.TenNganh}</h2>
                 <p className={cn('text-[11px] mt-1 line-clamp-1', active ? 'text-sky-100' : 'text-slate-500')}>
                   {major.Khoa}

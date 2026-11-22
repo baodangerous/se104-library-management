@@ -8,13 +8,6 @@ interface FeaturedBooksCarouselProps {
   onViewAll: () => void;
 }
 
-const SPINE_GRADIENTS = [
-  'from-[#003B73] to-[#0054A6]',
-  'from-[#0F4C81] to-[#0284C7]',
-  'from-[#1E3A5F] to-[#2563EB]',
-  'from-[#0F766E] to-[#0054A6]',
-];
-
 export function FeaturedBooksCarousel({
   books,
   onSelectBook,
@@ -69,9 +62,9 @@ export function FeaturedBooksCarousel({
         ref={scrollerRef}
         className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth"
       >
-        {books.map((book, idx) => {
+        {books.map((book) => {
           const isAvailable = book.TinhTrang === 'Có sẵn';
-          const grad = SPINE_GRADIENTS[idx % SPINE_GRADIENTS.length];
+          const coverSrc = book.AnhBia || `/resources/majors/${book.MaNganh || 'CNTT'}.svg`;
           return (
             <button
               key={book.MaSach}
@@ -79,21 +72,27 @@ export function FeaturedBooksCarousel({
               onClick={() => onSelectBook(book)}
               className="snap-start shrink-0 w-64 text-left bg-slate-50/70 hover:bg-white border border-slate-200 hover:border-[#0054A6]/50 rounded-xl overflow-hidden transition-all hover:shadow-md cursor-pointer flex flex-col group"
             >
-              {/* Crisp Typographic Academic Book Cover */}
-              <div
-                className={`h-32 bg-gradient-to-br ${grad} p-4 text-white flex flex-col justify-between relative`}
-              >
-                <div className="flex items-center justify-between gap-2 text-[11px] text-sky-100">
-                  <span className="font-mono font-semibold">{book.MaSach}</span>
-                  <span className="px-2 py-0.5 rounded bg-white/15 text-white font-medium">
+              {/* Visual Cover */}
+              <div className="h-36 relative overflow-hidden bg-slate-900">
+                <img
+                  src={coverSrc}
+                  alt={book.TenSach}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent" />
+                <div className="absolute top-2.5 inset-x-3 flex items-center justify-between gap-2 text-[11px]">
+                  <span className="font-mono font-semibold px-2 py-0.5 rounded bg-slate-900/75 text-white backdrop-blur-xs">
+                    {book.MaSach}
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-white/20 text-white font-medium backdrop-blur-xs">
                     {book.NgonNgu === 'Tiếng Anh' ? 'Ngoại văn' : 'Tiếng Việt'}
                   </span>
                 </div>
-                <div className="flex items-end justify-between gap-2">
-                  <p className="text-sm font-bold leading-snug line-clamp-2">
+                <div className="absolute bottom-2.5 inset-x-3 flex items-end justify-between gap-2 text-white">
+                  <p className="text-xs font-bold leading-snug line-clamp-2 drop-shadow-xs">
                     {book.TenSach}
                   </p>
-                  <BookMarked className="w-4 h-4 text-sky-200/80 shrink-0 mb-0.5" />
+                  <BookMarked className="w-4 h-4 text-sky-300 shrink-0 mb-0.5" />
                 </div>
               </div>
 
