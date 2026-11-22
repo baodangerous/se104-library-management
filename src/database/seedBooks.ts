@@ -33,6 +33,8 @@ export const SEED_TACGIA: TacGia[] = [
   { MaTacGia: 19, TenTacGia: 'Richard Szeliski' },
   { MaTacGia: 20, TenTacGia: 'Gerald Friedland' },
   { MaTacGia: 21, TenTacGia: 'Ramesh Jain' },
+  { MaTacGia: 22, TenTacGia: 'Enrico Pontelli' },
+  { MaTacGia: 23, TenTacGia: 'Virginia Evans' },
 ];
 
 const SEED_SACH_CORE: SachRow[] = [

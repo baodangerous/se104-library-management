@@ -24,5 +24,8 @@ export const SEED_SACH_TACGIA: SachTacGiaRow[] = [
   { MaSachTacGia: 21, MaSach: 'S020', MaTacGia: 19 },
   { MaSachTacGia: 22, MaSach: 'S021', MaTacGia: 20 },
   { MaSachTacGia: 23, MaSach: 'S021', MaTacGia: 21 },
+  { MaSachTacGia: 24, MaSach: 'S022', MaTacGia: 18 },
+  { MaSachTacGia: 25, MaSach: 'S022', MaTacGia: 22 },
+  { MaSachTacGia: 26, MaSach: 'S022', MaTacGia: 23 },
 ];
 
