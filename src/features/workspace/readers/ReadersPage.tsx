@@ -22,6 +22,7 @@ export function ReadersPage() {
     setLoaiFilter,
     saveReader,
     deleteReader,
+    renewReaderCard,
   } = useReaders();
 
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -36,9 +37,14 @@ export function ReadersPage() {
           setEditing(reader);
           setModalOpen(true);
         },
-        (reader) => setDeleteTarget(reader)
+        (reader) => setDeleteTarget(reader),
+        (reader) => {
+          renewReaderCard(reader).catch((err: any) =>
+            toast.error(err?.message || 'Không thể gia hạn thẻ.')
+          );
+        }
       ),
-    []
+    [renewReaderCard]
   );
 
   async function handleConfirmDelete() {

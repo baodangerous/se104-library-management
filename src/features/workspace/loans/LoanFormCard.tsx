@@ -176,7 +176,15 @@ export function LoanFormCard({ readers, books, thamSo, onCreateLoan }: LoanFormC
         <Button
           type="submit"
           className="w-full"
-          disabled={submitting || !selectedReaderId || selectedBookIds.length === 0}
+          disabled={
+            submitting ||
+            !selectedReaderId ||
+            selectedBookIds.length === 0 ||
+            Boolean(
+              ruleStatus &&
+                (!ruleStatus.cardValid || !ruleStatus.noOverdue || !ruleStatus.withinLimit)
+            )
+          }
         >
           <BookUp className="w-4 h-4" />
           {submitting ? 'Đang lập phiếu...' : 'Xác nhận cho mượn sách'}

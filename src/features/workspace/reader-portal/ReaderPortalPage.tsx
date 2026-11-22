@@ -4,7 +4,8 @@ import { toast } from 'sonner';
 import { Button } from '../../../components/ui/button';
 import { Card, CardBody } from '../../../components/ui/card';
 import { adminService, type ReaderProfileData } from '../../../services/adminService';
-import { diffDaysIso, todayIsoDate } from '../../../services/rules/dateUtils';
+import { circulationService } from '../../../services/circulationService';
+import { diffDaysIso, formatDateVn, todayIsoDate } from '../../../services/rules/dateUtils';
 import type { NavPageId } from '../layout/navConfig';
 import { ReaderCardSummary } from './ReaderCardSummary';
 import { ReaderHistoryTables } from './ReaderHistoryTables';
@@ -13,7 +14,8 @@ export function ReaderPortalPage({ onNavigate }: { onNavigate: (page: NavPageId)
   const [data, setData] = React.useState<ReaderProfileData | null>(null);
   const [loading, setLoading] = React.useState(true);
 
-  React.useEffect(() => {
+  const loadProfile = React.useCallback(() => {
+    setLoading(true);
     adminService
       .getReaderProfile()
       .then(setData)
@@ -22,6 +24,22 @@ export function ReaderPortalPage({ onNavigate }: { onNavigate: (page: NavPageId)
       )
       .finally(() => setLoading(false));
   }, []);
+
+  React.useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
+
+  async function handleRenewLoan(maChiTietMuon: number) {
+    try {
+      const res = await circulationService.renewLoanItem(maChiTietMuon);
+      toast.success(
+        `Gia hạn sách thành công đến ${formatDateVn(res.HanTraMoi)} (lần ${res.SoLanGiaHan}/2).`
+      );
+      loadProfile();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Không thể gia hạn sách.');
+    }
+  }
 
   if (loading) {
     return (
@@ -77,6 +95,8 @@ export function ReaderPortalPage({ onNavigate }: { onNavigate: (page: NavPageId)
         lichSuMuon={data.lichSuMuon}
         phieuThuPhat={data.phieuThuPhat}
         today={today}
+        isCardExpired={isExpired}
+        onRenewLoan={handleRenewLoan}
       />
     </div>
   );

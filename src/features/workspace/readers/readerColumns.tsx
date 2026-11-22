@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Pencil, Trash2 } from 'lucide-react';
+import { CalendarPlus, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import type { DataTableColumn } from '../../../components/ui/data-table';
 import { formatDateVn, formatVnd, todayIsoDate } from '../../../services/rules/dateUtils';
@@ -7,7 +7,8 @@ import type { DocGia } from '../../../types/library';
 
 export function buildReaderColumns(
   onEdit: (reader: DocGia) => void,
-  onDelete: (reader: DocGia) => void
+  onDelete: (reader: DocGia) => void,
+  onRenew?: (reader: DocGia) => void
 ): DataTableColumn<DocGia>[] {
   const today = todayIsoDate();
 
@@ -97,6 +98,17 @@ export function buildReaderColumns(
       enableSorting: false,
       cell: ({ row }) => (
         <div className="flex items-center gap-1">
+          {onRenew ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              title="Gia hạn thẻ độc giả"
+              aria-label={`Gia hạn thẻ ${row.original.HoTen}`}
+              onClick={() => onRenew(row.original)}
+            >
+              <CalendarPlus className="w-4 h-4 text-[#0054A6]" />
+            </Button>
+          ) : null}
           <Button
             variant="ghost"
             size="icon"

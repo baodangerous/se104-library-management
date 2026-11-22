@@ -4,7 +4,7 @@ import { LoanHistoryList } from './LoanHistoryList';
 import { useLoans } from './useLoans';
 
 export function LoansPage() {
-  const { readers, books, loans, thamSo, loading, createLoan } = useLoans();
+  const { readers, books, loans, thamSo, loading, createLoan, renewLoanItem } = useLoans();
 
   return (
     <div className="space-y-6">
@@ -26,7 +26,7 @@ export function LoansPage() {
           thamSo={thamSo}
           onCreateLoan={createLoan}
         />
-        <LoanHistoryList loans={loans} loading={loading} />
+        <LoanHistoryList loans={loans} loading={loading} onRenewItem={renewLoanItem} />
       </div>
     </div>
   );

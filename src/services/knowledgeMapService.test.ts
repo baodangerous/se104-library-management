@@ -3,6 +3,7 @@ import test from 'node:test';
 import { bookService } from './bookService';
 import { circulationService } from './circulationService';
 import { buildKnowledgeGraph } from './knowledgeMapService';
+import { readerService } from './readerService';
 import { removeVietnameseTones } from './rules/searchUtils';
 import { serviceRequestService } from './serviceRequestService';
 import { resetDb } from './storage';
@@ -87,4 +88,74 @@ test('CirculationService enforces borrow rules, dynamic book status, return fine
     SoTienThu: 2000,
   });
   assert.equal(receipt.ConLai, 1000);
+});
+
+test('CirculationService supports loan renewal, return validation, and card renewal', async () => {
+  resetDb();
+  const loan = await circulationService.createLoan({
+    MaDocGia: 'DG002',
+    NgayMuon: '2026-11-21',
+    MaSachList: ['S002'],
+  });
+  assert.equal(loan.HanTra, '2026-11-25');
+
+  const active = await circulationService.listReaderActiveLoans('DG002');
+  const ctId = active[0].MaChiTietMuon;
+
+  // Reject return with wrong reader
+  await assert.rejects(
+    () =>
+      circulationService.createReturn({
+        MaDocGia: 'DG001',
+        NgayTra: '2026-11-23',
+        MaChiTietMuonList: [ctId],
+      }),
+    /không thuộc về độc giả/
+  );
+
+  // Reject return before borrow date
+  await assert.rejects(
+    () =>
+      circulationService.createReturn({
+        MaDocGia: 'DG002',
+        NgayTra: '2026-11-20',
+        MaChiTietMuonList: [ctId],
+      }),
+    /không được trước ngày mượn/
+  );
+
+  // Renew loan twice on time
+  const r1 = await circulationService.renewLoanItem(ctId, '2026-11-24');
+  assert.equal(r1.HanTraMoi, '2026-11-29');
+  assert.equal(r1.SoLanGiaHan, 1);
+
+  const r2 = await circulationService.renewLoanItem(ctId, '2026-11-28');
+  assert.equal(r2.HanTraMoi, '2026-12-03');
+  assert.equal(r2.SoLanGiaHan, 2);
+
+  // 3rd renewal rejected
+  await assert.rejects(
+    () => circulationService.renewLoanItem(ctId, '2026-12-01'),
+    /tối đa/
+  );
+
+  // Past room booking rejected
+  await assert.rejects(
+    () =>
+      serviceRequestService.createRoomBooking({
+        MaPhong: 'P202',
+        NguoiDat: 'SV Test',
+        MaSoSV: '22520001',
+        Email: '22520001@gm.uit.edu.vn',
+        NgayDat: '2020-01-01',
+        KhungGio: '08:00 – 10:00',
+        MucDich: 'Test',
+      }),
+    /quá khứ/
+  );
+
+  // Card renewal extends NgayHetHan
+  const before = (await readerService.list('DG002'))[0];
+  const renewed = await readerService.renewCard('DG002');
+  assert.ok(renewed.NgayHetHan > before.NgayHetHan);
 });

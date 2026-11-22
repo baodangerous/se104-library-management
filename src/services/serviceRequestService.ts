@@ -1,5 +1,5 @@
 import type { LichDatPhong, PhongHop, YeuCauTaiLieu } from '../types/portal';
-import { todayIsoDate } from './rules/dateUtils';
+import { diffDaysIso, isValidIsoDate, todayIsoDate } from './rules/dateUtils';
 import { appendAuditLog, loadDb, mutateDb, nextPrefixedId } from './storage';
 
 export interface RoomBookingInput {
@@ -36,6 +36,12 @@ export const serviceRequestService = {
 
   async createRoomBooking(payload: RoomBookingInput): Promise<LichDatPhong> {
     return mutateDb((db) => {
+      if (!isValidIsoDate(payload.NgayDat)) {
+        throw new Error('Ngày đặt phòng không hợp lệ.');
+      }
+      if (diffDaysIso(payload.NgayDat, todayIsoDate()) < 0) {
+        throw new Error('Không thể đặt phòng cho ngày trong quá khứ.');
+      }
       const room = db.PHONGHOP.find((p) => p.MaPhong === payload.MaPhong);
       if (!room) throw new Error('Không tìm thấy phòng họp nhóm.');
       if (room.TrangThai !== 'Sẵn sàng') {

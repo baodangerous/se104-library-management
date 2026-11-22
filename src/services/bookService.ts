@@ -142,6 +142,10 @@ export const bookService = {
         MaNganh: payload.MaNganh || db.SACH[idx].MaNganh,
         NgonNgu: payload.NgonNgu || db.SACH[idx].NgonNgu,
         NguonTaiLieu: payload.NguonTaiLieu || db.SACH[idx].NguonTaiLieu,
+        ChuDe: payload.ChuDe !== undefined ? payload.ChuDe : db.SACH[idx].ChuDe,
+        NoiBat: payload.NoiBat !== undefined ? payload.NoiBat : db.SACH[idx].NoiBat,
+        MaKeSach: payload.MaKeSach !== undefined ? payload.MaKeSach : db.SACH[idx].MaKeSach,
+        MoTa: payload.MoTa !== undefined ? payload.MoTa : db.SACH[idx].MoTa,
       };
       linkBookAuthors(db, maSach, payload.TacGiaList);
       appendAuditLog(db, 'SUA_SACH', 'SACH', `Cập nhật thông tin sách ${maSach}.`);

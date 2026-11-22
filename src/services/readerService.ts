@@ -1,7 +1,7 @@
 import type { DocGia, LoaiDocGia, ThamSo } from '../types/library';
 import type { LibraryDatabase } from './dbSchema';
 import { validateReaderCard } from './rules/catalogRules';
-import { diffDaysIso, todayIsoDate } from './rules/dateUtils';
+import { addMonthsIso, diffDaysIso, todayIsoDate } from './rules/dateUtils';
 import { matchesVietnameseSearch } from './rules/searchUtils';
 import { appendAuditLog, loadDb, mutateDb, nextPrefixedId } from './storage';
 
@@ -99,6 +99,28 @@ export const readerService = {
         NgayHetHan: nextExpiry,
       };
       appendAuditLog(db, 'SUA_DOCGIA', 'DOCGIA', `Cập nhật thẻ độc giả ${maDocGia}.`);
+      return hydrateReaders(db).find((d) => d.MaDocGia === maDocGia)!;
+    });
+  },
+
+  async renewCard(maDocGia: string): Promise<DocGia> {
+    return mutateDb((db) => {
+      const idx = db.DOCGIA.findIndex((d) => d.MaDocGia === maDocGia);
+      if (idx === -1) throw new Error('Không tìm thấy thẻ độc giả.');
+      const current = db.DOCGIA[idx];
+      const today = todayIsoDate();
+      const baseDate = diffDaysIso(current.NgayHetHan, today) >= 0 ? current.NgayHetHan : today;
+      const nextExpiry = addMonthsIso(baseDate, db.THAMSO[0].ThoiHanThe);
+      db.DOCGIA[idx] = {
+        ...current,
+        NgayHetHan: nextExpiry,
+      };
+      appendAuditLog(
+        db,
+        'GIA_HAN_THE',
+        'DOCGIA',
+        `Gia hạn thẻ độc giả ${maDocGia} (${current.HoTen}) đến ${nextExpiry}.`
+      );
       return hydrateReaders(db).find((d) => d.MaDocGia === maDocGia)!;
     });
   },

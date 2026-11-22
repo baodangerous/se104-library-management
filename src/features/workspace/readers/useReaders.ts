@@ -54,6 +54,14 @@ export function useReaders() {
     await loadData();
   }
 
+  async function renewReaderCard(reader: DocGia) {
+    const updated = await readersService.renewCard(reader.MaDocGia);
+    toast.success(
+      `Đã gia hạn thẻ ${updated.MaDocGia} đến ${formatDateVn(updated.NgayHetHan)}`
+    );
+    await loadData();
+  }
+
   return {
     readers,
     loaiList,
@@ -65,5 +73,6 @@ export function useReaders() {
     setLoaiFilter,
     saveReader,
     deleteReader,
+    renewReaderCard,
   };
 }

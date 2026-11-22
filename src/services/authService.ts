@@ -1,5 +1,41 @@
 import type { AuthUser, UserRole } from '../types/library';
-import { appendAuditLog, mutateDb, setCurrentActor } from './storage';
+import { appendAuditLog, loadDb, mutateDb, setCurrentActor } from './storage';
+
+const SESSION_KEY = 'uit_library_session_v1';
+
+interface StoredSession {
+  userId: number;
+  mode: 'portal' | 'workspace';
+}
+
+function saveStoredSession(session: StoredSession | null): void {
+  try {
+    if (typeof window === 'undefined' || typeof window.localStorage === 'undefined') return;
+    if (!session) {
+      window.localStorage.removeItem(SESSION_KEY);
+    } else {
+      window.localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    }
+  } catch {
+    // Ignore storage errors in restricted environments
+  }
+}
+
+function readStoredSession(): StoredSession | null {
+  try {
+    if (typeof window === 'undefined' || typeof window.localStorage === 'undefined') return null;
+    const raw = window.localStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<StoredSession>;
+    if (typeof parsed.userId !== 'number') return null;
+    return {
+      userId: parsed.userId,
+      mode: parsed.mode === 'workspace' ? 'workspace' : 'portal',
+    };
+  } catch {
+    return null;
+  }
+}
 
 function toAuthUser(row: {
   MaTaiKhoan: number;
@@ -20,6 +56,27 @@ function toAuthUser(row: {
 }
 
 export const authService = {
+  restoreSession(): { user: AuthUser; mode: 'portal' | 'workspace' } | null {
+    const saved = readStoredSession();
+    if (!saved) return null;
+    const db = loadDb();
+    const row = db.TAIKHOAN.find(
+      (acc) => acc.MaTaiKhoan === saved.userId && acc.TrangThai === 'ACTIVE'
+    );
+    if (!row) {
+      saveStoredSession(null);
+      setCurrentActor(null);
+      return null;
+    }
+    const user = toAuthUser(row);
+    setCurrentActor(user);
+    return { user, mode: saved.mode };
+  },
+
+  saveMode(userId: number, mode: 'portal' | 'workspace'): void {
+    saveStoredSession({ userId, mode });
+  },
+
   async login(tenDangNhap: string, matKhau: string): Promise<AuthUser> {
     return mutateDb((db) => {
       const normalized = tenDangNhap.trim().toLowerCase();
@@ -34,6 +91,7 @@ export const authService = {
       }
       const user = toAuthUser(row);
       setCurrentActor(user);
+      saveStoredSession({ userId: user.MaTaiKhoan, mode: 'workspace' });
       appendAuditLog(
         db,
         'DANG_NHAP',
@@ -55,6 +113,7 @@ export const authService = {
       }
       const user = toAuthUser(row);
       setCurrentActor(user);
+      saveStoredSession({ userId: user.MaTaiKhoan, mode: 'workspace' });
       appendAuditLog(
         db,
         'DANG_NHAP',
@@ -68,5 +127,6 @@ export const authService = {
 
   logout(): void {
     setCurrentActor(null);
+    saveStoredSession(null);
   },
 };

@@ -49,5 +49,13 @@ export function useLoans() {
     await loadData();
   }
 
-  return { readers, books, loans, thamSo, loading, createLoan };
+  async function renewLoanItem(maChiTietMuon: number) {
+    const res = await circulationService.renewLoanItem(maChiTietMuon);
+    toast.success(
+      `Đã gia hạn thành công đến ${formatDateVn(res.HanTraMoi)} (lần ${res.SoLanGiaHan}/2)`
+    );
+    await loadData();
+  }
+
+  return { readers, books, loans, thamSo, loading, createLoan, renewLoanItem };
 }

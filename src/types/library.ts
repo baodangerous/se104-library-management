@@ -84,6 +84,7 @@ export interface ChiTietPhieuMuon {
   NgayTra: string | null;
   TienPhat: number | null;
   DaTra: boolean;
+  SoLanGiaHan?: number;
 }
 
 export interface PhieuMuon {

@@ -6,12 +6,23 @@ import { authService } from './services/authService';
 import type { AuthUser } from './types/library';
 
 export default function App() {
-  const [user, setUser] = React.useState<AuthUser | null>(null);
-  const [mode, setMode] = React.useState<'portal' | 'workspace'>('portal');
+  const [initialSession] = React.useState(() => authService.restoreSession());
+  const [user, setUser] = React.useState<AuthUser | null>(initialSession?.user ?? null);
+  const [mode, setMode] = React.useState<'portal' | 'workspace'>(
+    initialSession?.mode ?? 'portal'
+  );
+
+  function updateMode(nextMode: 'portal' | 'workspace') {
+    setMode(nextMode);
+    if (user) {
+      authService.saveMode(user.MaTaiKhoan, nextMode);
+    }
+  }
 
   function handleLoginSuccess(loggedInUser: AuthUser) {
     setUser(loggedInUser);
     setMode('workspace');
+    authService.saveMode(loggedInUser.MaTaiKhoan, 'workspace');
   }
 
   function handleLogout() {
@@ -27,14 +38,14 @@ export default function App() {
       {mode === 'workspace' && user ? (
         <WorkspaceApp
           user={user}
-          onBackToPortal={() => setMode('portal')}
+          onBackToPortal={() => updateMode('portal')}
           onLogout={handleLogout}
         />
       ) : (
         <PublicPortalShell
           user={user}
           onLoginSuccess={handleLoginSuccess}
-          onEnterWorkspace={() => setMode('workspace')}
+          onEnterWorkspace={() => updateMode('workspace')}
           onLogout={handleLogout}
         />
       )}

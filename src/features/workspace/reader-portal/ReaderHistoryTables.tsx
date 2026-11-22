@@ -1,4 +1,7 @@
+import * as React from 'react';
+import { RefreshCw } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/ui/card';
+import { MAX_RENEWALS_PER_LOAN } from '../../../services/rules/circulationRules';
 import { diffDaysIso, formatDateVn, formatVnd } from '../../../services/rules/dateUtils';
 import type { ChiTietPhieuMuon, PhieuThuTienPhat } from '../../../types/library';
 
@@ -6,13 +9,28 @@ interface ReaderHistoryTablesProps {
   lichSuMuon: ChiTietPhieuMuon[];
   phieuThuPhat: PhieuThuTienPhat[];
   today: string;
+  isCardExpired?: boolean;
+  onRenewLoan?: (maChiTietMuon: number) => Promise<void>;
 }
 
 export function ReaderHistoryTables({
   lichSuMuon,
   phieuThuPhat,
   today,
+  isCardExpired = false,
+  onRenewLoan,
 }: ReaderHistoryTablesProps) {
+  const [renewingId, setRenewingId] = React.useState<number | null>(null);
+
+  async function handleRenew(id: number) {
+    if (!onRenewLoan) return;
+    setRenewingId(id);
+    try {
+      await onRenewLoan(id);
+    } finally {
+      setRenewingId(null);
+    }
+  }
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
       <Card className="lg:col-span-8">
@@ -34,28 +52,49 @@ export function ReaderHistoryTables({
             <tbody className="divide-y divide-slate-100 tabular-nums">
               {lichSuMuon.map((item) => {
                 const isOverdue = !item.DaTra && diffDaysIso(today, item.HanTra) > 0;
+                const renewals = item.SoLanGiaHan ?? 0;
+                const canRenew =
+                  Boolean(onRenewLoan) &&
+                  !item.DaTra &&
+                  !isOverdue &&
+                  !isCardExpired &&
+                  renewals < MAX_RENEWALS_PER_LOAN;
                 return (
                   <tr key={item.MaChiTietMuon} className="hover:bg-slate-50">
                     <td className="px-4 py-3">
                       <div className="font-medium text-slate-900">{item.TenSach}</div>
                       <div className="text-xs text-slate-500 font-mono">
                         {item.MaSach} · {item.MaPhieuMuon}
+                        {renewals > 0 ? ` · Gia hạn ${renewals}/${MAX_RENEWALS_PER_LOAN}` : ''}
                       </div>
                     </td>
                     <td className="px-4 py-3 text-xs">{formatDateVn(item.NgayMuon)}</td>
                     <td className="px-4 py-3 text-xs">{formatDateVn(item.HanTra)}</td>
                     <td className="px-4 py-3 text-xs">
-                      {item.DaTra ? (
-                        <span className="text-emerald-700 font-medium">
-                          Đã trả ({formatDateVn(item.NgayTra)})
-                        </span>
-                      ) : isOverdue ? (
-                        <span className="text-rose-700 font-semibold">
-                          Quá hạn {diffDaysIso(today, item.HanTra)} ngày
-                        </span>
-                      ) : (
-                        <span className="text-[#0054A6] font-medium">Đang mượn</span>
-                      )}
+                      <div className="flex flex-wrap items-center gap-2">
+                        {item.DaTra ? (
+                          <span className="text-emerald-700 font-medium">
+                            Đã trả ({formatDateVn(item.NgayTra)})
+                          </span>
+                        ) : isOverdue ? (
+                          <span className="text-rose-700 font-semibold">
+                            Quá hạn {diffDaysIso(today, item.HanTra)} ngày
+                          </span>
+                        ) : (
+                          <span className="text-[#0054A6] font-medium">Đang mượn</span>
+                        )}
+                        {canRenew ? (
+                          <button
+                            type="button"
+                            disabled={renewingId === item.MaChiTietMuon}
+                            onClick={() => handleRenew(item.MaChiTietMuon)}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-[#0054A6]/30 text-[#0054A6] hover:bg-[#0054A6]/10 text-[11px] font-medium cursor-pointer disabled:opacity-50"
+                          >
+                            <RefreshCw className="w-3 h-3" />
+                            Gia hạn
+                          </button>
+                        ) : null}
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-right text-xs font-medium">
                       {item.TienPhat && item.TienPhat > 0 ? (

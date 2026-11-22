@@ -42,6 +42,7 @@ export function CatalogSearchPage({
 }: CatalogSearchPageProps) {
   const [books, setBooks] = React.useState<Sach[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [sortBy, setSortBy] = React.useState<'newest' | 'available' | 'title' | 'year'>('newest');
 
   React.useEffect(() => {
     let active = true;
@@ -58,6 +59,24 @@ export function CatalogSearchPage({
       active = false;
     };
   }, [filters]);
+
+  const sortedBooks = React.useMemo(() => {
+    const list = [...books];
+    switch (sortBy) {
+      case 'available':
+        return list.sort((a, b) => {
+          if (a.TinhTrang === b.TinhTrang) return a.TenSach.localeCompare(b.TenSach, 'vi');
+          return a.TinhTrang === 'Có sẵn' ? -1 : 1;
+        });
+      case 'title':
+        return list.sort((a, b) => a.TenSach.localeCompare(b.TenSach, 'vi'));
+      case 'year':
+        return list.sort((a, b) => b.NamXuatBan - a.NamXuatBan);
+      case 'newest':
+      default:
+        return list.sort((a, b) => b.NgayNhap.localeCompare(a.NgayNhap));
+    }
+  }, [books, sortBy]);
 
   const update = (patch: Partial<CatalogFilterState>) =>
     onChangeFilters({ ...filters, ...patch });
@@ -85,9 +104,22 @@ export function CatalogSearchPage({
               Tìm kiếm không dấu theo nhan đề, tác giả, nhà xuất bản, mã ngành hoặc vị trí kệ sách.
             </p>
           </div>
-          <span className="text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg self-start sm:self-auto">
-            Tìm thấy <strong className="text-[#0054A6]">{books.length}</strong> tài liệu
-          </span>
+          <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+            <select
+              aria-label="Sắp xếp kết quả"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+              className="h-8 px-2.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-700"
+            >
+              <option value="newest">Mới nhập gần đây</option>
+              <option value="available">Sẵn sàng mượn trước</option>
+              <option value="title">Nhan đề A–Z</option>
+              <option value="year">Năm xuất bản mới nhất</option>
+            </select>
+            <span className="text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg">
+              Tìm thấy <strong className="text-[#0054A6]">{books.length}</strong> tài liệu
+            </span>
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-1.5 border-b border-slate-100 pb-4">
@@ -171,7 +203,7 @@ export function CatalogSearchPage({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {books.map((book) => (
+          {sortedBooks.map((book) => (
             <CatalogBookCard key={book.MaSach} book={book} onSelect={onSelectBook} />
           ))}
         </div>

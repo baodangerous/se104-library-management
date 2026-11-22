@@ -55,6 +55,7 @@ export interface ChiTietPhieuMuonRow {
   MaPhieuMuon: string;
   MaSach: string;
   HanTra: string;
+  SoLanGiaHan?: number;
 }
 
 export interface PhieuTraRow {

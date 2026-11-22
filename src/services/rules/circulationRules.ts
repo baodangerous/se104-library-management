@@ -3,6 +3,7 @@ import type { ValidationResult } from './catalogRules';
 import { addDaysIso, diffDaysIso, formatVnd, isValidIsoDate } from './dateUtils';
 
 export const FINE_PER_OVERDUE_DAY = 1000;
+export const MAX_RENEWALS_PER_LOAN = 2;
 
 export interface BorrowEligibilityInput {
   ngayMuon: string;
@@ -126,4 +127,61 @@ export function computeCategoryReportPercentages<T extends { SoLuotMuon: number 
         : 0,
   }));
   return { tongSoLuotMuon, rows: enriched };
+}
+
+export interface LoanRenewalInput {
+  today: string;
+  hanTra: string;
+  ngayHetHanThe: string;
+  daTra: boolean;
+  soLanGiaHan: number;
+  soNgayMuonToiDa: number;
+  maxRenewals?: number;
+}
+
+/**
+ * UIT Library renewal rule: only active, non-overdue loans on valid cards
+ * can be renewed, up to maxRenewals times.
+ */
+export function validateLoanRenewal(
+  input: LoanRenewalInput
+): ValidationResult & { newHanTra?: string } {
+  const {
+    today,
+    hanTra,
+    ngayHetHanThe,
+    daTra,
+    soLanGiaHan,
+    soNgayMuonToiDa,
+    maxRenewals = MAX_RENEWALS_PER_LOAN,
+  } = input;
+
+  if (!isValidIsoDate(today) || !isValidIsoDate(hanTra)) {
+    return { valid: false, error: 'Ngày gia hạn hoặc hạn trả không hợp lệ.' };
+  }
+  if (daTra) {
+    return { valid: false, error: 'Sách này đã được trả, không thể gia hạn.' };
+  }
+  if (diffDaysIso(ngayHetHanThe, today) < 0) {
+    return {
+      valid: false,
+      error: `Thẻ độc giả đã hết hạn từ ngày ${ngayHetHanThe}. Vui lòng gia hạn thẻ trước.`,
+    };
+  }
+  if (diffDaysIso(today, hanTra) > 0) {
+    return {
+      valid: false,
+      error: `Sách đã quá hạn trả (${hanTra}), không đủ điều kiện gia hạn trực tuyến.`,
+    };
+  }
+  if (soLanGiaHan >= maxRenewals) {
+    return {
+      valid: false,
+      error: `Sách đã đạt số lần gia hạn tối đa (${maxRenewals} lần).`,
+    };
+  }
+  return {
+    valid: true,
+    newHanTra: addDaysIso(hanTra, soNgayMuonToiDa),
+  };
 }

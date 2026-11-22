@@ -42,6 +42,7 @@ export function buildReaderProfile(): ReaderProfileData {
       NgayTra: pt?.NgayTra ?? null,
       TienPhat: tr?.TienPhat ?? null,
       DaTra: Boolean(tr),
+      SoLanGiaHan: ct.SoLanGiaHan ?? 0,
     };
   });
   const phieuThuPhat = db.PHIEUTHUTIENPHAT.filter((p) => p.MaDocGia === docGia.MaDocGia);

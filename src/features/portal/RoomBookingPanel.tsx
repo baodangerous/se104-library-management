@@ -29,6 +29,27 @@ export function RoomBookingPanel({ user }: RoomBookingPanelProps) {
   const [submitting, setSubmitting] = React.useState(false);
   const [cancelTarget, setCancelTarget] = React.useState<LichDatPhong | null>(null);
 
+  React.useEffect(() => {
+    if (user) {
+      setNguoiDat((prev) => prev || user.HoTen);
+      setMaSoSV((prev) => prev || user.MaDocGia || '');
+      setEmail((prev) => prev || user.TenDangNhap);
+    }
+  }, [user]);
+
+  const bookedSlotsForSelection = React.useMemo(() => {
+    return new Set(
+      bookings
+        .filter(
+          (b) =>
+            b.TrangThai === 'Đã xác nhận' &&
+            b.MaPhong === maPhong &&
+            b.NgayDat === ngayDat
+        )
+        .map((b) => b.KhungGio)
+    );
+  }, [bookings, maPhong, ngayDat]);
+
   const loadData = React.useCallback(async () => {
     const [r, b] = await Promise.all([
       serviceRequestService.listRooms(),
@@ -125,12 +146,19 @@ export function RoomBookingPanel({ user }: RoomBookingPanelProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
               <FieldLabel htmlFor="rb-date" required>Ngày sử dụng</FieldLabel>
-              <TextInput id="rb-date" type="date" value={ngayDat} onChange={(e) => setNgayDat(e.target.value)} />
+              <TextInput id="rb-date" type="date" min={todayIsoDate()} value={ngayDat} onChange={(e) => setNgayDat(e.target.value)} />
             </div>
             <div>
               <FieldLabel htmlFor="rb-slot" required>Khung giờ</FieldLabel>
               <SelectInput id="rb-slot" value={khungGio} onChange={(e) => setKhungGio(e.target.value)}>
-                {ROOM_TIME_SLOTS.map((slot) => <option key={slot} value={slot}>{slot}</option>)}
+                {ROOM_TIME_SLOTS.map((slot) => {
+                  const isTaken = bookedSlotsForSelection.has(slot);
+                  return (
+                    <option key={slot} value={slot} disabled={isTaken}>
+                      {slot}{isTaken ? ' (Đã đặt)' : ''}
+                    </option>
+                  );
+                })}
               </SelectInput>
             </div>
             <div>

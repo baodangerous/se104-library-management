@@ -9,6 +9,7 @@ import {
   validateBookIntake,
   validateBorrowEligibility,
   validateFinePayment,
+  validateLoanRenewal,
   validateReaderCard,
   validateRegulationParams,
 } from './businessRules';
@@ -153,4 +154,24 @@ test('BM7.1 & QD8: computes category percentages and validates regulation parame
     validateRegulationParams({ ...DEFAULT_THAMSO, TuoiToiThieu: 60, TuoiToiDa: 55 }).valid,
     false
   );
+});
+
+test('UIT Renewal: validates non-overdue active loan renewal up to 2 times', () => {
+  const base = {
+    today: '2026-11-22',
+    hanTra: '2026-11-25',
+    ngayHetHanThe: '2027-03-01',
+    daTra: false,
+    soLanGiaHan: 0,
+    soNgayMuonToiDa: 4,
+  };
+
+  const ok = validateLoanRenewal(base);
+  assert.equal(ok.valid, true);
+  assert.equal(ok.newHanTra, '2026-11-29');
+
+  assert.equal(validateLoanRenewal({ ...base, daTra: true }).valid, false);
+  assert.equal(validateLoanRenewal({ ...base, ngayHetHanThe: '2026-11-21' }).valid, false);
+  assert.equal(validateLoanRenewal({ ...base, today: '2026-11-26' }).valid, false);
+  assert.equal(validateLoanRenewal({ ...base, soLanGiaHan: 2 }).valid, false);
 });
