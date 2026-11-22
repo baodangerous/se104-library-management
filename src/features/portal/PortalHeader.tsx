@@ -1,27 +1,22 @@
 import * as React from 'react';
 import {
-  Clock,
   LayoutDashboard,
   LogIn,
   LogOut,
-  Mail,
   Menu,
-  Phone,
   X,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { ThemeToggle } from '../../components/ui/theme-toggle';
 import { UitLogo } from '../../components/ui/uit-logo';
 import { cn } from '../../lib/utils';
-import { portalService } from '../../services/portalService';
 import type { AuthUser } from '../../types/library';
 import type { PortalTabId } from '../../types/portal';
 
 const NAV_ITEMS: Array<{ id: PortalTabId; label: string }> = [
   { id: 'home', label: 'Trang chủ' },
-  { id: 'catalog', label: 'Tra cứu & Sách mới' },
-  { id: 'majors', label: 'CSDL Ngành học' },
-  { id: 'knowledge-map', label: 'Bản đồ Tri thức' },
+  { id: 'catalog', label: 'Tra cứu' },
+  { id: 'majors', label: 'Ngành học' },
   { id: 'services', label: 'Dịch vụ' },
   { id: 'about', label: 'Giới thiệu' },
 ];
@@ -44,7 +39,6 @@ export function PortalHeader({
   onLogout,
 }: PortalHeaderProps) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const UIT_LIBRARY_INFO = React.useMemo(() => portalService.getConfig(), []);
 
   const handleSelect = (tab: PortalTabId) => {
     onSelectTab(tab);
@@ -53,29 +47,8 @@ export function PortalHeader({
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-xs">
-      {/* Topbar */}
-      <div className="bg-gradient-to-r from-[#030a24] via-[#06164a] to-[#0a2b86] text-[#c3d6fa] text-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-9 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4 sm:gap-6 truncate">
-            <span className="inline-flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5 text-sky-300 shrink-0" />
-              <span className="font-medium text-white">{UIT_LIBRARY_INFO.hotline}</span>
-            </span>
-            <span className="hidden sm:inline-flex items-center gap-1.5">
-              <Mail className="w-3.5 h-3.5 text-sky-300 shrink-0" />
-              <span>{UIT_LIBRARY_INFO.email}</span>
-            </span>
-          </div>
-          <div className="inline-flex items-center gap-1.5 text-sky-100 shrink-0">
-            <Clock className="w-3.5 h-3.5 text-sky-300 shrink-0" />
-            <span className="hidden md:inline">{UIT_LIBRARY_INFO.gioMoCuaNgan}</span>
-            <span className="md:hidden">T2–T6: 07:30–18:00</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Navbar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      {/* Single-tier Main Navbar */}
+      <div className="max-w-[1120px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         <button
           type="button"
           onClick={() => handleSelect('home')}
@@ -140,7 +113,7 @@ export function PortalHeader({
               </button>
             </>
           ) : (
-            <Button variant="primary" size="sm" onClick={onOpenLogin} className="gap-1.5">
+            <Button variant="outline" size="sm" onClick={onOpenLogin} className="gap-1.5">
               <LogIn className="w-4 h-4" />
               Đăng nhập
             </Button>
