@@ -28,15 +28,38 @@ export function AboutPage({ books }: AboutPageProps) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-2">
-        <h1 className="text-xl font-bold text-slate-900">
-          Giới thiệu {portalConfig.tenDonVi}
-        </h1>
-        <p className="text-sm text-slate-600 leading-relaxed max-w-3xl">
-          Thư viện UIT cung cấp không gian đọc hiện đại, phòng thảo luận nhóm tiện nghi và hệ thống
-          học liệu chuyên sâu về Công nghệ Thông tin, Trí tuệ Nhân tạo, An toàn Thông tin và Vi mạch
-          bán dẫn phục vụ đào tạo đại học và sau đại học.
-        </p>
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <div className="lg:col-span-7 space-y-3">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0054A6]/10 text-[#0054A6] text-[11px] font-bold uppercase tracking-wider">
+            Welcome to UIT · Soi rọi tri thức số
+          </span>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 leading-snug">
+            Giới thiệu {portalConfig.tenDonVi}
+          </h1>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            Như thấu kính phóng đại giúp nhìn rõ từng chi tiết tri thức, Thư viện UIT kết nối sinh
+            viên với không gian đọc hiện đại, phòng thảo luận nhóm tiện nghi và hệ thống học liệu
+            chuyên sâu về Công nghệ Thông tin, Trí tuệ Nhân tạo, An toàn Thông tin và Thiết kế Vi
+            mạch.
+          </p>
+          <p className="text-xs text-slate-500 italic">
+            “Từ khuôn viên xanh UIT đến kho tàng tri thức mở — mỗi lần tra cứu là một góc nhìn mới.”
+          </p>
+        </div>
+
+        <figure className="lg:col-span-5 rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-100 relative group">
+          <div className="aspect-[3/2] overflow-hidden">
+            <img
+              src="/resources/library/welcome-uit-lens.jpg"
+              alt="Kính lúp Welcome to UIT — Biểu tượng tra cứu và khám phá tri thức"
+              className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+            />
+          </div>
+          <figcaption className="px-3 py-2 bg-white/95 border-t border-slate-100 text-[11px] font-medium text-slate-600 flex items-center justify-between gap-2">
+            <span>Lăng kính khám phá tri thức UIT</span>
+            <span className="text-[#0054A6] font-semibold shrink-0">Khuôn viên UIT</span>
+          </figcaption>
+        </figure>
       </div>
 
       {/* Public Live Statistics */}
