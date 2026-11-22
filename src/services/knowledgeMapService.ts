@@ -1,6 +1,7 @@
 import type { Sach, TheLoai } from '../types/library';
 import { bookService } from './bookService';
 import { portalService } from './portalService';
+import { matchesVietnameseSearch } from './rules/searchUtils';
 
 export type KnowledgeNodeType = 'MAJOR' | 'CATEGORY' | 'BOOK' | 'AUTHOR';
 
@@ -37,19 +38,80 @@ export const NODE_COLORS: Record<KnowledgeNodeType, string> = {
  * Pure graph builder transforming UIT Majors, Categories, Books, and Authors
  * into an Obsidian-style interactive 2D force-directed Knowledge Map.
  */
+export interface RelatedSearchHit {
+  book: Sach;
+  matchType: 'direct' | 'related';
+}
+
+export function searchRelatedCatalog(
+  books: Sach[],
+  query: string,
+  limit = 40
+): RelatedSearchHit[] {
+  const q = query.trim();
+  if (!q) return [];
+
+  const direct = books.filter((b) =>
+    matchesVietnameseSearch(q, [
+      b.MaSach,
+      b.TenSach,
+      b.NhaXuatBan,
+      b.TenTheLoai,
+      b.TenNganh,
+      b.MaNganh,
+      b.MoTa,
+      ...b.TacGiaList,
+    ])
+  );
+
+  const directIds = new Set(direct.map((b) => b.MaSach));
+  const hitMajors = new Set(direct.map((b) => b.MaNganh).filter(Boolean));
+  const hitAuthors = new Set(
+    direct.flatMap((b) => b.TacGiaList.map((a) => a.toLowerCase()))
+  );
+
+  const related =
+    direct.length > 0 && direct.length < limit
+      ? books
+          .filter(
+            (b) =>
+              !directIds.has(b.MaSach) &&
+              (hitAuthors.has((b.TacGiaList[0] || '').toLowerCase()) ||
+                (b.MaNganh && hitMajors.has(b.MaNganh)))
+          )
+          .slice(0, Math.min(12, limit - direct.length))
+      : [];
+
+  return [
+    ...direct.slice(0, limit).map((book) => ({ book, matchType: 'direct' as const })),
+    ...related.map((book) => ({ book, matchType: 'related' as const })),
+  ];
+}
+
 export function buildKnowledgeGraph(
   books: Sach[],
   categories: TheLoai[],
-  options?: { majorFilter?: string; categoryFilter?: string }
+  options?: { majorFilter?: string; categoryFilter?: string; query?: string }
 ): KnowledgeGraphData {
   const majorFilter = options?.majorFilter || 'ALL';
   const categoryFilter = options?.categoryFilter || 'ALL';
+  const query = options?.query?.trim() || '';
 
-  const filteredBooks = books.filter((b) => {
+  let filteredBooks = books.filter((b) => {
     if (majorFilter !== 'ALL' && b.MaNganh !== majorFilter) return false;
     if (categoryFilter !== 'ALL' && b.MaTheLoai !== categoryFilter) return false;
     return true;
   });
+
+  if (query) {
+    filteredBooks = searchRelatedCatalog(filteredBooks, query, 45).map((h) => h.book);
+  } else if (filteredBooks.length > 80) {
+    // Keep overview graph smooth by sampling newest/featured items across majors
+    const sorted = [...filteredBooks].sort(
+      (a, b) => Number(Boolean(b.NoiBat)) - Number(Boolean(a.NoiBat)) || b.NamXuatBan - a.NamXuatBan
+    );
+    filteredBooks = sorted.slice(0, 80);
+  }
 
   const nodeMap = new Map<string, KnowledgeNode>();
   const links: KnowledgeLink[] = [];
