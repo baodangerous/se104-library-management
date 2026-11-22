@@ -1,0 +1,186 @@
+import { ArrowRight, BookOpen, Calendar, DoorOpen, GraduationCap, Library, Network } from 'lucide-react';
+import { PORTAL_NEWS, THEMATIC_SHELVES } from '../../constants/portalContent';
+import type { Sach, TheLoai } from '../../types/library';
+import type { PortalTabId } from '../../types/portal';
+import { FeaturedBooksCarousel } from './FeaturedBooksCarousel';
+import { HeroSearchSection, type HeroSearchQuery } from './HeroSearchSection';
+
+interface PortalHomePageProps {
+  books: Sach[];
+  categories: TheLoai[];
+  onHeroSearch: (query: HeroSearchQuery) => void;
+  onSelectBook: (book: Sach) => void;
+  onSelectTheme: (themeId: string) => void;
+  onNavigateTab: (tab: PortalTabId) => void;
+}
+
+export function PortalHomePage({
+  books,
+  categories,
+  onHeroSearch,
+  onSelectBook,
+  onSelectTheme,
+  onNavigateTab,
+}: PortalHomePageProps) {
+  const availableCount = books.filter((b) => b.TinhTrang === 'Có sẵn').length;
+  const featuredBooks = books.filter((b) => b.NoiBat);
+  const carouselBooks = featuredBooks.length >= 4 ? featuredBooks : books.slice(0, 8);
+
+  return (
+    <div className="space-y-8">
+      <HeroSearchSection
+        categories={categories}
+        totalBooks={books.length}
+        availableBooks={availableCount}
+        onSearch={onHeroSearch}
+        onOpenKnowledgeMap={() => onNavigateTab('knowledge-map')}
+      />
+
+      {/* Quick Utility Strip */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <QuickShortcut
+          icon={GraduationCap}
+          title="CSDL 12 ngành đào tạo UIT"
+          description="Lọc giáo trình, sách tham khảo và luận văn theo từng ngành học."
+          onClick={() => onNavigateTab('majors')}
+        />
+        <QuickShortcut
+          icon={Network}
+          title="Bản đồ Tri thức Học liệu"
+          description="Khám phá trực quan mạng lưới liên kết Ngành học – Thể loại – Sách – Tác giả."
+          onClick={() => onNavigateTab('knowledge-map')}
+        />
+        <QuickShortcut
+          icon={DoorOpen}
+          title="Đặt phòng họp nhóm & Dịch vụ"
+          description="Đăng ký phòng thảo luận tầng 2–3 và gửi đề xuất bổ sung sách mới."
+          onClick={() => onNavigateTab('services')}
+        />
+      </section>
+
+      {/* Featured IT Books Carousel */}
+      <FeaturedBooksCarousel
+        books={carouselBooks}
+        onSelectBook={onSelectBook}
+        onViewAll={() => onNavigateTab('catalog')}
+      />
+
+      {/* Bento Grid: News + Thematic Shelves */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Tin hoạt động */}
+        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-xl p-6 shadow-xs flex flex-col">
+          <div className="flex items-center justify-between gap-2 pb-4 border-b border-slate-100">
+            <div>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900">Tin hoạt động</h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Thông báo học liệu mới, sự kiện học thuật và lịch phục vụ tại Thư viện UIT
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => onNavigateTab('about')}
+              className="text-xs font-semibold text-[#0054A6] hover:underline shrink-0 cursor-pointer"
+            >
+              Lịch phục vụ
+            </button>
+          </div>
+
+          <div className="divide-y divide-slate-100 flex-1">
+            {PORTAL_NEWS.map((item) => (
+              <article key={item.id} className="py-4 first:pt-4 last:pb-0 space-y-1.5">
+                <div className="flex items-center gap-2.5 text-xs text-slate-500">
+                  <span className="font-semibold text-[#0054A6]">{item.chuyenMuc}</span>
+                  <span>·</span>
+                  <span className="inline-flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                    {item.ngayDang}
+                  </span>
+                </div>
+                <h3 className="text-sm font-semibold text-slate-900 leading-snug">
+                  {item.tieuDe}
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">{item.tomTat}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        {/* Tủ sách Chuyên đề */}
+        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-xl p-6 shadow-xs flex flex-col">
+          <div className="pb-4 border-b border-slate-100">
+            <h2 className="text-base sm:text-lg font-bold text-slate-900">Tủ sách Chuyên đề</h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Bộ sưu tập văn hóa, kỹ năng và học liệu mở chọn lọc tại Thư viện
+            </p>
+          </div>
+
+          <div className="space-y-3 pt-4 flex-1">
+            {THEMATIC_SHELVES.map((shelf) => {
+              const linkedCount = books.filter((b) => b.ChuDe === shelf.id).length;
+              return (
+                <button
+                  key={shelf.id}
+                  type="button"
+                  onClick={() => onSelectTheme(shelf.id)}
+                  className="w-full text-left p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white hover:border-[#0054A6]/50 transition-all hover:shadow-xs cursor-pointer group"
+                >
+                  <div className="flex items-start gap-3">
+                    <div
+                      className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-white"
+                      style={{ backgroundColor: shelf.accentColor }}
+                    >
+                      <Library className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="text-sm font-semibold text-slate-900 group-hover:text-[#0054A6] transition-colors">
+                          {shelf.tenTuSach}
+                        </h3>
+                        <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#0054A6] shrink-0" />
+                      </div>
+                      <p className="text-xs text-slate-600 mt-1 line-clamp-2">{shelf.moTa}</p>
+                      <p className="text-[11px] font-medium text-slate-500 mt-2 inline-flex items-center gap-1">
+                        <BookOpen className="w-3 h-3 text-[#0054A6]" />
+                        {shelf.soTaiLieuMinhHoa}+ tài liệu ({linkedCount} bản tiêu biểu trên cổng)
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function QuickShortcut({
+  icon: Icon,
+  title,
+  description,
+  onClick,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="text-left bg-white border border-slate-200 hover:border-[#0054A6]/50 rounded-xl p-5 shadow-xs hover:shadow-md transition-all cursor-pointer flex items-start gap-4 group"
+    >
+      <div className="w-10 h-10 rounded-xl bg-[#0054A6]/10 text-[#0054A6] flex items-center justify-center shrink-0 group-hover:bg-[#0054A6] group-hover:text-white transition-colors">
+        <Icon className="w-5 h-5" />
+      </div>
+      <div className="min-w-0">
+        <h3 className="text-sm font-bold text-slate-900 group-hover:text-[#0054A6] transition-colors">
+          {title}
+        </h3>
+        <p className="text-xs text-slate-600 mt-1 leading-relaxed">{description}</p>
+      </div>
+    </button>
+  );
+}
