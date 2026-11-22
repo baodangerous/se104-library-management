@@ -7,6 +7,7 @@ import {
   SEED_TINTUC,
   SEED_TUSACHCHUYENDE,
 } from './seedPortalData';
+import { SEED_HUONGDAN } from './seedGuideData';
 import { createSeedBookRequests, createSeedBookings, SEED_PHONGHOP } from './seedRooms';
 
 export function createInitialDatabase(): LibraryDatabase {
@@ -177,5 +178,6 @@ export function createInitialDatabase(): LibraryDatabase {
     TINTUC: SEED_TINTUC,
     TUSACHCHUYENDE: SEED_TUSACHCHUYENDE,
     CAUHINHCONG: SEED_CAUHINHCONG,
+    HUONGDAN: SEED_HUONGDAN,
   };
 }

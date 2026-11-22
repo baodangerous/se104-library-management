@@ -1,5 +1,6 @@
 import { loadDb } from '../database/dbEngine';
 import type {
+  LibraryGuideData,
   LibraryPortalConfig,
   NganhHoc,
   TinHoatDong,
@@ -40,6 +41,10 @@ export const portalService = {
 
   getConfig(): LibraryPortalConfig {
     return loadDb().CAUHINHCONG;
+  },
+
+  getGuide(): LibraryGuideData {
+    return loadDb().HUONGDAN;
   },
 };
 

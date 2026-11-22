@@ -10,6 +10,7 @@ import type {
 } from '../types/library';
 import type {
   LichDatPhong,
+  LibraryGuideData,
   LibraryPortalConfig,
   NganhHoc,
   NgonNguSach,
@@ -105,5 +106,6 @@ export interface LibraryDatabase {
   TINTUC: TinHoatDong[];
   TUSACHCHUYENDE: TuSachChuyenDe[];
   CAUHINHCONG: LibraryPortalConfig;
+  HUONGDAN: LibraryGuideData;
 }
 

@@ -80,6 +80,29 @@ export interface TuSachChuyenDe {
   accentColor: string;
 }
 
+export interface LibraryFloorZone {
+  id: string;
+  tenKhuVuc: string;
+  moTaNgan: string;
+  icon: string;
+  badge: string;
+}
+
+export interface LibraryFloorGuide {
+  id: 'ground' | 'floor2';
+  tenTang: string;
+  tieuDe: string;
+  anhChinh: string;
+  boSuuTap: Array<{ src: string; caption: string }>;
+  khuVuc: LibraryFloorZone[];
+}
+
+export interface LibraryGuideData {
+  tang: LibraryFloorGuide[];
+  noiQuyTrucQuan: Array<{ id: string; tieuDe: string; nhan: string; icon: string }>;
+  lienKetDatPhong: Array<{ id: string; tieuDe: string; moTa: string; url: string; loai: 'internal' | 'external' }>;
+}
+
 export interface LibraryPortalConfig {
   tenDonVi: string;
   tenNgan: string;
