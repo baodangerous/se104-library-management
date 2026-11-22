@@ -113,12 +113,26 @@ export function RoomBookingPanel({ user }: { user: AuthUser | null }) {
                 type="button"
                 disabled={!ready}
                 onClick={() => setMaPhong(room.MaPhong)}
-                className={`text-left p-4 rounded-xl border transition-all cursor-pointer disabled:opacity-60 ${
+                className={`text-left rounded-xl border transition-all cursor-pointer disabled:opacity-60 overflow-hidden ${
                   selected
                     ? 'border-[#0054A6] bg-[#0054A6]/5 ring-1 ring-[#0054A6]'
                     : 'border-slate-200 bg-white hover:border-slate-300'
                 }`}
               >
+                {room.MaPhong === 'P202' || room.MaPhong === 'P201' ? (
+                  <div className="aspect-[3/2] w-full overflow-hidden bg-slate-100 border-b border-slate-100">
+                    <img
+                      src={
+                        room.MaPhong === 'P202'
+                          ? '/resources/library/room-a202.jpg'
+                          : '/resources/library/floor2-group.jpg'
+                      }
+                      alt={room.TenPhong}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : null}
+                <div className="p-4">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-bold text-slate-900">{room.TenPhong}</span>
                   <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${ready ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
@@ -133,6 +147,7 @@ export function RoomBookingPanel({ user }: { user: AuthUser | null }) {
                   <span>Tối đa {room.SucChua} người</span>
                 </p>
                 <p className="text-[11px] text-slate-500 mt-1.5">{room.TrangThietBi}</p>
+                </div>
               </button>
             );
           })}
