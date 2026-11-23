@@ -66,7 +66,7 @@ export function PortalHeader({
         </button>
 
         {/* Desktop Nav */}
-        <nav aria-label="Điều hướng chính" className="hidden lg:flex items-center gap-1">
+        <nav aria-label="Điều hướng chính" className="hidden md:flex items-center gap-1">
           {NAV_ITEMS.map((item) => {
             const active = activeTab === item.id;
             return (
@@ -123,7 +123,7 @@ export function PortalHeader({
             type="button"
             onClick={() => setMobileOpen((prev) => !prev)}
             aria-label="Mở menu điều hướng"
-            className="lg:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 cursor-pointer"
+            className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 cursor-pointer"
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -132,7 +132,7 @@ export function PortalHeader({
 
       {/* Mobile Nav Drawer */}
       {mobileOpen ? (
-        <div className="lg:hidden border-t border-slate-200 bg-white px-4 py-3 space-y-1">
+        <div className="md:hidden border-t border-slate-200 bg-white px-4 py-3 space-y-1">
           {NAV_ITEMS.map((item) => (
             <button
               key={item.id}

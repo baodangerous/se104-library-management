@@ -150,7 +150,7 @@ export function CatalogSearchPage({
             ))}
           </div>
           {totalPages > 1 ? (
-            <div className="flex items-center justify-between bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-600">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-600">
               <span>
                 Trang <strong className="text-slate-900">{page}</strong> / {totalPages} · Hiển thị{' '}
                 {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, sortedBooks.length)} /{' '}

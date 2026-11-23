@@ -25,8 +25,8 @@ export function KnowledgeMapCanvas({
     if (!el) return;
     const update = () => {
       setSize({
-        width: Math.max(320, Math.floor(el.clientWidth)),
-        height: 540,
+        width: Math.max(300, Math.floor(el.clientWidth)),
+        height: Math.max(340, Math.floor(el.clientHeight)),
       });
     };
     update();
@@ -60,7 +60,7 @@ export function KnowledgeMapCanvas({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[540px] rounded-xl border border-slate-200 bg-slate-950 overflow-hidden"
+      className="relative w-full h-[380px] sm:h-[460px] lg:h-[540px] rounded-xl border border-slate-200 bg-slate-950 overflow-hidden"
     >
       <div className="absolute top-3 right-3 z-10 flex items-center gap-1 bg-slate-900/90 border border-slate-700/80 rounded-lg p-1 backdrop-blur-xs">
         <button
@@ -89,7 +89,7 @@ export function KnowledgeMapCanvas({
         </button>
       </div>
 
-      <div className="absolute bottom-3 left-3 z-10 flex flex-wrap items-center gap-3 bg-slate-900/90 border border-slate-700/80 rounded-lg px-3 py-2 text-[11px] text-slate-200 backdrop-blur-xs">
+      <div className="absolute bottom-3 left-3 z-10 max-w-[calc(100%-1.5rem)] flex flex-wrap items-center gap-x-2.5 gap-y-1 sm:gap-3 bg-slate-900/90 border border-slate-700/80 rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2 text-[10px] sm:text-[11px] text-slate-200 backdrop-blur-xs">
         <LegendDot color="#6366F1" sizeClass="w-4 h-4" label="Ngành UIT (Lớn nhất)" />
         <LegendDot color="#F59E0B" sizeClass="w-3.5 h-3.5" label="Thể loại (Trung-lớn)" />
         <LegendDot color="#0EA5E9" sizeClass="w-2.5 h-2.5" label="Sách có sẵn" />
