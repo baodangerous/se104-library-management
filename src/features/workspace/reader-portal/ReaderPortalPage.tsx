@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BookCopy, Network } from 'lucide-react';
+import { BookCopy, DoorOpen, GraduationCap, Network } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../../../components/ui/button';
 import { Card, CardBody } from '../../../components/ui/card';
@@ -90,11 +90,17 @@ export function ReaderPortalPage({ onNavigate }: { onNavigate: (page: NavPageId)
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" onClick={() => onNavigate('reader-services')}>
+            <DoorOpen className="w-4 h-4" /> Đặt phòng &amp; Yêu cầu
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => onNavigate('reader-majors')}>
+            <GraduationCap className="w-4 h-4" /> Tài liệu theo ngành
+          </Button>
           <Button variant="outline" size="sm" onClick={() => onNavigate('knowledge-map')}>
             <Network className="w-4 h-4" /> Bản đồ tri thức
           </Button>
           <Button size="sm" onClick={() => onNavigate('books')}>
-            <BookCopy className="w-4 h-4" /> Tra cứu học liệu
+            <BookCopy className="w-4 h-4" /> Tra cứu &amp; Đặt trước
           </Button>
         </div>
       </div>

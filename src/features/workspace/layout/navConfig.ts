@@ -4,8 +4,11 @@ import {
   BookCopy,
   BookDown,
   BookUp,
+  Compass,
   CreditCard,
   DatabaseBackup,
+  DoorOpen,
+  GraduationCap,
   History,
   LayoutDashboard,
   Network,
@@ -31,7 +34,10 @@ export type NavPageId =
   | 'accounts'
   | 'audit'
   | 'backup'
-  | 'reader-portal';
+  | 'reader-portal'
+  | 'reader-services'
+  | 'reader-majors'
+  | 'reader-about';
 
 export interface NavItem {
   id: NavPageId;
@@ -63,6 +69,27 @@ export const NAV_ITEMS: NavItem[] = [
     section: 'Cổng độc giả UIT',
     roles: ['READER'],
     icon: UserCircle2,
+  },
+  {
+    id: 'reader-services',
+    label: 'Đặt phòng & Yêu cầu',
+    section: 'Cổng độc giả UIT',
+    roles: ['READER'],
+    icon: DoorOpen,
+  },
+  {
+    id: 'reader-majors',
+    label: 'Giáo trình theo ngành',
+    section: 'Học liệu & Độc giả',
+    roles: ['READER'],
+    icon: GraduationCap,
+  },
+  {
+    id: 'reader-about',
+    label: 'Tin tức, Nội quy & CSDL',
+    section: 'Cổng độc giả UIT',
+    roles: ['READER'],
+    icon: Compass,
   },
   {
     id: 'books',
