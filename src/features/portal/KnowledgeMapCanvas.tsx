@@ -38,15 +38,68 @@ export function KnowledgeMapCanvas({
   React.useEffect(() => {
     const fg = fgRef.current;
     if (fg) {
-      const charge = fg.d3Force('charge') as { strength?: (n: number) => void } | undefined;
-      charge?.strength?.(-320);
+      const charge = fg.d3Force('charge') as { strength?: (n: number) => void; distanceMax?: (n: number) => void } | undefined;
+      charge?.strength?.(-85);
+      charge?.distanceMax?.(260);
       const linkForce = fg.d3Force('link') as { distance?: (n: number) => void } | undefined;
-      linkForce?.distance?.(85);
+      linkForce?.distance?.(34);
+
+      // Centripetal radial gravity keeps all clusters packed into a cohesive spherical knowledge globe
+      let simNodes: Array<{ x?: number; y?: number; vx?: number; vy?: number; type?: string; val?: number }> = [];
+      const gravityForce = (alpha: number) => {
+        for (const n of simNodes) {
+          const x = n.x ?? 0;
+          const y = n.y ?? 0;
+          const dist = Math.hypot(x, y) || 1;
+          const pull = (n.type === 'MAJOR' ? 0.24 : n.type === 'CATEGORY' ? 0.2 : 0.14) * alpha;
+          // Stronger radial pull at outer perimeter to maintain a clean rounded boundary
+          const radialBoost = dist > 180 ? 1.45 : 1;
+          n.vx = (n.vx ?? 0) - x * pull * radialBoost;
+          n.vy = (n.vy ?? 0) - y * pull * radialBoost;
+        }
+      };
+      gravityForce.initialize = (nodes: typeof simNodes) => {
+        simNodes = nodes;
+      };
+      fg.d3Force('gravity', gravityForce as never);
+
+      // Soft collision pass so dense nodes stay distinct without overlapping
+      let collideNodes: typeof simNodes = [];
+      const collideForce = (alpha: number) => {
+        const strength = 0.35 * alpha;
+        for (let i = 0; i < collideNodes.length; i++) {
+          const a = collideNodes[i];
+          const ra = Math.sqrt(Math.max(4, a.val || 6)) * 1.65 + 2.5;
+          for (let j = i + 1; j < collideNodes.length; j++) {
+            const b = collideNodes[j];
+            const rb = Math.sqrt(Math.max(4, b.val || 6)) * 1.65 + 2.5;
+            const dx = (b.x ?? 0) - (a.x ?? 0);
+            const dy = (b.y ?? 0) - (a.y ?? 0);
+            const minDist = ra + rb;
+            const d2 = dx * dx + dy * dy;
+            if (d2 > 0 && d2 < minDist * minDist) {
+              const d = Math.sqrt(d2);
+              const shift = ((minDist - d) / d) * strength;
+              const sx = dx * shift;
+              const sy = dy * shift;
+              a.vx = (a.vx ?? 0) - sx;
+              a.vy = (a.vy ?? 0) - sy;
+              b.vx = (b.vx ?? 0) + sx;
+              b.vy = (b.vy ?? 0) + sy;
+            }
+          }
+        }
+      };
+      collideForce.initialize = (nodes: typeof simNodes) => {
+        collideNodes = nodes;
+      };
+      fg.d3Force('collide', collideForce as never);
+
       fg.d3ReheatSimulation();
     }
     const timer = window.setTimeout(() => {
-      fgRef.current?.zoomToFit(450, 76);
-    }, 420);
+      fgRef.current?.zoomToFit(450, 44);
+    }, 520);
     return () => window.clearTimeout(timer);
   }, [graphData]);
 
@@ -81,7 +134,7 @@ export function KnowledgeMapCanvas({
         </button>
         <button
           type="button"
-          onClick={() => fgRef.current?.zoomToFit(400, 76)}
+          onClick={() => fgRef.current?.zoomToFit(400, 44)}
           aria-label="Căn giữa toàn bộ đồ thị"
           className="p-1.5 rounded text-slate-300 hover:text-white hover:bg-slate-800 cursor-pointer"
         >
@@ -104,20 +157,22 @@ export function KnowledgeMapCanvas({
         height={size.height}
         graphData={graphData}
         backgroundColor="#0B1220"
-        cooldownTicks={100}
+        cooldownTicks={140}
+        d3AlphaDecay={0.025}
+        d3VelocityDecay={0.32}
         linkColor={(link) => {
-          if (!selectedNodeId) return 'rgba(148, 163, 184, 0.28)';
+          if (!selectedNodeId) return 'rgba(148, 163, 184, 0.2)';
           const src = typeof link.source === 'object' ? (link.source as KnowledgeNode).id : String(link.source);
           const tgt = typeof link.target === 'object' ? (link.target as KnowledgeNode).id : String(link.target);
           return src === selectedNodeId || tgt === selectedNodeId
             ? 'rgba(56, 189, 248, 0.92)'
-            : 'rgba(148, 163, 184, 0.08)';
+            : 'rgba(148, 163, 184, 0.06)';
         }}
         linkWidth={(link) => {
-          if (!selectedNodeId) return 1;
+          if (!selectedNodeId) return 0.75;
           const src = typeof link.source === 'object' ? (link.source as KnowledgeNode).id : String(link.source);
           const tgt = typeof link.target === 'object' ? (link.target as KnowledgeNode).id : String(link.target);
-          return src === selectedNodeId || tgt === selectedNodeId ? 2 : 0.7;
+          return src === selectedNodeId || tgt === selectedNodeId ? 2 : 0.6;
         }}
         onNodeClick={(node) => {
           onSelectNode(node as KnowledgeNode);
@@ -128,15 +183,20 @@ export function KnowledgeMapCanvas({
           const y = node.y ?? 0;
           const isSelected = node.id === selectedNodeId;
           const isHighlighted = !selectedNodeId || connectedNodeIds.has(node.id);
-          const radius = Math.sqrt(Math.max(4, node.val || 6)) * 1.9;
+          const radius = Math.sqrt(Math.max(4, node.val || 6)) * 1.65;
 
           ctx.save();
-          ctx.globalAlpha = isHighlighted ? 1 : 0.2;
+          ctx.globalAlpha = isHighlighted ? 1 : 0.18;
 
           if (isSelected) {
             ctx.beginPath();
-            ctx.arc(x, y, radius + 4, 0, 2 * Math.PI, false);
+            ctx.arc(x, y, radius + 4.5, 0, 2 * Math.PI, false);
             ctx.fillStyle = 'rgba(56, 189, 248, 0.35)';
+            ctx.fill();
+          } else if (node.type === 'MAJOR' || node.type === 'CATEGORY') {
+            ctx.beginPath();
+            ctx.arc(x, y, radius + 3, 0, 2 * Math.PI, false);
+            ctx.fillStyle = node.type === 'MAJOR' ? 'rgba(99, 102, 241, 0.22)' : 'rgba(245, 158, 11, 0.18)';
             ctx.fill();
           }
 
@@ -144,14 +204,16 @@ export function KnowledgeMapCanvas({
           ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
           ctx.fillStyle = node.color;
           ctx.fill();
-          ctx.lineWidth = isSelected ? 1.8 / Math.max(1, globalScale * 0.5) : 0.8;
+          ctx.lineWidth = isSelected ? 1.8 / Math.max(1, globalScale * 0.5) : 0.7;
           ctx.strokeStyle = isSelected ? '#FFFFFF' : 'rgba(255,255,255,0.45)';
           ctx.stroke();
 
           const showLabel =
             isSelected ||
             node.type === 'MAJOR' ||
-            (selectedNodeId ? connectedNodeIds.has(node.id) : globalScale >= 1.25 || node.type === 'CATEGORY');
+            (selectedNodeId
+              ? connectedNodeIds.has(node.id)
+              : globalScale >= 1.3 || (node.type === 'CATEGORY' && globalScale >= 0.85));
 
           if (showLabel) {
             const screenPx = isSelected || node.type === 'MAJOR' ? 12 : 10.5;

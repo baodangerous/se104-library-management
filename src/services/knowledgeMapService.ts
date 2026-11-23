@@ -104,13 +104,35 @@ export function buildKnowledgeGraph(
   });
 
   if (query) {
-    filteredBooks = searchRelatedCatalog(filteredBooks, query, 45).map((h) => h.book);
-  } else if (filteredBooks.length > 80) {
-    // Keep overview graph smooth by sampling newest/featured items across majors
+    filteredBooks = searchRelatedCatalog(filteredBooks, query, 60).map((h) => h.book);
+  } else if (filteredBooks.length > 260) {
+    // Stratified round-robin sampling across majors so all 12 majors form a dense, balanced knowledge sphere
     const sorted = [...filteredBooks].sort(
       (a, b) => Number(Boolean(b.NoiBat)) - Number(Boolean(a.NoiBat)) || b.NamXuatBan - a.NamXuatBan
     );
-    filteredBooks = sorted.slice(0, 80);
+    const byMajor = new Map<string, Sach[]>();
+    for (const book of sorted) {
+      const key = book.MaNganh || 'OTHER';
+      const list = byMajor.get(key) || [];
+      list.push(book);
+      byMajor.set(key, list);
+    }
+    const sampled: Sach[] = [];
+    const queues = Array.from(byMajor.values());
+    let idx = 0;
+    while (sampled.length < 260) {
+      let addedInPass = false;
+      for (const q of queues) {
+        if (idx < q.length) {
+          sampled.push(q[idx]);
+          addedInPass = true;
+          if (sampled.length >= 260) break;
+        }
+      }
+      if (!addedInPass) break;
+      idx += 1;
+    }
+    filteredBooks = sampled;
   }
 
   const nodeMap = new Map<string, KnowledgeNode>();
