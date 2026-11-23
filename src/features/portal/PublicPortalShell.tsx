@@ -9,6 +9,7 @@ import { AboutPage } from './AboutPage';
 import { BookDetailDrawer } from './BookDetailDrawer';
 import { CatalogSearchPage, type CatalogFilterState } from './CatalogSearchPage';
 import { CommandPaletteModal } from './CommandPaletteModal';
+import { ContactFeedbackModal } from './ContactFeedbackModal';
 import { usePortalHashSync } from './usePortalRouting';
 import type { HeroSearchQuery } from './HeroSearchSection';
 import { KnowledgeMapView } from './KnowledgeMapView';
@@ -55,6 +56,7 @@ export function PublicPortalShell({
   const [mapFocusBookId, setMapFocusBookId] = React.useState<string | null>(null);
   const [selectedBook, setSelectedBook] = React.useState<Sach | null>(null);
   const [loginOpen, setLoginOpen] = React.useState(false);
+  const [feedbackOpen, setFeedbackOpen] = React.useState(false);
   const [paletteOpen, setPaletteOpen] = React.useState(false);
   const loadCatalog = React.useCallback(async () => {
     const [b, c] = await Promise.all([bookService.listPublic(), bookService.listPublicCategories()]);
@@ -153,6 +155,7 @@ export function PublicPortalShell({
         onSelectTab={handleSelectTab}
         user={user}
         onOpenLogin={() => setLoginOpen(true)}
+        onOpenFeedback={() => setFeedbackOpen(true)}
         onEnterWorkspace={onEnterWorkspace}
         onLogout={onLogout}
       />
@@ -219,6 +222,12 @@ export function PublicPortalShell({
         open={loginOpen}
         onOpenChange={setLoginOpen}
         onLoginSuccess={onLoginSuccess}
+      />
+
+      <ContactFeedbackModal
+        open={feedbackOpen}
+        user={user}
+        onOpenChange={setFeedbackOpen}
       />
 
       <UitLibBotWidget

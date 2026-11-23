@@ -4,6 +4,7 @@ import {
   LogIn,
   LogOut,
   Menu,
+  MessageSquarePlus,
   X,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
@@ -26,6 +27,7 @@ interface PortalHeaderProps {
   onSelectTab: (tab: PortalTabId) => void;
   user: AuthUser | null;
   onOpenLogin: () => void;
+  onOpenFeedback: () => void;
   onEnterWorkspace: () => void;
   onLogout: () => void;
 }
@@ -35,6 +37,7 @@ export function PortalHeader({
   onSelectTab,
   user,
   onOpenLogin,
+  onOpenFeedback,
   onEnterWorkspace,
   onLogout,
 }: PortalHeaderProps) {
@@ -89,6 +92,14 @@ export function PortalHeader({
 
         {/* Auth / Workspace Action */}
         <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={onOpenFeedback}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-[#0054A6] bg-[#0054A6]/8 hover:bg-[#0054A6]/15 border border-[#0054A6]/20 transition-colors cursor-pointer whitespace-nowrap"
+          >
+            <MessageSquarePlus className="w-3.5 h-3.5" />
+            <span>Liên hệ &amp; Góp ý</span>
+          </button>
           <ThemeToggle />
           {user ? (
             <>
@@ -148,6 +159,17 @@ export function PortalHeader({
               {item.label}
             </button>
           ))}
+          <button
+            type="button"
+            onClick={() => {
+              setMobileOpen(false);
+              onOpenFeedback();
+            }}
+            className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold text-[#0054A6] bg-[#0054A6]/8 hover:bg-[#0054A6]/15 flex items-center gap-2 cursor-pointer"
+          >
+            <MessageSquarePlus className="w-4 h-4" />
+            Liên hệ &amp; Đóng góp ý kiến
+          </button>
         </div>
       ) : null}
     </header>
