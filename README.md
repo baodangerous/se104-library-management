@@ -85,17 +85,21 @@ Hệ thống kết hợp **Cổng bạn đọc công khai (Public Portal)** và 
 
 | Vai trò | Quyền hạn &amp; Chức năng chính |
 | :--- | :--- |
-| **Khách / Bạn đọc vô danh** | Tra cứu danh mục không dấu (`Ctrl+K`), lọc theo 12 ngành UIT, xem Bản đồ Tri thức, đặt phòng họp nhóm, gửi đề xuất bổ sung tài liệu, tra cứu quy tắc tài khoản 13 số, xem giờ mở cửa realtime và hỏi **UIT LibBot**. |
-| **Độc giả (`READER`)** | Toàn bộ quyền khách + Đặt trước / giữ chỗ sách, theo dõi trạng thái thẻ, xem sách đang mượn, gia hạn trực tuyến, xem lịch sử trả và công nợ tiền phạt cá nhân. |
-| **Thủ thư (`LIBRARIAN`)** | Tiếp nhận sách, quản lý hồ sơ độc giả &amp; gia hạn thẻ, lập phiếu mượn – nhận trả (tự động giữ chỗ cho người đặt trước), thu tiền phạt, xử lý yêu cầu sách &amp; lịch đặt phòng, xem báo cáo BM7.1/BM7.2. |
-| **Quản trị viên (`ADMIN`)** | Toàn bộ quyền Thủ thư + Quản lý thể loại, điều chỉnh tham số quy định, cấp/khóa tài khoản, xem nhật ký thao tác hệ thống (`NHATKYTHAOTAC`) và sao lưu/khôi phục dữ liệu JSON. |
+| **Khách / Bạn đọc vô danh** | Tra cứu hơn **1.085 học liệu** không dấu (`Ctrl+K`), lọc theo 12 ngành UIT, dùng **Search Engine Bản đồ Tri thức**, đặt phòng họp nhóm **A2.01 / A2.02**, gửi đề xuất bổ sung tài liệu, xem giờ mở cửa realtime và hỏi **UIT LibBot**. |
+| **Sinh viên / Độc giả (`READER`)** | Toàn bộ quyền khách ngay trong không gian cá nhân + **Đổi mật khẩu tài khoản**, đặt trước / giữ chỗ sách, theo dõi thẻ, gia hạn sách trực tuyến (tối đa 2 lần), xem lịch sử trả và công nợ tiền phạt. |
+| **Chuyên viên thư viện (`LIBRARIAN`)** | Tiếp nhận & cập nhật sách, thêm tác giả, quản lý hồ sơ độc giả & gia hạn thẻ, lập phiếu mượn – nhận trả (tự giữ chỗ cho người đặt trước), thu tiền phạt, xử lý yêu cầu sách & lịch đặt phòng, xem báo cáo BM7.1/BM7.2. |
+| **Phụ trách thư viện (`HEAD_LIBRARIAN`)** | Toàn bộ quyền Chuyên viên + **Xóa sách, sửa/xóa tác giả**, đăng/sửa/xóa **Tin tức & Sự kiện Portal**, tạo/sửa/khóa tài khoản cấp `LIBRARIAN` & `READER`, chỉnh sửa quy định/thể loại và xem nhật ký thao tác (`NHATKYTHAOTAC`). |
+| **Quản trị viên (`ADMIN`)** | Toàn quyền hệ thống: quản lý tài khoản mọi cấp (kể cả `ADMIN` & `HEAD_LIBRARIAN`), cấu hình quy định, tin tức Portal, nhật ký bảo mật và **sao lưu/khôi phục dữ liệu SQLite/JSON**. |
 
 ### Điểm nổi bật về giao diện &amp; nghiệp vụ
 
-- **Cổng thông tin tối giản chuẩn 60/30/10:** Bố cục rộng `1120px`, Hero tìm kiếm tập trung, lưới **12 ngành đào tạo UIT** kèm ảnh chính thức, **Bản đồ Tri thức** tương tác 2D (`react-force-graph-2d`), hỗ trợ Light/Dark mode.
-- **Trạng thái mở cửa Realtime:** Tự động tính giờ mở cửa theo múi giờ Việt Nam (`T2–T6: 07:30–18:00`, `T7: 08:00–16:00`), hiển thị đồng hồ từng giây và đếm ngược đóng/mở cửa.
-- **Hướng dẫn không gian tương tác &amp; Dữ liệu thật UIT:** Tích hợp ảnh thực tế Tầng trệt, Tầng 2, phòng A2.01–A2.02, cơ cấu nhân sự, thống kê chính thức đến 28/08/2026 và sự kiện nổi bật của Thư viện UIT.
-- **Trợ lý ảo UIT LibBot:** Mini-RAG kết hợp Gemini API (`gemini-2.5-flash`) và Local Smart Engine tra cứu sách trực tiếp, giải đáp tài khoản 13 số, quy định mượn–trả và giờ phục vụ.
+- **Cổng thông tin &amp; Dashboard đa phân quyền:** Bố cục rộng `1280px`, nền **Ambient Mesh Glow &amp; Dot-Grid**, Hero Banner theo từng vai trò (`ADMIN`, `HEAD_LIBRARIAN`, `LIBRARIAN`, `READER`, Khách), hỗ trợ Light/Dark mode và responsive trên mọi kích thước màn hình.
+- **Kho học liệu UIT thực tế (1.085+ tài liệu):**
+  - **115/115 giáo trình UIT** kèm **115 ảnh bìa thật**, vị trí kệ, link OPAC và bản điện tử `ir.vnulib.edu.vn`.
+  - **912 luận văn UIT (2004–2026)** trình bày dạng bìa cứng gáy vàng **phân màu theo 12 ngành đào tạo**.
+  - **58 đầu sách chuyên ngành, ngoại văn, Tủ sách Học tập suốt đời &amp; OpenStax OER**; sách chưa có ảnh hiển thị **bìa 3D tượng trưng** theo ngành.
+- **Bản đồ Tri thức có Search Engine:** Tích hợp tìm kiếm không dấu &amp; gợi ý tài liệu liên quan cùng ngành/tác giả trên đồ thị 2D (`react-force-graph-2d`), phân cấp kích thước và màu sắc theo 4 nhóm nút (*Ngành UIT*, *Thể loại*, *Sách/Luận văn*, *Tác giả*).
+- **Trạng thái mở cửa Realtime &amp; UIT LibBot:** Tự động tính giờ mở cửa theo múi giờ Việt Nam (`T2–T6: 07:30–18:00`, `T7: 08:00–16:00`), kết hợp Gemini API (`gemini-2.5-flash`) và Local Smart Engine.
 
 ---
 
@@ -124,24 +128,26 @@ flowchart LR
 ```text
 ├── server.ts                  # Điểm khởi chạy Express + Vite middleware
 ├── server/
-│   ├── auth.ts                # Xác thực JWT & middleware phân quyền RBAC
+│   ├── auth.ts                # Xác thực JWT & middleware phân quyền RBAC 4 vai trò
 │   ├── db.ts                  # Kết nối SQLite WAL, schema & seed cốt lõi
-│   ├── migratePortal.ts       # Migration cột mở rộng, 21 đầu sách & phòng họp
-│   ├── routes.ts              # API nghiệp vụ lưu thông, độc giả, sách, báo cáo, hệ thống
-│   ├── portalRoutes.ts        # API đặt trước, đặt phòng, yêu cầu sách, dashboard, gia hạn
+│   ├── migratePortal.ts       # Migration & đồng bộ 1.085+ học liệu, ngành, tin tức, phòng họp
+│   ├── routes/                # API tách module (auth, catalog, reader, circulation, admin)
+│   ├── portalRoutes.ts        # API portal-bundle, tin tức CRUD, đặt trước, đặt phòng, gia hạn
 │   └── chatbotRoute.ts        # Endpoint UIT LibBot (/api/chatbot/ask)
 ├── public/
 │   ├── images/                # Logo chính thức Thư viện UIT
-│   └── resources/             # Ảnh bìa sách, 12 ngành UIT, sự kiện & không gian Tầng trệt/Tầng 2
+│   └── resources/             # 115 ảnh bìa giáo trình, bìa sách, 12 ngành, sự kiện & phòng A2.01–A2.02
 ├── data/
-│   └── uit_library.sqlite     # Cơ sở dữ liệu SQLite cục bộ
+│   └── uit_library.sqlite     # Cơ sở dữ liệu SQLite cục bộ (full Portal + Workspace)
+├── tests/
+│   └── rbac-and-sync.test.ts  # Bộ test End-to-End phân quyền 4 vai trò & đồng bộ CSDL
 └── src/
     ├── features/
-    │   ├── portal/            # Trang chủ, Tra cứu, 12 Ngành học, Bản đồ tri thức, Dịch vụ, Giới thiệu
-    │   ├── workspace/         # Dashboard, Độc giả, Sách, Mượn/Trả, Phạt, Báo cáo, Quản trị
+    │   ├── portal/            # Trang chủ, Tra cứu, 12 Ngành học, Bản đồ tri thức (Search), Dịch vụ, Giới thiệu
+    │   ├── workspace/         # Dashboard theo vai trò, Cổng Sinh viên, Đổi mật khẩu, Sách/Tác giả, Tin tức, Quản trị
     │   └── chatbot/           # UIT LibBot widget & Local Smart Engine
     ├── services/              # Tầng giao tiếp REST API (apiClient.ts & domain services)
-    ├── database/              # Dữ liệu tham chiếu cổng thông tin & định nghĩa schema
+    ├── database/              # Dữ liệu tham chiếu (seedTextbooks, seedTheses, seedBooksExtra, ...)
     ├── components/ui/         # Thành phần UI dùng chung (Button, Card, ThemeToggle, LiveLibraryHours)
     └── lib/                   # Tiện ích, hash router & quy tắc nghiệp vụ thuần
 ```
@@ -177,7 +183,7 @@ Các biến môi trường hỗ trợ trong `.env`:
 npm run dev
 ```
 
-> Trong giao diện **Đăng nhập**, bạn có thể chọn đăng nhập nhanh theo 3 vai trò trải nghiệm: **Quản trị viên (`ADMIN`)**, **Thủ thư (`LIBRARIAN`)** hoặc **Độc giả (`READER`)**.
+> Trong giao diện **Đăng nhập**, bạn có thể chọn đăng nhập nhanh theo **4 vai trò trải nghiệm**: **Admin (`ADMIN`)**, **Phụ trách TV (`HEAD_LIBRARIAN`)**, **Chuyên viên TV (`LIBRARIAN`)** hoặc **Sinh viên (`READER`)**.
 
 ### Bước 3: Kiểm tra &amp; Đóng gói
 
@@ -188,6 +194,9 @@ npm run lint
 # Đóng gói bản production (thư mục dist/)
 npm run build
 
-# Chạy bộ kiểm thử đơn vị quy tắc nghiệp vụ & chatbot
+# Chạy bộ kiểm thử End-to-End phân quyền 4 vai trò, đổi mật khẩu & đồng bộ SQLite
+npm test
+
+# Chạy kiểm thử đơn vị quy tắc nghiệp vụ & chatbot
 npx tsx --test src/lib/businessRules.test.ts src/features/chatbot/libBotEngine.test.ts
 ```
