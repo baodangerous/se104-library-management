@@ -66,6 +66,14 @@ export function ReaderPortalPage({
     }
   }
 
+  const featuredBooks = React.useMemo(
+    () =>
+      [...books]
+        .sort((a, b) => Number(Boolean(b.AnhBia)) - Number(Boolean(a.AnhBia)))
+        .slice(0, 12),
+    [books]
+  );
+
   if (loading) {
     return (
       <div className="p-8 text-center text-sm text-slate-500">
@@ -88,13 +96,6 @@ export function ReaderPortalPage({
   const activeLoans = data.lichSuMuon.filter((l) => !l.DaTra);
   const overdueLoans = activeLoans.filter((l) => diffDaysIso(today, l.HanTra) > 0);
   const isExpired = diffDaysIso(data.docGia.NgayHetHan, today) < 0;
-  const featuredBooks = React.useMemo(
-    () =>
-      [...books]
-        .sort((a, b) => Number(Boolean(b.AnhBia)) - Number(Boolean(a.AnhBia)))
-        .slice(0, 12),
-    [books]
-  );
 
   return (
     <div className="space-y-6">
