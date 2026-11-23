@@ -54,7 +54,26 @@ export function AppShell({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="relative min-h-screen bg-[#f4f7fc] flex">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-0 overflow-hidden dark:hidden"
+      >
+        <div
+          className="absolute -top-32 right-0 w-[680px] h-[420px] rounded-full opacity-45 blur-3xl"
+          style={{
+            background:
+              'radial-gradient(circle, rgba(58,134,255,0.14), rgba(0,84,166,0.04) 60%, transparent 75%)',
+          }}
+        />
+        <div
+          className="absolute inset-0 opacity-25"
+          style={{
+            backgroundImage: 'radial-gradient(#94a3b8 0.85px, transparent 0.85px)',
+            backgroundSize: '26px 26px',
+          }}
+        />
+      </div>
       <aside className="hidden lg:block w-[260px] shrink-0 fixed inset-y-0 left-0 z-30 no-print">
         <Sidebar
           user={user}
@@ -85,7 +104,7 @@ export function AppShell({
         </div>
       ) : null}
 
-      <div className="flex-1 lg:pl-[260px] min-w-0 flex flex-col min-h-screen">
+      <div className="relative z-10 flex-1 lg:pl-[260px] min-w-0 flex flex-col min-h-screen">
         <header className="h-16 bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 sticky top-0 z-20 no-print">
           <div className="flex items-center gap-3 min-w-0">
             <button

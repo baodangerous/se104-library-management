@@ -90,7 +90,11 @@ export function WorkspaceApp({
     const navMeta = NAV_ITEMS.find((i) => i.id === activePage);
     if (!navMeta || !navMeta.roles.includes(user.VaiTro)) {
       return user.VaiTro === 'READER' ? (
-        <ReaderPortalPage onNavigate={handleNavigate} />
+        <ReaderPortalPage
+          books={portalBooks}
+          onSelectBook={setInspectedBook}
+          onNavigate={handleNavigate}
+        />
       ) : (
         <DashboardPage onNavigate={handleNavigate} />
       );
@@ -135,7 +139,13 @@ export function WorkspaceApp({
       case 'backup':
         return <BackupPage />;
       case 'reader-portal':
-        return <ReaderPortalPage onNavigate={handleNavigate} />;
+        return (
+          <ReaderPortalPage
+            books={portalBooks}
+            onSelectBook={setInspectedBook}
+            onNavigate={handleNavigate}
+          />
+        );
       case 'reader-services':
         return <ServicesPage user={user} />;
       case 'reader-majors':
