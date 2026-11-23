@@ -73,7 +73,7 @@ export function ContactFeedbackModal({
             <PhoneCall className="w-4 h-4 text-[#0054A6] shrink-0 mt-0.5" />
             <div>
               <p className="font-semibold text-slate-900">(028) 3725 2002</p>
-              <p className="text-slate-500">Máy lẻ 128 (Quầy) · 154 (Tài khoản)</p>
+              <p className="text-slate-500">Thư viện Trường ĐH CNTT</p>
             </div>
           </div>
           <div className="flex items-start gap-2">

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ChevronDown, ChevronsUpDown, HelpCircle, PhoneCall, Sparkles } from 'lucide-react';
+import { ChevronDown, ChevronsUpDown, HelpCircle } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 interface FaqItem {
@@ -48,15 +48,14 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     id: 'faq-6',
     category: 'Giờ phục vụ & Hỗ trợ',
-    question: 'Thư viện UIT mở cửa vào khung giờ nào và liên hệ ai khi gặp sự cố?',
+    question: 'Thư viện UIT mở cửa vào khung giờ nào và liên hệ qua kênh nào?',
     answer:
-      'Thư viện UIT (Tòa nhà A, Khu phố 34, P. Linh Xuân, TP.HCM) mở cửa Thứ 2 – Thứ 6 từ 07:30 đến 18:00, Thứ 7 từ 08:00 đến 16:00 (nghỉ Chủ nhật và ngày lễ). Khi cần hỗ trợ mượn trả hoặc lỗi tài khoản, vui lòng gọi máy lẻ 128 (Quầy phục vụ) hoặc 154 (Kỹ thuật & Tài khoản), hoặc gửi email về thuvien@uit.edu.vn.',
+      'Thư viện UIT (Tòa nhà A, Khu phố 34, P. Linh Xuân, TP.HCM) mở cửa Thứ 2 – Thứ 6 từ 07:30 đến 18:00, Thứ 7 từ 08:00 đến 16:00 (nghỉ Chủ nhật và ngày lễ). Khi cần hỗ trợ mượn trả hoặc tài khoản, bạn có thể gửi góp ý trực tiếp qua nút "Liên hệ & Góp ý" trên thanh điều hướng hoặc email thuvien@uit.edu.vn.',
   },
 ];
 
 export function PortalFaqSection() {
-  const [sectionOpen, setSectionOpen] = React.useState(false);
-  const [openIds, setOpenIds] = React.useState<Set<string>>(() => new Set(['faq-1']));
+  const [openIds, setOpenIds] = React.useState<Set<string>>(() => new Set());
 
   const toggleItem = (id: string) => {
     setOpenIds((prev) => {
@@ -73,126 +72,80 @@ export function PortalFaqSection() {
   };
 
   return (
-    <section className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden transition-all">
-      {/* Interactive Collapsible Header */}
-      <div
-        role="button"
-        tabIndex={0}
-        aria-expanded={sectionOpen}
-        onClick={() => setSectionOpen((prev) => !prev)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            setSectionOpen((prev) => !prev);
-          }
-        }}
-        className="w-full text-left p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50/70 transition-colors cursor-pointer select-none"
-      >
+    <section className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 shadow-xs space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
         <div className="flex items-start gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#0054A6] to-[#1556d6] text-white flex items-center justify-center shrink-0 shadow-xs">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0054A6] to-[#1556d6] text-white flex items-center justify-center shrink-0 shadow-xs">
             <HelpCircle className="w-5 h-5" />
           </div>
-          <div className="space-y-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-base sm:text-lg font-bold text-[#0a1f4d]">
-                Câu hỏi thường gặp (FAQ)
-              </h2>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#0054A6]/10 text-[#0054A6]">
-                <Sparkles className="w-3 h-3" />
-                {FAQ_ITEMS.length} giải đáp nhanh
-              </span>
-            </div>
-            <p className="text-xs text-slate-500">
-              Quy định mượn trả, gia hạn trực tuyến, phòng học nhóm A2.01/A2.02 và truy cập CSDL điện tử UIT.
+          <div>
+            <h2 className="text-lg font-bold text-[#0a1f4d]">
+              Câu hỏi thường gặp (FAQ)
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Nhấp vào từng câu hỏi bên dưới để xem hướng dẫn chi tiết từ Thư viện UIT.
             </p>
           </div>
         </div>
-
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-          <span className="inline-flex items-center gap-1.5 text-xs text-slate-600 bg-slate-100/80 border border-slate-200 rounded-lg px-3 py-1.5">
-            <PhoneCall className="w-3.5 h-3.5 text-[#0054A6]" />
-            <span>
-              Máy lẻ <strong className="text-slate-900">128 / 154</strong>
-            </span>
-          </span>
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#0054A6] text-white text-xs font-semibold shadow-2xs">
-            <span>{sectionOpen ? 'Thu gọn FAQ' : 'Xem giải đáp'}</span>
-            <ChevronDown
-              className={cn(
-                'w-4 h-4 transition-transform duration-300',
-                sectionOpen && 'rotate-180'
-              )}
-            />
-          </span>
-        </div>
+        <button
+          type="button"
+          onClick={toggleAllItems}
+          className="inline-flex items-center gap-1.5 self-start sm:self-auto px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-[#0054A6] transition-colors cursor-pointer shrink-0"
+        >
+          <ChevronsUpDown className="w-3.5 h-3.5" />
+          {allExpanded ? 'Ẩn tất cả câu trả lời' : 'Mở tất cả câu trả lời'}
+        </button>
       </div>
 
-      {/* Smooth Animated Collapsible Body */}
-      <div
-        className={cn(
-          'grid transition-all duration-300 ease-in-out',
-          sectionOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-        )}
-      >
-        <div className="overflow-hidden">
-          <div className="px-5 sm:px-6 pb-6 pt-3 border-t border-slate-100 space-y-4">
-            <div className="flex items-center justify-between text-xs text-slate-500">
-              <span>Nhấp vào từng câu hỏi để xem hướng dẫn chi tiết</span>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        {FAQ_ITEMS.map((item) => {
+          const isOpen = openIds.has(item.id);
+          return (
+            <div
+              key={item.id}
+              className={cn(
+                'rounded-xl border transition-all overflow-hidden',
+                isOpen
+                  ? 'border-[#0054A6]/40 bg-[#f7faff] shadow-2xs'
+                  : 'border-slate-200 bg-white hover:border-[#0054A6]/35 hover:bg-slate-50/50'
+              )}
+            >
               <button
                 type="button"
-                onClick={toggleAllItems}
-                className="inline-flex items-center gap-1 font-semibold text-[#0054A6] hover:underline cursor-pointer"
+                aria-expanded={isOpen}
+                onClick={() => toggleItem(item.id)}
+                className="w-full text-left px-4 py-3.5 flex items-start justify-between gap-3 cursor-pointer"
               >
-                <ChevronsUpDown className="w-3.5 h-3.5" />
-                {allExpanded ? 'Thu gọn tất cả' : 'Mở tất cả'}
+                <div className="space-y-1 min-w-0">
+                  <span className="inline-block text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#0054A6]/10 text-[#0054A6]">
+                    {item.category}
+                  </span>
+                  <p className="text-sm font-semibold text-slate-900 leading-snug">
+                    {item.question}
+                  </p>
+                </div>
+                <ChevronDown
+                  className={cn(
+                    'w-4 h-4 text-slate-400 shrink-0 mt-1 transition-transform duration-200',
+                    isOpen && 'rotate-180 text-[#0054A6]'
+                  )}
+                />
               </button>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              {FAQ_ITEMS.map((item) => {
-                const isOpen = openIds.has(item.id);
-                return (
-                  <div
-                    key={item.id}
-                    className={cn(
-                      'rounded-xl border transition-all',
-                      isOpen
-                        ? 'border-[#0054A6]/40 bg-[#f7faff] shadow-2xs'
-                        : 'border-slate-200 bg-white hover:border-slate-300'
-                    )}
-                  >
-                    <button
-                      type="button"
-                      aria-expanded={isOpen}
-                      onClick={() => toggleItem(item.id)}
-                      className="w-full text-left px-4 py-3.5 flex items-start justify-between gap-3 cursor-pointer"
-                    >
-                      <div className="space-y-1 min-w-0">
-                        <span className="inline-block text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#0054A6]/10 text-[#0054A6]">
-                          {item.category}
-                        </span>
-                        <p className="text-sm font-semibold text-slate-900 leading-snug">
-                          {item.question}
-                        </p>
-                      </div>
-                      <ChevronDown
-                        className={cn(
-                          'w-4 h-4 text-slate-400 shrink-0 mt-1 transition-transform duration-200',
-                          isOpen && 'rotate-180 text-[#0054A6]'
-                        )}
-                      />
-                    </button>
-                    {isOpen ? (
-                      <div className="px-4 pb-4 text-xs sm:text-[13px] text-slate-600 leading-relaxed border-t border-slate-100/80 mt-1 pt-2.5">
-                        {item.answer}
-                      </div>
-                    ) : null}
+              <div
+                className={cn(
+                  'grid transition-all duration-200 ease-in-out',
+                  isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                )}
+              >
+                <div className="overflow-hidden">
+                  <div className="px-4 pb-4 text-xs sm:text-[13px] text-slate-600 leading-relaxed border-t border-slate-100/80 pt-2.5">
+                    {item.answer}
                   </div>
-                );
-              })}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          );
+        })}
       </div>
     </section>
   );
