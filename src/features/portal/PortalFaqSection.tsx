@@ -97,7 +97,7 @@ export function PortalFaqSection() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start">
         {FAQ_ITEMS.map((item) => {
           const isOpen = openIds.has(item.id);
           return (
