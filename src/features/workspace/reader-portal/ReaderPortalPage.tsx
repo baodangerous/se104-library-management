@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BookCopy, DoorOpen, GraduationCap, IdCard, Network, Sparkles } from 'lucide-react';
+import { BookCopy, DoorOpen, GraduationCap, IdCard, KeyRound, Network, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardBody } from '../../../components/ui/card';
 import { adminService, type ReaderProfileData } from '../../../services/adminService';
@@ -9,6 +9,7 @@ import { diffDaysIso, formatDateVn, todayIsoDate } from '../../../services/rules
 import type { Sach } from '../../../types/library';
 import type { DatTruoc } from '../../../types/portal';
 import { FeaturedBooksCarousel } from '../../portal/FeaturedBooksCarousel';
+import { ChangePasswordModal } from '../ChangePasswordModal';
 import type { NavPageId } from '../layout/navConfig';
 import { ReaderCardSummary } from './ReaderCardSummary';
 import { ReaderHistoryTables } from './ReaderHistoryTables';
@@ -26,6 +27,7 @@ export function ReaderPortalPage({
   const [data, setData] = React.useState<ReaderProfileData | null>(null);
   const [reservations, setReservations] = React.useState<DatTruoc[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [changePwOpen, setChangePwOpen] = React.useState(false);
 
   const loadProfile = React.useCallback(() => {
     setLoading(true);
@@ -134,6 +136,14 @@ export function ReaderPortalPage({
               >
                 {isExpired ? 'Thẻ hết hạn' : 'Đang hoạt động'} · HSD {formatDateVn(data.docGia.NgayHetHan)}
               </span>
+              <button
+                type="button"
+                onClick={() => setChangePwOpen(true)}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white/95 font-medium transition-colors cursor-pointer"
+              >
+                <KeyRound className="w-3 h-3 text-[#4de1ff]" />
+                Đổi mật khẩu
+              </button>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
               Xin chào, <span className="text-[#4de1ff]">{data.docGia.HoTen}</span>
@@ -213,6 +223,12 @@ export function ReaderPortalPage({
       <ReaderReservationsCard
         reservations={reservations}
         onCancel={handleCancelReservation}
+      />
+
+      <ChangePasswordModal
+        open={changePwOpen}
+        username={data.docGia.Email || data.docGia.MaDocGia}
+        onOpenChange={setChangePwOpen}
       />
     </div>
   );

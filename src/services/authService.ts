@@ -89,6 +89,17 @@ export const authService = {
     return res.user;
   },
 
+  async changePassword(
+    MatKhauHienTai: string,
+    MatKhauMoi: string,
+    XacNhanMatKhau: string
+  ): Promise<{ success: boolean; message: string }> {
+    return apiRequest<{ success: boolean; message: string }>('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ MatKhauHienTai, MatKhauMoi, XacNhanMatKhau }),
+    });
+  },
+
   logout(): void {
     setAuthToken(null);
     saveStoredSession(null);

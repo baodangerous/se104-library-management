@@ -106,3 +106,52 @@ router.get('/auth/me', requireAuth, (req: AuthenticatedRequest, res) => {
   res.json({ user: req.user });
 });
 
+const changePasswordSchema = z
+  .object({
+    MatKhauHienTai: z.string().min(1, 'Vui lòng nhập mật khẩu hiện tại.'),
+    MatKhauMoi: z.string().min(6, 'Mật khẩu mới phải có tối thiểu 6 ký tự.'),
+    XacNhanMatKhau: z.string().min(1, 'Vui lòng xác nhận mật khẩu mới.'),
+  })
+  .refine((d) => d.MatKhauMoi === d.XacNhanMatKhau, {
+    message: 'Xác nhận mật khẩu mới không khớp.',
+    path: ['XacNhanMatKhau'],
+  })
+  .refine((d) => d.MatKhauMoi !== d.MatKhauHienTai, {
+    message: 'Mật khẩu mới phải khác mật khẩu hiện tại.',
+    path: ['MatKhauMoi'],
+  });
+
+router.post('/auth/change-password', requireAuth, (req: AuthenticatedRequest, res) => {
+  const parsed = changePasswordSchema.safeParse(req.body);
+  if (!parsed.success) return sendZodError(res, parsed.error);
+
+  const row = db
+    .prepare('SELECT MaTaiKhoan, TenDangNhap, VaiTro, MatKhauHash, TrangThai FROM TAIKHOAN WHERE MaTaiKhoan = ?')
+    .get(req.user!.MaTaiKhoan) as
+    | { MaTaiKhoan: number; TenDangNhap: string; VaiTro: string; MatKhauHash: string; TrangThai: string }
+    | undefined;
+
+  if (!row) {
+    res.status(404).json({ error: 'Không tìm thấy tài khoản.' });
+    return;
+  }
+  if (!bcrypt.compareSync(parsed.data.MatKhauHienTai, row.MatKhauHash)) {
+    res.status(400).json({ error: 'Mật khẩu hiện tại không chính xác.' });
+    return;
+  }
+
+  const nextHash = bcrypt.hashSync(parsed.data.MatKhauMoi, 10);
+  db.prepare('UPDATE TAIKHOAN SET MatKhauHash = ? WHERE MaTaiKhoan = ?').run(nextHash, row.MaTaiKhoan);
+
+  writeAuditLog({
+    MaTaiKhoan: row.MaTaiKhoan,
+    TenDangNhap: row.TenDangNhap,
+    VaiTro: row.VaiTro,
+    HanhDong: 'DOI_MAT_KHAU',
+    BangTacDong: 'TAIKHOAN',
+    ChiTiet: `Tài khoản ${row.TenDangNhap} tự đổi mật khẩu cá nhân.`,
+  });
+
+  res.json({ success: true, message: 'Đổi mật khẩu thành công.' });
+});
+

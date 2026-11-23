@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Globe, LogOut, Menu } from 'lucide-react';
+import { Globe, KeyRound, LogOut, Menu } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import type { AuthUser } from '../../../types/library';
+import { ChangePasswordModal } from '../ChangePasswordModal';
 import { NAV_ITEMS, ROLE_LABELS, type NavItem, type NavPageId } from './navConfig';
 import { Sidebar } from './Sidebar';
 
@@ -23,6 +24,7 @@ export function AppShell({
   children,
 }: AppShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [changePwOpen, setChangePwOpen] = React.useState(false);
 
   const visibleItems = React.useMemo(
     () => NAV_ITEMS.filter((item) => item.roles.includes(user.VaiTro)),
@@ -128,6 +130,10 @@ export function AppShell({
             <span className="hidden xl:inline whitespace-nowrap">
               {user.HoTen} · {ROLE_LABELS[user.VaiTro]}
             </span>
+            <Button variant="outline" size="sm" onClick={() => setChangePwOpen(true)} className="gap-1.5">
+              <KeyRound className="w-3.5 h-3.5 text-[#0054A6]" />
+              <span className="hidden md:inline">Đổi mật khẩu</span>
+            </Button>
             <Button variant="outline" size="sm" onClick={onBackToPortal} className="gap-1.5">
               <Globe className="w-3.5 h-3.5 text-[#0054A6]" />
               <span className="hidden sm:inline">Cổng Thư viện</span>
@@ -143,6 +149,12 @@ export function AppShell({
           {children}
         </main>
       </div>
+
+      <ChangePasswordModal
+        open={changePwOpen}
+        username={user.TenDangNhap}
+        onOpenChange={setChangePwOpen}
+      />
     </div>
   );
 }

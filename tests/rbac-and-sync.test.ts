@@ -297,3 +297,74 @@ test('DB Sync: Borrow & Return updates SACH.TinhTrang in real time', async () =>
   const delAttempt = await api(`/sach/${maSach}`, { method: 'DELETE', token: head.token });
   assert.equal(delAttempt.status, 400);
 });
+
+test('Auth & DB Sync: READER changes provisioned password in real SQLite', async () => {
+  const head = await demoLogin('HEAD_LIBRARIAN');
+  const readers = await api<any[]>('/docgia', { token: head.token });
+  const targetReader = readers.data[0];
+
+  const username = `sv_pw_${Date.now()}@gm.uit.edu.vn`;
+  const initialPw = 'InitialPass123';
+  const nextPw = 'NewCustomPass456';
+
+  const created = await api<any>('/taikhoan', {
+    method: 'POST',
+    token: head.token,
+    body: {
+      TenDangNhap: username,
+      MatKhau: initialPw,
+      HoTen: 'Sinh viên Đổi Mật Khẩu',
+      VaiTro: 'READER',
+      MaDocGia: targetReader.MaDocGia,
+    },
+  });
+  assert.equal(created.status, 201);
+  const accId = created.data.MaTaiKhoan;
+
+  // Login with provisioned password
+  const login1 = await api<{ token: string }>('/auth/login', {
+    method: 'POST',
+    body: { TenDangNhap: username, MatKhau: initialPw },
+  });
+  assert.equal(login1.status, 200);
+
+  // Wrong current password must fail (400)
+  const wrongChange = await api('/auth/change-password', {
+    method: 'POST',
+    token: login1.data.token,
+    body: {
+      MatKhauHienTai: 'WrongPass',
+      MatKhauMoi: nextPw,
+      XacNhanMatKhau: nextPw,
+    },
+  });
+  assert.equal(wrongChange.status, 400);
+
+  // Correct current password updates hash in SQLite (200)
+  const okChange = await api('/auth/change-password', {
+    method: 'POST',
+    token: login1.data.token,
+    body: {
+      MatKhauHienTai: initialPw,
+      MatKhauMoi: nextPw,
+      XacNhanMatKhau: nextPw,
+    },
+  });
+  assert.equal(okChange.status, 200);
+
+  // Old password rejected (401), new password succeeds (200)
+  const oldLogin = await api('/auth/login', {
+    method: 'POST',
+    body: { TenDangNhap: username, MatKhau: initialPw },
+  });
+  assert.equal(oldLogin.status, 401);
+
+  const newLogin = await api('/auth/login', {
+    method: 'POST',
+    body: { TenDangNhap: username, MatKhau: nextPw },
+  });
+  assert.equal(newLogin.status, 200);
+
+  // Cleanup
+  assert.equal((await api(`/taikhoan/${accId}`, { method: 'DELETE', token: head.token })).status, 200);
+});
