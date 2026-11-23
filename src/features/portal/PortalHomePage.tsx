@@ -139,26 +139,42 @@ export function PortalHomePage({
         <div className="lg:col-span-5 rounded-xl border border-slate-200 bg-gradient-to-br from-[#030a24] to-[#0a2b86] p-6 text-white space-y-4">
           <div className="flex items-center justify-between text-xs text-[#c3d6fa]">
             <span className="font-bold text-white">Xem trước mạng tri thức</span>
-            <span className="px-2 py-0.5 rounded-full bg-[#4de1ff]/15 text-[#4de1ff] font-bold">
+            <button
+              type="button"
+              onClick={() => onNavigateTab('knowledge-map')}
+              className="px-2.5 py-0.5 rounded-full bg-[#4de1ff]/15 text-[#4de1ff] font-bold hover:bg-[#4de1ff]/25 transition-colors cursor-pointer"
+            >
               Tương tác
-            </span>
+            </button>
           </div>
           <div className="grid grid-cols-3 gap-3 items-center text-center">
-            <div className="p-3 rounded-xl bg-white/10 border border-white/15 space-y-1">
+            <button
+              type="button"
+              onClick={() => onNavigateTab('majors')}
+              className="p-3 rounded-xl bg-white/10 border border-white/15 space-y-1 hover:bg-white/20 hover:border-white/30 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#4de1ff]/60"
+            >
               <GraduationCap className="w-5 h-5 text-[#f2b84a] mx-auto" />
-              <p className="text-xs font-bold">12 Ngành</p>
-            </div>
-            <div className="p-3 rounded-xl bg-[#1556d6] border border-[#4de1ff]/40 space-y-1">
+              <p className="text-xs font-bold text-white">12 Ngành</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => onNavigateTab('knowledge-map')}
+              className="p-3 rounded-xl bg-[#1556d6] border border-[#4de1ff]/40 space-y-1 hover:bg-[#1b63ee] hover:border-[#4de1ff]/70 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#4de1ff]/60"
+            >
               <Network className="w-5 h-5 text-[#4de1ff] mx-auto" />
-              <p className="text-xs font-bold">Liên kết</p>
-            </div>
-            <div className="p-3 rounded-xl bg-white/10 border border-white/15 space-y-1">
+              <p className="text-xs font-bold text-white">Liên kết</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => onNavigateTab('catalog')}
+              className="p-3 rounded-xl bg-white/10 border border-white/15 space-y-1 hover:bg-white/20 hover:border-white/30 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#4de1ff]/60"
+            >
               <BookOpen className="w-5 h-5 text-[#4de1ff] mx-auto" />
-              <p className="text-xs font-bold">{books.length} Sách</p>
-            </div>
+              <p className="text-xs font-bold text-white">{books.length} Sách</p>
+            </button>
           </div>
           <p className="text-[11px] font-normal text-[#c3d6fa] text-center">
-            Nhấp vào từng nút ngành học để lọc và mở chi tiết tài liệu trực tiếp.
+            Nhấp vào từng mục để mở Ngành học, Bản đồ tri thức hoặc Kho sách.
           </p>
         </div>
       </section>
