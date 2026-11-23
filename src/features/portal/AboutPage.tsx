@@ -4,6 +4,7 @@ import { LiveLibraryHours } from '../../components/ui/live-library-hours';
 import { portalService } from '../../services/portalService';
 import type { Sach } from '../../types/library';
 import { AboutOrgAndStats } from './AboutOrgAndStats';
+import { PortalFaqSection } from './PortalFaqSection';
 import { PortalNewsSection } from './PortalNewsSection';
 
 interface AboutPageProps {
@@ -188,6 +189,8 @@ export function AboutPage({ books }: AboutPageProps) {
       <AboutOrgAndStats />
 
       <PortalNewsSection news={news} />
+
+      <PortalFaqSection />
     </div>
   );
 }

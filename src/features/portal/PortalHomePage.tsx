@@ -4,6 +4,7 @@ import type { Sach, TheLoai } from '../../types/library';
 import type { PortalTabId } from '../../types/portal';
 import { FeaturedBooksCarousel } from './FeaturedBooksCarousel';
 import { HeroSearchSection, type HeroSearchQuery } from './HeroSearchSection';
+import { PortalFaqSection } from './PortalFaqSection';
 
 interface PortalHomePageProps {
   books: Sach[];
@@ -161,6 +162,8 @@ export function PortalHomePage({
           </p>
         </div>
       </section>
+
+      <PortalFaqSection />
     </div>
   );
 }
