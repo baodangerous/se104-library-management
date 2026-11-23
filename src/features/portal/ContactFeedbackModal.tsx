@@ -63,31 +63,29 @@ export function ContactFeedbackModal({
       open={open}
       onOpenChange={onOpenChange}
       title="Liên hệ & Đóng góp ý kiến"
-      description="Kết nối trực tiếp với Thư viện Trường ĐH Công nghệ Thông tin – ĐHQG-HCM"
+      description="Thư viện Trường ĐH Công nghệ Thông tin – ĐHQG-HCM"
       maxWidthClass="max-w-lg"
     >
-      <div className="space-y-5">
+      <div className="space-y-4 text-sm">
         {/* Quick Contact Info */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700">
-          <div className="flex items-start gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+          <div className="flex items-start gap-2.5">
             <PhoneCall className="w-4 h-4 text-[#0054A6] shrink-0 mt-0.5" />
             <div>
               <p className="font-semibold text-slate-900">(028) 3725 2002</p>
-              <p className="text-slate-500">Thư viện Trường ĐH CNTT</p>
+              <p className="text-xs text-slate-500">T2–T6: 07:30–18:00 · T7: 08:00–16:00</p>
             </div>
           </div>
-          <div className="flex items-start gap-2">
+          <div className="flex items-start gap-2.5">
             <Mail className="w-4 h-4 text-[#0054A6] shrink-0 mt-0.5" />
             <div>
               <p className="font-semibold text-slate-900">thuvien@uit.edu.vn</p>
-              <p className="text-slate-500">T2–T6: 07:30–18:00 · T7: 08:00–16:00</p>
+              <p className="text-xs text-slate-500">Hỗ trợ bạn đọc trực tuyến</p>
             </div>
           </div>
-          <div className="sm:col-span-2 flex items-start gap-2 pt-1.5 border-t border-slate-200/80">
-            <MapPin className="w-4 h-4 text-[#0054A6] shrink-0 mt-0.5" />
-            <p className="text-slate-600">
-              Tòa nhà A, Khu phố 34, Phường Linh Xuân, TP. Hồ Chí Minh
-            </p>
+          <div className="sm:col-span-2 flex items-center gap-2.5 pt-2 border-t border-slate-200/80 text-xs text-slate-600">
+            <MapPin className="w-3.5 h-3.5 text-[#0054A6] shrink-0" />
+            <span>Tòa nhà A, Khu phố 34, Phường Linh Xuân, TP. Hồ Chí Minh</span>
           </div>
         </div>
 
