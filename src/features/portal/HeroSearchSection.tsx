@@ -62,13 +62,23 @@ export function HeroSearchSection({
 
   return (
     <section
-      className="relative overflow-hidden rounded-2xl border border-[#1556d6]/25 shadow-md"
+      className="relative overflow-hidden rounded-2xl border border-[#1556d6]/30 shadow-lg"
       style={{
         background: 'linear-gradient(135deg, #030a24 0%, #0a2b86 58%, #1556d6 100%)',
       }}
     >
-      {/* Single subtle soft glow */}
-      <div className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full bg-[#4de1ff]/12 blur-3xl" />
+      {/* Tech grid & floating ambient orbs */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-[0.07]"
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }}
+      />
+      <div className="pointer-events-none absolute -top-24 -right-24 w-80 h-80 rounded-full bg-[#4de1ff]/15 blur-3xl animate-pulse" />
+      <div className="pointer-events-none absolute -bottom-24 -left-20 w-72 h-72 rounded-full bg-[#6366f1]/20 blur-3xl" />
 
       <div className="relative z-10 px-6 sm:px-10 py-12 sm:py-16 max-w-3xl mx-auto text-center space-y-6">
         <div className="space-y-3">

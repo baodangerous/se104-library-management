@@ -114,7 +114,40 @@ export function PublicPortalShell({
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+    <div className="relative min-h-screen flex flex-col bg-[#f4f7fc] text-slate-900">
+      {/* Ambient Mesh Glow & Subtle Dot-Grid Backdrop */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-0 overflow-hidden dark:hidden"
+      >
+        <div
+          className="absolute -top-40 left-1/2 -translate-x-1/2 w-[1100px] h-[520px] rounded-full opacity-55 blur-3xl"
+          style={{
+            background:
+              'radial-gradient(circle at 30% 40%, rgba(58,134,255,0.16), rgba(0,84,166,0.06) 55%, transparent 75%)',
+          }}
+        />
+        <div
+          className="absolute top-1/3 -left-36 w-[420px] h-[420px] rounded-full opacity-40 blur-3xl"
+          style={{
+            background: 'radial-gradient(circle, rgba(14,165,233,0.14), transparent 70%)',
+          }}
+        />
+        <div
+          className="absolute bottom-10 -right-32 w-[460px] h-[460px] rounded-full opacity-40 blur-3xl"
+          style={{
+            background: 'radial-gradient(circle, rgba(99,102,241,0.12), transparent 70%)',
+          }}
+        />
+        <div
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage: 'radial-gradient(#94a3b8 0.85px, transparent 0.85px)',
+            backgroundSize: '26px 26px',
+          }}
+        />
+      </div>
+
       <PortalHeader
         activeTab={activeTab}
         onSelectTab={handleSelectTab}
@@ -124,7 +157,7 @@ export function PublicPortalShell({
         onLogout={onLogout}
       />
 
-      <main className="flex-1 max-w-[1120px] w-full mx-auto px-4 sm:px-6 py-8">
+      <main className="relative z-10 flex-1 max-w-[1280px] w-full mx-auto px-4 sm:px-6 py-7">
         {activeTab === 'home' ? (
           <PortalHomePage
             books={books}
