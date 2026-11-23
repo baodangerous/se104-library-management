@@ -96,13 +96,13 @@ export function WorkspaceApp({
           onNavigate={handleNavigate}
         />
       ) : (
-        <DashboardPage onNavigate={handleNavigate} />
+        <DashboardPage user={user} onNavigate={handleNavigate} />
       );
     }
 
     switch (activePage) {
       case 'dashboard':
-        return <DashboardPage onNavigate={handleNavigate} />;
+        return <DashboardPage user={user} onNavigate={handleNavigate} />;
       case 'readers':
         return <ReadersPage />;
       case 'books':
@@ -159,7 +159,7 @@ export function WorkspaceApp({
       case 'reader-about':
         return <AboutPage books={portalBooks} />;
       default:
-        return <DashboardPage onNavigate={handleNavigate} />;
+        return <DashboardPage user={user} onNavigate={handleNavigate} />;
     }
   }
 
