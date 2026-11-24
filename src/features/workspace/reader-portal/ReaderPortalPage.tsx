@@ -1,9 +1,13 @@
 import * as React from 'react';
-import { BookCopy, DoorOpen, GraduationCap, IdCard, KeyRound, Network, Sparkles } from 'lucide-react';
+import { BookCopy, CreditCard, DoorOpen, GraduationCap, IdCard, KeyRound, Network, ShieldAlert, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
+import { Button } from '../../../components/ui/button';
 import { Card, CardBody } from '../../../components/ui/card';
+import { ModalDialog } from '../../../components/ui/dialog';
+import { FieldLabel, SelectInput, TextInput } from '../../../components/ui/input';
 import { adminService, type ReaderProfileData } from '../../../services/adminService';
 import { circulationService } from '../../../services/circulationService';
+import { operationalService } from '../../../services/operationalService';
 import { reservationService } from '../../../services/reservationService';
 import { diffDaysIso, formatDateVn, todayIsoDate } from '../../../services/rules/dateUtils';
 import type { Sach } from '../../../types/library';
@@ -28,6 +32,9 @@ export function ReaderPortalPage({
   const [reservations, setReservations] = React.useState<DatTruoc[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [changePwOpen, setChangePwOpen] = React.useState(false);
+  const [payOpen, setPayOpen] = React.useState(false);
+  const [payChannel, setPayChannel] = React.useState<'VNPay' | 'Momo' | 'ZaloPay'>('VNPay');
+  const [payAmount, setPayAmount] = React.useState('');
 
   const loadProfile = React.useCallback(() => {
     setLoading(true);
@@ -198,6 +205,57 @@ export function ReaderPortalPage({
         isExpired={isExpired}
       />
 
+      <div className="flex flex-wrap items-center gap-2">
+        {data.docGia && data.docGia.TongNo > 0 && (
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => {
+              if (!data.docGia) return;
+              setPayAmount(String(data.docGia.TongNo));
+              setPayOpen(true);
+            }}
+            className="gap-1.5"
+          >
+            <CreditCard className="w-4 h-4" /> Thanh toán phạt trực tuyến ({data.docGia.TongNo.toLocaleString('vi-VN')} ₫)
+          </Button>
+        )}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={async () => {
+            if (!data.docGia) return;
+            try {
+              const res = await operationalService.renewCard(data.docGia.MaDocGia);
+              toast.success(`Đã gia hạn thẻ đến ${formatDateVn(res.NgayHetHan)}.`);
+              loadProfile();
+            } catch (err) {
+              toast.error(err instanceof Error ? err.message : 'Không thể gia hạn thẻ.');
+            }
+          }}
+          className="gap-1.5"
+        >
+          <IdCard className="w-4 h-4" /> Gia hạn thẻ
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={async () => {
+            if (!data.docGia) return;
+            try {
+              const res = await operationalService.reportLostCard(data.docGia.MaDocGia);
+              toast.success(`Đã khoá thẻ cũ và cấp thẻ mới ${res.MaTheMoi}.`);
+              loadProfile();
+            } catch (err) {
+              toast.error(err instanceof Error ? err.message : 'Không thể báo mất thẻ.');
+            }
+          }}
+          className="gap-1.5 text-rose-600 border-rose-200 hover:bg-rose-50"
+        >
+          <ShieldAlert className="w-4 h-4" /> Báo mất &amp; Cấp lại thẻ
+        </Button>
+      </div>
+
       {featuredBooks.length > 0 && onSelectBook ? (
         <div className="space-y-2">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-[#0054A6] px-1">
@@ -230,6 +288,46 @@ export function ReaderPortalPage({
         username={data.docGia.Email || data.docGia.MaDocGia}
         onOpenChange={setChangePwOpen}
       />
+
+      <ModalDialog open={payOpen} onOpenChange={setPayOpen} title="Thanh toán tiền phạt trực tuyến">
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            if (!data.docGia) return;
+            try {
+              const res = await operationalService.payOnline({
+                MaDocGia: data.docGia.MaDocGia,
+                KenhThanhToan: payChannel,
+                SoTien: Number(payAmount),
+                MaGD_CongThanhToan: `${payChannel.toUpperCase()}-${Date.now()}`,
+              });
+              toast.success(`Thanh toán thành công (${res.MaGD}). Nợ còn lại: ${res.ConLai.toLocaleString('vi-VN')} ₫.`);
+              setPayOpen(false);
+              loadProfile();
+            } catch (err) {
+              toast.error(err instanceof Error ? err.message : 'Thanh toán thất bại.');
+            }
+          }}
+          className="space-y-3"
+        >
+          <div>
+            <FieldLabel required>Cổng thanh toán</FieldLabel>
+            <SelectInput value={payChannel} onChange={(e) => setPayChannel(e.target.value as typeof payChannel)}>
+              <option value="VNPay">VNPay QR</option>
+              <option value="Momo">Ví MoMo</option>
+              <option value="ZaloPay">ZaloPay</option>
+            </SelectInput>
+          </div>
+          <div>
+            <FieldLabel required>Số tiền thanh toán (VNĐ)</FieldLabel>
+            <TextInput type="number" min={1000} max={data.docGia?.TongNo ?? 0} value={payAmount} onChange={(e) => setPayAmount(e.target.value)} required />
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="button" variant="outline" onClick={() => setPayOpen(false)}>Huỷ</Button>
+            <Button type="submit" variant="primary">Xác nhận thanh toán</Button>
+          </div>
+        </form>
+      </ModalDialog>
     </div>
   );
 }

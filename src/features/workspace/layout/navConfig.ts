@@ -1,9 +1,11 @@
 import * as React from 'react';
 import {
+  ArrowLeftRight,
   BarChart3,
   BookCopy,
   BookDown,
   BookUp,
+  ClipboardCheck,
   Compass,
   CreditCard,
   DatabaseBackup,
@@ -13,6 +15,7 @@ import {
   LayoutDashboard,
   Network,
   Newspaper,
+  PackagePlus,
   SlidersHorizontal,
   UserCircle2,
   Users,
@@ -26,8 +29,11 @@ export type NavPageId =
   | 'knowledge-map'
   | 'loans'
   | 'returns'
-  | 'fines'
+  | 'acquisitions'
+  | 'transfers'
+  | 'inventory'
   | 'service-requests'
+  | 'fines'
   | 'reports'
   | 'news'
   | 'regulations'
@@ -49,9 +55,10 @@ export interface NavItem {
 }
 
 export const ROLE_LABELS: Record<UserRole, string> = {
-  ADMIN: 'Quản trị viên',
-  HEAD_LIBRARIAN: 'Phụ trách thư viện',
-  LIBRARIAN: 'Chuyên viên thư viện',
+  ADMIN: 'Quản trị hệ thống',
+  HEAD_LIBRARIAN: 'Quản lý thư viện',
+  LIBRARIAN: 'Thủ thư',
+  CATALOGER: 'Nhân viên biên mục',
   READER: 'Sinh viên / Độc giả',
 };
 
@@ -60,7 +67,7 @@ export const NAV_ITEMS: NavItem[] = [
     id: 'dashboard',
     label: 'Tổng quan',
     section: 'Hoạt động chính',
-    roles: ['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'],
+    roles: ['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'CATALOGER'],
     icon: LayoutDashboard,
   },
   {
@@ -93,18 +100,39 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'books',
-    label: 'Kho sách & Tra cứu',
+    label: 'Kho sách & Bản sao',
     readerLabel: 'Tra cứu học liệu',
     section: 'Học liệu & Độc giả',
-    roles: ['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'READER'],
+    roles: ['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'CATALOGER', 'READER'],
     icon: BookCopy,
   },
   {
     id: 'knowledge-map',
     label: 'Bản đồ tri thức',
     section: 'Học liệu & Độc giả',
-    roles: ['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'READER'],
+    roles: ['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'CATALOGER', 'READER'],
     icon: Network,
+  },
+  {
+    id: 'acquisitions',
+    label: 'Bổ sung & Mua sắm',
+    section: 'Học liệu & Độc giả',
+    roles: ['HEAD_LIBRARIAN', 'CATALOGER'],
+    icon: PackagePlus,
+  },
+  {
+    id: 'transfers',
+    label: 'Điều chuyển chi nhánh',
+    section: 'Học liệu & Độc giả',
+    roles: ['HEAD_LIBRARIAN', 'LIBRARIAN', 'CATALOGER'],
+    icon: ArrowLeftRight,
+  },
+  {
+    id: 'inventory',
+    label: 'Kiểm kê & Thanh lý',
+    section: 'Học liệu & Độc giả',
+    roles: ['HEAD_LIBRARIAN', 'LIBRARIAN', 'CATALOGER'],
+    icon: ClipboardCheck,
   },
   {
     id: 'readers',

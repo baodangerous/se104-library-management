@@ -43,7 +43,7 @@ export function requireAuth(
     const decoded = jwt.verify(token, JWT_SECRET) as unknown as TokenPayload;
     const user = db
       .prepare(
-        `SELECT MaTaiKhoan, TenDangNhap, HoTen, VaiTro, MaDocGia, TrangThai
+        `SELECT MaTaiKhoan, TenDangNhap, HoTen, VaiTro, MaDocGia, TrangThai, MaCN
          FROM TAIKHOAN WHERE MaTaiKhoan = ?`
       )
       .get(decoded.sub) as AuthUser | undefined;
@@ -63,6 +63,21 @@ export function requireAuth(
   }
 }
 
+export function hasPermission(role: UserRole, maQuyen: string): boolean {
+  const row = db
+    .prepare('SELECT 1 FROM VAITROQUYEN WHERE MaVaiTro = ? AND MaQuyen = ?')
+    .get(role, maQuyen);
+  return Boolean(row);
+}
+
+export function hasBranchScope(maTaiKhoan: number, maCN: string): boolean {
+  const rows = db
+    .prepare('SELECT MaCN FROM PHAMVICHINHANH WHERE MaTaiKhoan = ?')
+    .all(maTaiKhoan) as Array<{ MaCN: string }>;
+  if (rows.length === 0) return true;
+  return rows.some((r) => r.MaCN === maCN);
+}
+
 export function requireRole(...roles: UserRole[]) {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {
@@ -72,6 +87,23 @@ export function requireRole(...roles: UserRole[]) {
     if (!roles.includes(req.user.VaiTro)) {
       res.status(403).json({
         error: 'Bạn không có quyền truy cập chức năng này.',
+      });
+      return;
+    }
+    next();
+  };
+}
+
+export function requirePermission(...permissions: string[]) {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+    if (!req.user) {
+      res.status(401).json({ error: 'Chưa xác thực người dùng.' });
+      return;
+    }
+    const ok = permissions.some((p) => hasPermission(req.user!.VaiTro, p));
+    if (!ok) {
+      res.status(403).json({
+        error: `Bạn không có quyền thực hiện thao tác này (${permissions.join(' / ')}).`,
       });
       return;
     }

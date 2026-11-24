@@ -238,7 +238,7 @@ const authorBodySchema = z.object({
 router.post(
   '/tacgia',
   requireAuth,
-  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'CATALOGER'),
   (req: AuthenticatedRequest, res) => {
     const parsed = authorBodySchema.safeParse(req.body);
     if (!parsed.success) return sendZodError(res, parsed.error);
@@ -264,7 +264,7 @@ router.post(
 router.put(
   '/tacgia/:id',
   requireAuth,
-  requireRole('ADMIN', 'HEAD_LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'CATALOGER'),
   (req: AuthenticatedRequest, res) => {
     const id = Number(req.params.id);
     const existing = db.prepare('SELECT * FROM TACGIA WHERE MaTacGia = ?').get(id) as
@@ -379,7 +379,7 @@ function upsertBookAuthors(maSach: string, tacGiaNames: string[]): void {
 router.post(
   '/sach',
   requireAuth,
-  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'CATALOGER'),
   (req: AuthenticatedRequest, res) => {
     const parsed = bookBodySchema.safeParse(req.body);
     if (!parsed.success) return sendZodError(res, parsed.error);
@@ -445,7 +445,7 @@ router.post(
 router.put(
   '/sach/:id',
   requireAuth,
-  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'CATALOGER'),
   (req: AuthenticatedRequest, res) => {
     const id = req.params.id;
     const existing = db.prepare('SELECT * FROM SACH WHERE MaSach = ?').get(id) as any;

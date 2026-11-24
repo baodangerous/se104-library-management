@@ -5,6 +5,7 @@ import { router as catalogRoutes } from "./catalogRoutes";
 import { router as readerRoutes } from "./readerRoutes";
 import { router as circulationRoutes } from "./circulationRoutes";
 import { router as adminRoutes } from "./adminRoutes";
+import { operationalRouter } from "./operationalRoutes";
 
 export const apiRouter = Router();
 apiRouter.use(portalRouter);
@@ -13,3 +14,4 @@ apiRouter.use(catalogRoutes);
 apiRouter.use(readerRoutes);
 apiRouter.use(circulationRoutes);
 apiRouter.use(adminRoutes);
+apiRouter.use(operationalRouter);

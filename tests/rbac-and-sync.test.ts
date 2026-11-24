@@ -368,3 +368,149 @@ test('Auth & DB Sync: READER changes provisioned password in real SQLite', async
   // Cleanup
   assert.equal((await api(`/taikhoan/${accId}`, { method: 'DELETE', token: head.token })).status, 200);
 });
+
+test('RBAC 5th Role (CATALOGER) & Permission Separation of Duties', async () => {
+  const cataloger = await demoLogin('CATALOGER');
+  const admin = await demoLogin('ADMIN');
+
+  // CATALOGER can list physical copies and read permission matrix is blocked (403)
+  assert.equal((await api('/ops/copies', { token: cataloger.token })).status, 200);
+  assert.equal((await api('/ops/permissions/matrix', { token: cataloger.token })).status, 403);
+  assert.equal((await api('/taikhoan', { token: cataloger.token })).status, 403);
+
+  // ADMIN can read matrix, but cannot approve financial adjustments (separation of duties)
+  assert.equal((await api('/ops/permissions/matrix', { token: admin.token })).status, 200);
+  const adjAttempt = await api('/ops/finance/adjustments/PDC2026-001/decision', {
+    method: 'POST',
+    token: admin.token,
+    body: { decision: 'Đã duyệt' },
+  });
+  assert.equal(adjAttempt.status, 403);
+});
+
+test('Acquisitions Budget Guard (QĐ37) & 7-Step Transfer Lifecycle (QĐ29)', async () => {
+  const head = await demoLogin('HEAD_LIBRARIAN');
+  const lib = await demoLogin('LIBRARIAN');
+
+  // QĐ37: Exceeding plan budget must be rejected (400)
+  const overBudget = await api('/ops/acquisitions/orders', {
+    method: 'POST',
+    token: head.token,
+    body: {
+      MaKeHoach: 'KH2026-HK1',
+      MaNCC: 'NCC01',
+      ChiTiet: [{ TenTaiLieuDat: 'Expensive AI Cluster Guide', SoLuongDat: 1000, DonGia: 1000000 }],
+    },
+  });
+  assert.equal(overBudget.status, 400);
+
+  // QĐ29: Transfer only moves BANSAO.MaCN upon destination receipt (Đã nhập kho)
+  const copiesRes = await api<any[]>('/ops/copies?maCN=CN01', { token: lib.token });
+  const readyCopy = copiesRes.data.find((c) => c.TinhTrang === 'Sẵn sàng');
+  assert.ok(readyCopy);
+
+  const trf = await api<{ SoPhieuDC: string }>('/ops/transfers', {
+    method: 'POST',
+    token: lib.token,
+    body: { MaBanSao: readyCopy.MaBanSao, ChiNhanhNhan: 'CN02' },
+  });
+  assert.equal(trf.status, 201);
+  const soPhieu = trf.data.SoPhieuDC;
+
+  // Librarian cannot approve (403)
+  assert.equal(
+    (await api(`/ops/transfers/${soPhieu}/transition`, {
+      method: 'POST',
+      token: lib.token,
+      body: { nextStatus: 'Đã duyệt' },
+    })).status,
+    403
+  );
+
+  // Head Librarian approves -> Librarian dispatches -> Copy still at CN01
+  assert.equal(
+    (await api(`/ops/transfers/${soPhieu}/transition`, {
+      method: 'POST',
+      token: head.token,
+      body: { nextStatus: 'Đã duyệt' },
+    })).status,
+    200
+  );
+  assert.equal(
+    (await api(`/ops/transfers/${soPhieu}/transition`, {
+      method: 'POST',
+      token: lib.token,
+      body: { nextStatus: 'Đã xuất kho' },
+    })).status,
+    200
+  );
+  const midCopy = (await api<any[]>(`/ops/copies?q=${readyCopy.MaBanSao}`, { token: lib.token })).data[0];
+  assert.equal(midCopy.MaCN, 'CN01');
+
+  // Destination confirms receipt -> Copy moves to CN02
+  assert.equal(
+    (await api(`/ops/transfers/${soPhieu}/transition`, {
+      method: 'POST',
+      token: lib.token,
+      body: { nextStatus: 'Đã nhập kho' },
+    })).status,
+    200
+  );
+  const doneCopy = (await api<any[]>(`/ops/copies?q=${readyCopy.MaBanSao}`, { token: lib.token })).data[0];
+  assert.equal(doneCopy.MaCN, 'CN02');
+
+  // Restore copy back to CN01 so DB remains clean
+  const trfBack = await api<{ SoPhieuDC: string }>('/ops/transfers', {
+    method: 'POST',
+    token: lib.token,
+    body: { MaBanSao: readyCopy.MaBanSao, ChiNhanhNhan: 'CN01' },
+  });
+  await api(`/ops/transfers/${trfBack.data.SoPhieuDC}/transition`, {
+    method: 'POST',
+    token: head.token,
+    body: { nextStatus: 'Đã duyệt' },
+  });
+  await api(`/ops/transfers/${trfBack.data.SoPhieuDC}/transition`, {
+    method: 'POST',
+    token: lib.token,
+    body: { nextStatus: 'Đã nhập kho' },
+  });
+});
+
+test('Inventory Discrepancy Approval, Online Pay Idempotency & Reconciliation', async () => {
+  const head = await demoLogin('HEAD_LIBRARIAN');
+  const lib = await demoLogin('LIBRARIAN');
+
+  // Create & approve inventory session
+  const inv = await api<{ MaBBKK: string }>('/ops/inventory', {
+    method: 'POST',
+    token: lib.token,
+    body: { MaCN: 'CN01', ChiTiet: [{ MaSach: 'S001', SoLuongThucTe: 1 }] },
+  });
+  assert.equal(inv.status, 201);
+  assert.equal(
+    (await api(`/ops/inventory/${inv.data.MaBBKK}/approve`, { method: 'POST', token: head.token })).status,
+    200
+  );
+
+  // Finance reconciliation & adjustment slip
+  const rec = await api<any>('/ops/finance/reconcile', { token: head.token });
+  assert.equal(rec.status, 200);
+  assert.equal(typeof rec.data.netReconciled, 'number');
+
+  // Duplicate gateway transaction ID must fail with 409 (TC36-02)
+  const txId = `VNPAY-TEST-${Date.now()}`;
+  const pay1 = await api('/ops/finance/online-pay', {
+    method: 'POST',
+    token: lib.token,
+    body: { MaDocGia: 'DG002', KenhThanhToan: 'VNPay', SoTien: 500, MaGD_CongThanhToan: txId },
+  });
+  if (pay1.status === 201) {
+    const payDup = await api('/ops/finance/online-pay', {
+      method: 'POST',
+      token: lib.token,
+      body: { MaDocGia: 'DG002', KenhThanhToan: 'VNPay', SoTien: 500, MaGD_CongThanhToan: txId },
+    });
+    assert.equal(payDup.status, 409);
+  }
+});

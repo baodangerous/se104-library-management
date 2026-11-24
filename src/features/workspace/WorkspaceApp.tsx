@@ -14,9 +14,11 @@ import { AuditLogPage } from './admin/AuditLogPage';
 import { BackupPage } from './admin/BackupPage';
 import { NewsManagePage } from './admin/NewsManagePage';
 import { ServiceRequestsManagePage } from './admin/ServiceRequestsManagePage';
+import { AcquisitionsPage } from './acquisitions/AcquisitionsPage';
 import { BooksPage } from './books/BooksPage';
 import { DashboardPage } from './dashboard/DashboardPage';
 import { FinesPage } from './fines/FinesPage';
+import { InventoryDisposalPage } from './inventory/InventoryDisposalPage';
 import { AppShell } from './layout/AppShell';
 import { NAV_ITEMS, type NavPageId } from './layout/navConfig';
 import { LoansPage } from './loans/LoansPage';
@@ -26,6 +28,7 @@ import { ReadersPage } from './readers/ReadersPage';
 import { RegulationsPage } from './regulations/RegulationsPage';
 import { ReportsPage } from './reports/ReportsPage';
 import { ReturnsPage } from './returns/ReturnsPage';
+import { TransfersPage } from './transfers/TransfersPage';
 
 function getDefaultPageForRole(role: AuthUser['VaiTro']): NavPageId {
   return role === 'READER' ? 'reader-portal' : 'dashboard';
@@ -122,10 +125,16 @@ export function WorkspaceApp({
         return <LoansPage />;
       case 'returns':
         return <ReturnsPage />;
+      case 'acquisitions':
+        return <AcquisitionsPage userRole={user.VaiTro} />;
+      case 'transfers':
+        return <TransfersPage userRole={user.VaiTro} />;
+      case 'inventory':
+        return <InventoryDisposalPage userRole={user.VaiTro} />;
       case 'service-requests':
         return <ServiceRequestsManagePage />;
       case 'fines':
-        return <FinesPage />;
+        return <FinesPage userRole={user.VaiTro} />;
       case 'reports':
         return <ReportsPage />;
       case 'news':

@@ -16,9 +16,10 @@ interface LoginModalProps {
 
 const QUICK_ROLES: Array<{ role: UserRole; label: string }> = [
   { role: 'ADMIN', label: 'Admin' },
-  { role: 'HEAD_LIBRARIAN', label: 'Phụ trách TV' },
-  { role: 'LIBRARIAN', label: 'Chuyên viên TV' },
-  { role: 'READER', label: 'Sinh viên' },
+  { role: 'HEAD_LIBRARIAN', label: 'Quản lý TV' },
+  { role: 'LIBRARIAN', label: 'Thủ thư' },
+  { role: 'CATALOGER', label: 'Biên mục' },
+  { role: 'READER', label: 'Độc giả' },
 ];
 
 export function LoginModal({
@@ -136,7 +137,7 @@ export function LoginModal({
           <p className="text-xs text-center text-slate-500">
             Tài khoản trải nghiệm nhanh
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
             {QUICK_ROLES.map((item) => (
               <button
                 key={item.role}

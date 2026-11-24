@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { BookmarkPlus, BookOpen, Building2, Calendar, Globe, MapPin, Network, User, X } from 'lucide-react';
+import { BookmarkPlus, BookOpen, Building2, Calendar, FileDown, Globe, MapPin, Network, Star, User, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../../components/ui/button';
 import { formatDateVN, formatVnd } from '../../lib/utils';
+import { operationalService } from '../../services/operationalService';
 import { reservationService } from '../../services/reservationService';
-import type { AuthUser, Sach } from '../../types/library';
+import type { AuthUser, BanSao, DanhGiaSach, Sach, TaiNguyenSo } from '../../types/library';
 
 interface BookDetailDrawerProps {
   book: Sach | null;
@@ -22,6 +23,23 @@ export function BookDetailDrawer({
   onRequireLogin,
 }: BookDetailDrawerProps) {
   const [reserving, setReserving] = React.useState(false);
+  const [copies, setCopies] = React.useState<BanSao[]>([]);
+  const [digital, setDigital] = React.useState<TaiNguyenSo | null>(null);
+  const [reviews, setReviews] = React.useState<DanhGiaSach[]>([]);
+  const [rating, setRating] = React.useState(5);
+  const [comment, setComment] = React.useState('');
+
+  React.useEffect(() => {
+    if (!book) return;
+    operationalService
+      .getBookExtras(book.MaSach)
+      .then((res) => {
+        setCopies(res.copies);
+        setDigital(res.digital);
+        setReviews(res.reviews);
+      })
+      .catch(() => {});
+  }, [book]);
 
   React.useEffect(() => {
     if (!book) return;
@@ -155,6 +173,91 @@ export function BookDetailDrawer({
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
             <span>Ngày tiếp nhận: {formatDateVN(book.NgayNhap)}</span>
             <span>Giá bìa: {formatVnd(book.TriGia)}</span>
+          </div>
+
+          {digital && (
+            <div className="p-3 rounded-xl bg-sky-50 border border-sky-200 flex items-center justify-between gap-2">
+              <div className="text-xs">
+                <p className="font-semibold text-[#0054A6] flex items-center gap-1.5">
+                  <FileDown className="w-3.5 h-3.5" /> Tài nguyên số ({digital.DinhDangFile})
+                </p>
+                <p className="text-slate-600 mt-0.5">
+                  DRM {digital.ThoiHanDRM_Ngay} ngày · Tối đa {digital.SoLuotMuonDongThoi} lượt đồng thời
+                </p>
+              </div>
+              <span className="text-[11px] font-mono text-sky-700 bg-white px-2 py-1 rounded border border-sky-200">
+                {digital.MaTNS}
+              </span>
+            </div>
+          )}
+
+          {copies.length > 0 && (
+            <div className="space-y-1.5 pt-2 border-t border-slate-100">
+              <p className="text-xs font-semibold text-slate-700">Bản sao vật lý ({copies.length})</p>
+              <div className="space-y-1">
+                {copies.map((c) => (
+                  <div key={c.MaBanSao} className="flex items-center justify-between text-xs px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-100">
+                    <div>
+                      <span className="font-mono font-semibold text-slate-800">{c.MaBanSao}</span>
+                      <span className="text-slate-500 ml-2">{c.MaCN}</span>
+                    </div>
+                    <span className={c.TinhTrang === 'Sẵn sàng' ? 'text-emerald-600 font-semibold' : 'text-amber-600 font-semibold'}>
+                      {c.TinhTrang}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-2 pt-2 border-t border-slate-100">
+            <p className="text-xs font-semibold text-slate-700">Đánh giá độc giả ({reviews.length})</p>
+            {reviews.map((rv) => (
+              <div key={rv.MaDanhGia} className="p-2.5 rounded-lg bg-slate-50 text-xs space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-slate-800">{rv.HoTenDocGia || rv.MaDocGia}</span>
+                  <span className="text-amber-500 flex items-center gap-0.5">
+                    <Star className="w-3 h-3 fill-amber-400" /> {rv.SoSao}/5
+                  </span>
+                </div>
+                <p className="text-slate-600">{rv.NoiDung}</p>
+              </div>
+            ))}
+            {user?.MaDocGia && (
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!comment.trim()) return;
+                  try {
+                    await operationalService.submitBookReview(book.MaSach, { SoSao: rating, NoiDung: comment });
+                    toast.success('Đã gửi đánh giá tài liệu.');
+                    setComment('');
+                    const refreshed = await operationalService.getBookExtras(book.MaSach);
+                    setReviews(refreshed.reviews);
+                  } catch (err) {
+                    toast.error(err instanceof Error ? err.message : 'Không thể gửi đánh giá.');
+                  }
+                }}
+                className="flex gap-1.5 pt-1"
+              >
+                <select
+                  value={rating}
+                  onChange={(e) => setRating(Number(e.target.value))}
+                  className="h-8 px-2 rounded-lg border border-slate-200 text-xs bg-white"
+                >
+                  {[5, 4, 3, 2, 1].map((s) => (
+                    <option key={s} value={s}>{s}★</option>
+                  ))}
+                </select>
+                <input
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Viết nhận xét..."
+                  className="flex-1 h-8 px-2.5 rounded-lg border border-slate-200 text-xs"
+                />
+                <Button type="submit" size="sm" variant="outline" className="h-8 text-xs">Gửi</Button>
+              </form>
+            )}
           </div>
         </div>
 

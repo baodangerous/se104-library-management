@@ -88,7 +88,8 @@ export function AccountFormModal({
                   <option value="HEAD_LIBRARIAN">HEAD_LIBRARIAN (Phụ trách thư viện)</option>
                 </>
               ) : null}
-              <option value="LIBRARIAN">LIBRARIAN (Chuyên viên thư viện)</option>
+              <option value="LIBRARIAN">LIBRARIAN (Thủ thư)</option>
+              <option value="CATALOGER">CATALOGER (Nhân viên biên mục)</option>
               <option value="READER">READER (Độc giả)</option>
             </Select>
           </div>

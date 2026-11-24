@@ -194,7 +194,9 @@ router.put(
       return;
     }
 
+    const prev = getThamSo();
     const d = parsed.data;
+    const today = todayIsoDate();
     // Only update MaThamSo = 1; never modify existing DOCGIA.NgayHetHan or CHITIETPHIEUMUON.HanTra
     db.prepare(
       `UPDATE THAMSO
@@ -209,6 +211,20 @@ router.put(
       d.SoSachMuonToiDa,
       d.SoNgayMuonToiDa
     );
+
+    const trackConfigChange = (key: string, oldVal: number, newVal: number, reason: string) => {
+      if (oldVal === newVal) return;
+      db.prepare(
+        `UPDATE LICHSUCAUHINH SET NgayHetHieuLuc = ? WHERE MaCauHinh = ? AND NgayHetHieuLuc IS NULL`
+      ).run(today, key);
+      db.prepare(
+        `INSERT INTO LICHSUCAUHINH (MaCauHinh, GiaTri, NgayHieuLuc, NgayHetHieuLuc, NguoiThayDoi, LyDoThayDoi)
+         VALUES (?, ?, ?, NULL, ?, ?)`
+      ).run(key, String(newVal), today, req.user!.TenDangNhap, reason);
+    };
+    trackConfigChange('SO_SACH_MUON_TOI_DA', prev.SoSachMuonToiDa, d.SoSachMuonToiDa, 'Cập nhật định mức mượn tối đa');
+    trackConfigChange('SO_NGAY_MUON_TOI_DA', prev.SoNgayMuonToiDa, d.SoNgayMuonToiDa, 'Cập nhật số ngày mượn tối đa');
+    trackConfigChange('THOI_HAN_THE_THANG', prev.ThoiHanThe, d.ThoiHanThe, 'Cập nhật thời hạn thẻ thư viện');
 
     writeAuditLog({
       MaTaiKhoan: req.user!.MaTaiKhoan,
@@ -366,7 +382,7 @@ const createAccountSchema = z.object({
   TenDangNhap: z.string().trim().min(3, 'Tên đăng nhập tối thiểu 3 ký tự.'),
   MatKhau: z.string().min(6, 'Mật khẩu tối thiểu 6 ký tự.'),
   HoTen: z.string().trim().min(2, 'Họ tên tối thiểu 2 ký tự.'),
-  VaiTro: z.enum(['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'READER']),
+  VaiTro: z.enum(['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'CATALOGER', 'READER']),
   MaDocGia: z.string().trim().nullable().optional(),
 });
 
@@ -379,9 +395,9 @@ router.post(
     if (!parsed.success) return sendZodError(res, parsed.error);
 
     const d = parsed.data;
-    if (req.user!.VaiTro === 'HEAD_LIBRARIAN' && !['LIBRARIAN', 'READER'].includes(d.VaiTro)) {
+    if (req.user!.VaiTro === 'HEAD_LIBRARIAN' && !['LIBRARIAN', 'CATALOGER', 'READER'].includes(d.VaiTro)) {
       res.status(403).json({
-        error: 'Phụ trách thư viện chỉ được phép tạo tài khoản Chuyên viên thư viện hoặc Độc giả.',
+        error: 'Phụ trách thư viện chỉ được phép tạo tài khoản Chuyên viên thư viện, Biên mục hoặc Độc giả.',
       });
       return;
     }

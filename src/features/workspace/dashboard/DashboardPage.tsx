@@ -70,6 +70,18 @@ const ROLE_BANNERS: Record<Exclude<UserRole, 'READER'>, RoleBannerConfig> = {
       { target: 'readers', label: 'Quản lý độc giả', Icon: Users },
     ],
   },
+  CATALOGER: {
+    badge: 'Nhân viên Biên mục · Kho & Bổ sung',
+    subtitle:
+      'Biên mục đầu sách, quản lý bản sao vật lý đa chi nhánh, tiếp nhận đơn đặt mua và đề xuất thanh lý.',
+    gradient: 'linear-gradient(135deg, #1e293b 0%, #0f4c81 55%, #0284c7 100%)',
+    actions: [
+      { target: 'books', label: 'Kho sách & Bản sao', primary: true, Icon: BookCopy },
+      { target: 'acquisitions', label: 'Tiếp nhận đặt mua', Icon: Newspaper },
+      { target: 'transfers', label: 'Điều chuyển chi nhánh', Icon: SlidersHorizontal },
+      { target: 'inventory', label: 'Kiểm kê & Thanh lý', Icon: History },
+    ],
+  },
 };
 
 export function DashboardPage({
