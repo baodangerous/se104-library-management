@@ -52,16 +52,6 @@ export function AccountsPage({ currentRole }: { currentRole: UserRole }) {
     }
   }
 
-  async function handleToggleBranch(maTaiKhoan: number, maCN: string, enabled: boolean) {
-    try {
-      await operationalService.toggleBranchScope({ MaTaiKhoan: maTaiKhoan, MaCN: maCN, enabled });
-      await loadMatrix();
-      toast.success(`Đã cập nhật phạm vi chi nhánh ${maCN}.`);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Không thể cập nhật chi nhánh.');
-    }
-  }
-
   const columns = React.useMemo<DataTableColumn<TaiKhoan>[]>(
     () => [
       {
@@ -179,7 +169,7 @@ export function AccountsPage({ currentRole }: { currentRole: UserRole }) {
             tab === 'matrix' ? 'bg-[#0054A6] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
           }`}
         >
-          <ShieldCheck className="w-3.5 h-3.5" /> Ma trận phân quyền &amp; Chi nhánh
+          <ShieldCheck className="w-3.5 h-3.5" /> Ma trận phân quyền
         </button>
       </div>
 
@@ -237,48 +227,6 @@ export function AccountsPage({ currentRole }: { currentRole: UserRole }) {
                     })}
                   </tr>
                 ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto">
-            <div className="px-4 py-3 border-b border-slate-200 font-semibold text-sm text-slate-900">
-              Phạm vi chi nhánh nhân viên (PHAMVICHINHANH)
-            </div>
-            <table className="w-full text-xs text-left">
-              <thead className="bg-slate-50 text-slate-500 uppercase border-b border-slate-200">
-                <tr>
-                  <th className="px-4 py-2.5">Nhân viên</th>
-                  <th className="px-4 py-2.5">Vai trò</th>
-                  {matrix?.branches.map((b) => (
-                    <th key={b.MaCN} className="px-4 py-2.5 text-center">{b.MaCN}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {state.accounts
-                  .filter((a) => a.VaiTro !== 'READER')
-                  .map((acc) => (
-                    <tr key={acc.MaTaiKhoan}>
-                      <td className="px-4 py-2 font-medium">{acc.HoTen} ({acc.TenDangNhap})</td>
-                      <td className="px-4 py-2 text-slate-500">{ROLE_TEXT[acc.VaiTro]}</td>
-                      {matrix?.branches.map((b) => {
-                        const checked = matrix.branchScopes.some(
-                          (bs) => bs.MaTaiKhoan === acc.MaTaiKhoan && bs.MaCN === b.MaCN
-                        );
-                        return (
-                          <td key={b.MaCN} className="px-4 py-2 text-center">
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={(e) => handleToggleBranch(acc.MaTaiKhoan, b.MaCN, e.target.checked)}
-                              className="h-4 w-4 accent-[#0054A6] cursor-pointer"
-                            />
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
               </tbody>
             </table>
           </div>

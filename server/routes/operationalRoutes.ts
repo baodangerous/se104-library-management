@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { addMonthsIso, todayIsoDate } from '../../src/lib/businessRules';
 import {
-  hasBranchScope,
   requireAuth,
   requirePermission,
   requireRole,
@@ -148,11 +147,6 @@ operationalRouter.post(
     const parsed = schema.safeParse(req.body);
     if (!parsed.success) return sendZodError(res, parsed.error);
     const d = parsed.data;
-
-    if (!hasBranchScope(req.user!.MaTaiKhoan, d.MaCN)) {
-      res.status(403).json({ error: `Bạn không có quyền thao tác tại chi nhánh ${d.MaCN}.` });
-      return;
-    }
 
     const existingCount = (
       db.prepare('SELECT COUNT(*) AS cnt FROM BANSAO WHERE MaSach = ?').get(d.MaSach) as {
@@ -1344,3 +1338,4 @@ operationalRouter.post('/ops/books/:maSach/reviews', requireAuth, (req: Authenti
 
   res.status(201).json({ ok: true });
 });
+

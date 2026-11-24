@@ -19,7 +19,7 @@ async function api<T = any>(
   return { status: res.status, data };
 }
 
-async function demoLogin(role: 'ADMIN' | 'HEAD_LIBRARIAN' | 'LIBRARIAN' | 'READER') {
+async function demoLogin(role: 'ADMIN' | 'HEAD_LIBRARIAN' | 'LIBRARIAN' | 'CATALOGER' | 'READER') {
   const { status, data } = await api<{ token: string; user: any }>('/auth/demo-login', {
     method: 'POST',
     body: { role },
@@ -513,4 +513,107 @@ test('Inventory Discrepancy Approval, Online Pay Idempotency & Reconciliation', 
     });
     assert.equal(payDup.status, 409);
   }
+});
+
+test('E2E All 5 Roles & Permissions: Every role executes its full workflows without branch limits', async () => {
+  const admin = await demoLogin('ADMIN');
+  const head = await demoLogin('HEAD_LIBRARIAN');
+  const lib = await demoLogin('LIBRARIAN');
+  const cataloger = await demoLogin('CATALOGER');
+  const reader = await demoLogin('READER');
+
+  // 1. READER: profile, card renew, report lost card, review book, quota override request
+  const readerProfile = await api<{ docGia: { MaDocGia: string } }>('/reader/profile', { token: reader.token });
+  assert.equal(readerProfile.status, 200);
+  const maDG = readerProfile.data.docGia.MaDocGia;
+
+  assert.equal((await api(`/ops/cards/${maDG}/report-lost`, { method: 'POST', token: reader.token })).status, 201);
+  assert.equal((await api('/ops/books/S001/reviews', {
+    method: 'POST',
+    token: reader.token,
+    body: { SoSao: 5, NoiDung: 'Kiểm thử đánh giá tài liệu E2E' },
+  })).status, 201);
+  const ovReq = await api<{ MaNgoaiLe: string }>('/ops/overrides', {
+    method: 'POST',
+    token: reader.token,
+    body: { MaDocGia: maDG, SoLuongThem: 2, LyDo: 'Nghiên cứu đồ án', HanApDung: '2026-12-31' },
+  });
+  assert.equal(ovReq.status, 201);
+
+  // 2. CATALOGER: create physical copies at BOTH CN01 and CN02 (no branch restriction!), create supplier, PO, receive
+  const createdCopyRes = await api<{ created: string[] }>('/ops/copies', {
+    method: 'POST',
+    token: cataloger.token,
+    body: { MaSach: 'S002', MaCN: 'CN02', SoLuong: 1 },
+  });
+  assert.equal(createdCopyRes.status, 201);
+  const createdCopyId = createdCopyRes.data.created[0];
+  assert.ok(createdCopyId);
+
+  const supRes = await api<{ MaNCC: string }>('/ops/acquisitions/suppliers', {
+    method: 'POST',
+    token: cataloger.token,
+    body: { TenNCC: `NCC Test ${Date.now()}`, SDT: '0909123456' },
+  });
+  assert.equal(supRes.status, 201);
+
+  const orderRes = await api<{ MaDonDatMua: string }>('/ops/acquisitions/orders', {
+    method: 'POST',
+    token: cataloger.token,
+    body: {
+      MaKeHoach: 'KH2026-HK1',
+      MaNCC: supRes.data.MaNCC,
+      ChiTiet: [{ TenTaiLieuDat: 'E2E Test Book', SoLuongDat: 2, DonGia: 100000 }],
+    },
+  });
+  assert.equal(orderRes.status, 201);
+  assert.equal((await api('/ops/acquisitions/receive', {
+    method: 'POST',
+    token: cataloger.token,
+    body: { MaDonDatMua: orderRes.data.MaDonDatMua, SoLuongThucNhan: 2, TinhTrangHang: 'Đạt' },
+  })).status, 201);
+
+  // 3. LIBRARIAN: reports, lock card, propose disposal, create financial adjustment
+  assert.equal((await api('/baocao/bm71', { token: lib.token })).status, 200);
+  assert.equal((await api('/baocao/bm72', { token: lib.token })).status, 200);
+  const disp = await api<{ SoPhieuTL: string }>('/ops/disposals', {
+    method: 'POST',
+    token: lib.token,
+    body: { MaBanSao: createdCopyId, LyDo: 'Kiểm thử thanh lý E2E' },
+  });
+  assert.equal(disp.status, 201);
+  const adj = await api<{ MaPhieuDieuChinh: string }>('/ops/finance/adjustments', {
+    method: 'POST',
+    token: lib.token,
+    body: { LoaiChungTu: 'PhieuPhat', MaChungTuGoc: 'PTH001', SoTienDieuChinh: 0, LyDo: 'Kiểm thử đối soát' },
+  });
+  assert.equal(adj.status, 201);
+
+  // 4. HEAD_LIBRARIAN: approve override, disposal, financial adjustment, view audit log & config history
+  assert.equal((await api(`/ops/overrides/${ovReq.data.MaNgoaiLe}/decision`, {
+    method: 'POST',
+    token: head.token,
+    body: { decision: 'Đã duyệt' },
+  })).status, 200);
+  assert.equal((await api(`/ops/disposals/${disp.data.SoPhieuTL}/decision`, {
+    method: 'POST',
+    token: head.token,
+    body: { decision: 'Đã duyệt' },
+  })).status, 200);
+  assert.equal((await api(`/ops/finance/adjustments/${adj.data.MaPhieuDieuChinh}/decision`, {
+    method: 'POST',
+    token: head.token,
+    body: { decision: 'Đã duyệt' },
+  })).status, 200);
+  assert.equal((await api('/ops/regulations/history', { token: head.token })).status, 200);
+  assert.equal((await api('/nhatky', { token: head.token })).status, 200);
+
+  // 5. ADMIN: toggle permission matrix, manage branches, download SQLite backup
+  assert.equal((await api('/ops/permissions/role', {
+    method: 'PUT',
+    token: admin.token,
+    body: { MaVaiTro: 'CATALOGER', MaQuyen: 'CATALOG_EDIT', enabled: true },
+  })).status, 200);
+  assert.equal((await api('/ops/branches', { token: admin.token })).status, 200);
+  assert.equal((await api('/hethong/backup', { token: admin.token })).status, 200);
 });
