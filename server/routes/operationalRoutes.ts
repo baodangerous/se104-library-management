@@ -1291,6 +1291,20 @@ operationalRouter.post(
       req.user!.TenDangNhap,
       req.params.maNgoaiLe
     );
+    const ov = db
+      .prepare('SELECT MaDocGia, SoLuongThem, HanApDung FROM NGOAILEMUON WHERE MaNgoaiLe = ?')
+      .get(req.params.maNgoaiLe) as { MaDocGia: string; SoLuongThem: number; HanApDung: string } | undefined;
+    if (ov) {
+      db.prepare(
+        `INSERT INTO THONGBAO (MaDocGia, LoaiTB, TieuDe, NoiDung, KenhGui, ThoiGianGui, DaDoc)
+         VALUES (?, 'Ngoại lệ mượn', ?, ?, 'App', ?, 0)`
+      ).run(
+        ov.MaDocGia,
+        `Yêu cầu mượn vượt định mức: ${parsed.data.decision}`,
+        `Yêu cầu mượn thêm ${ov.SoLuongThem} tài liệu (hạn ${ov.HanApDung}) đã được ${parsed.data.decision.toLowerCase()}.`,
+        new Date().toISOString()
+      );
+    }
     res.json({ ok: true });
   }
 );
@@ -1316,7 +1330,14 @@ operationalRouter.get('/ops/books/:maSach/extras', (req, res) => {
        WHERE b.MaSach = ? ORDER BY b.MaBanSao`
     )
     .all(req.params.maSach);
-  res.json({ reviews, digital, copies });
+  const courses = db
+    .prepare(
+      `SELECT m.MaMon, m.TenMon, m.MaNganh, m.HocKy, sm.BatBuoc
+       FROM SACH_MONHOC sm JOIN MONHOC m ON m.MaMon = sm.MaMon
+       WHERE sm.MaSach = ? ORDER BY sm.BatBuoc DESC, m.MaMon ASC`
+    )
+    .all(req.params.maSach);
+  res.json({ reviews, digital, copies, courses });
 });
 
 operationalRouter.post('/ops/books/:maSach/reviews', requireAuth, (req: AuthenticatedRequest, res) => {

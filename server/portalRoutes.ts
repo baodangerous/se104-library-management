@@ -104,6 +104,25 @@ portalRouter.patch(
       .prepare('UPDATE DATPHONG SET TrangThai = ? WHERE MaDatPhong = ?')
       .run(trangThai, req.params.id);
     if (info.changes === 0) return res.status(404).json({ error: 'Không tìm thấy lịch đặt phòng.' });
+    const booking = db.prepare('SELECT * FROM DATPHONG WHERE MaDatPhong = ?').get(req.params.id) as
+      | { MaPhong: string; NgayDat: string; KhungGio: string; Email: string }
+      | undefined;
+    if (booking?.Email) {
+      const dg = db
+        .prepare('SELECT MaDocGia FROM DOCGIA WHERE LOWER(Email) = LOWER(?) LIMIT 1')
+        .get(booking.Email) as { MaDocGia: string } | undefined;
+      if (dg) {
+        db.prepare(
+          `INSERT INTO THONGBAO (MaDocGia, LoaiTB, TieuDe, NoiDung, KenhGui, ThoiGianGui, DaDoc)
+           VALUES (?, 'Đặt phòng', ?, ?, 'App', ?, 0)`
+        ).run(
+          dg.MaDocGia,
+          `Lịch đặt phòng ${booking.MaPhong}: ${trangThai}`,
+          `Yêu cầu đặt phòng ${booking.MaPhong} ngày ${booking.NgayDat} (${booking.KhungGio}) đã chuyển sang trạng thái "${trangThai}".`,
+          new Date().toISOString()
+        );
+      }
+    }
     writeAuditLog({
       MaTaiKhoan: req.user?.MaTaiKhoan ?? null,
       TenDangNhap: req.user?.TenDangNhap ?? 'system',

@@ -421,14 +421,22 @@ router.post(
         for (const item of itemsToReturn) {
           const waiting = db
             .prepare(
-              `SELECT dt.MaDatTruoc, dg.HoTen
+              `SELECT dt.MaDatTruoc, dt.MaDocGia, dg.HoTen
                FROM DATTRUOC dt JOIN DOCGIA dg ON dg.MaDocGia = dt.MaDocGia
                WHERE dt.MaSach = ? AND dt.TrangThai = 'Đang chờ'
                ORDER BY dt.NgayDat ASC, dt.MaDatTruoc ASC LIMIT 1`
             )
-            .get(item.MaSach) as { MaDatTruoc: string; HoTen: string } | undefined;
+            .get(item.MaSach) as { MaDatTruoc: string; MaDocGia: string; HoTen: string } | undefined;
           if (waiting) {
             db.prepare(`UPDATE DATTRUOC SET TrangThai = 'Đã giữ chỗ' WHERE MaDatTruoc = ?`).run(waiting.MaDatTruoc);
+            db.prepare(
+              `INSERT INTO THONGBAO (MaDocGia, LoaiTB, TieuDe, NoiDung, KenhGui, ThoiGianGui, DaDoc)
+               VALUES (?, 'Sách sẵn sàng', 'Tài liệu đặt trước đã sẵn sàng', ?, 'App', ?, 0)`
+            ).run(
+              waiting.MaDocGia,
+              `Cuốn "${item.TenSach}" (${item.MaSach}) đã được trả về và đang giữ chỗ cho bạn trong 3 ngày.`,
+              new Date().toISOString()
+            );
             heldReservations.push({ MaSach: item.MaSach, HoTenDocGia: waiting.HoTen });
           }
         }

@@ -318,11 +318,12 @@ export const operationalService = {
     });
   },
 
-  // Book Extras (Copies, Digital Resource, Reviews)
+  // Book Extras (Copies, Digital Resource, Reviews, Courses)
   getBookExtras(maSach: string): Promise<{
     reviews: DanhGiaSach[];
     digital: TaiNguyenSo | null;
     copies: BanSao[];
+    courses: Array<{ MaMon: string; TenMon: string; MaNganh: string; HocKy: string; BatBuoc: number }>;
   }> {
     return apiRequest(`/ops/books/${encodeURIComponent(maSach)}/extras`);
   },
@@ -332,4 +333,70 @@ export const operationalService = {
       body: JSON.stringify(payload),
     });
   },
+
+  // Course Reserves, Citations, Notifications, DRM, OpenAlex Scholar Search
+  getCourses(): Promise<
+    Array<{
+      MaMon: string;
+      TenMon: string;
+      MaNganh: string;
+      HocKy: string;
+      SoTaiLieu: number;
+      TaiLieu: Array<{ MaSach: string; TenSach: string; BatBuoc: number }>;
+    }>
+  > {
+    return apiRequest('/public/courses');
+  },
+  exportCitation(
+    maSach: string,
+    format: 'bibtex' | 'ieee' | 'apa' | 'marc21' | 'dublincore'
+  ): Promise<{ format: string; content: string }> {
+    return apiRequest(`/public/books/${encodeURIComponent(maSach)}/export?format=${format}`);
+  },
+  openDigitalResource(maSach: string): Promise<{
+    MaTNS: string;
+    DinhDangFile: string;
+    HanDRM: string;
+    Watermark: string;
+    ActiveReaders: number;
+    MaxConcurrent: number;
+    PreviewText: string;
+  }> {
+    return apiRequest(`/ops/books/${encodeURIComponent(maSach)}/digital-open`, { method: 'POST' });
+  },
+  searchScholar(q: string): Promise<{
+    source: string;
+    results: Array<{
+      id: string;
+      title: string;
+      year: number | null;
+      citedBy: number;
+      doi: string;
+      venue: string;
+      authors: string;
+    }>;
+  }> {
+    return apiRequest(`/public/scholar-search?q=${encodeURIComponent(q)}`);
+  },
+  getNotifications(): Promise<{
+    unreadCount: number;
+    items: Array<{
+      MaTB: number;
+      LoaiTB: string;
+      TieuDe: string;
+      NoiDung: string;
+      KenhGui: string;
+      ThoiGianGui: string;
+      DaDoc: number;
+    }>;
+  }> {
+    return apiRequest('/notifications');
+  },
+  markNotificationRead(id: number): Promise<{ ok: boolean }> {
+    return apiRequest(`/notifications/${id}/read`, { method: 'PATCH' });
+  },
+  markAllNotificationsRead(): Promise<{ ok: boolean }> {
+    return apiRequest('/notifications/read-all', { method: 'POST' });
+  },
 };
+

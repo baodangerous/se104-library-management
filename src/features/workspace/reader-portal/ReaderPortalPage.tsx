@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BookCopy, CreditCard, DoorOpen, GraduationCap, IdCard, KeyRound, Network, ShieldAlert, Sparkles } from 'lucide-react';
+import { Bell, BookCopy, CheckCheck, CreditCard, DoorOpen, GraduationCap, IdCard, KeyRound, Network, QrCode, ShieldAlert, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../../../components/ui/button';
 import { Card, CardBody } from '../../../components/ui/card';
@@ -35,13 +35,23 @@ export function ReaderPortalPage({
   const [payOpen, setPayOpen] = React.useState(false);
   const [payChannel, setPayChannel] = React.useState<'VNPay' | 'Momo' | 'ZaloPay'>('VNPay');
   const [payAmount, setPayAmount] = React.useState('');
+  const [qrOpen, setQrOpen] = React.useState(false);
+  const [notifications, setNotifications] = React.useState<{
+    unreadCount: number;
+    items: Array<{ MaTB: number; LoaiTB: string; TieuDe: string; NoiDung: string; ThoiGianGui: string; DaDoc: number }>;
+  }>({ unreadCount: 0, items: [] });
 
   const loadProfile = React.useCallback(() => {
     setLoading(true);
-    Promise.all([adminService.getReaderProfile(), reservationService.list()])
-      .then(([profile, resList]) => {
+    Promise.all([
+      adminService.getReaderProfile(),
+      reservationService.list(),
+      operationalService.getNotifications().catch(() => ({ unreadCount: 0, items: [] })),
+    ])
+      .then(([profile, resList, notifs]) => {
         setData(profile);
         setReservations(resList);
+        setNotifications(notifs);
       })
       .catch((err) =>
         toast.error(err instanceof Error ? err.message : 'Lỗi tải hồ sơ độc giả')
@@ -223,6 +233,14 @@ export function ReaderPortalPage({
         <Button
           variant="outline"
           size="sm"
+          onClick={() => setQrOpen(true)}
+          className="gap-1.5"
+        >
+          <QrCode className="w-4 h-4" /> Thẻ QR điện tử
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
           onClick={async () => {
             if (!data.docGia) return;
             try {
@@ -236,6 +254,14 @@ export function ReaderPortalPage({
           className="gap-1.5"
         >
           <IdCard className="w-4 h-4" /> Gia hạn thẻ
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setQrOpen(true)}
+          className="gap-1.5"
+        >
+          <QrCode className="w-4 h-4" /> Thẻ QR điện tử
         </Button>
         <Button
           variant="outline"
@@ -282,6 +308,98 @@ export function ReaderPortalPage({
         reservations={reservations}
         onCancel={handleCancelReservation}
       />
+
+      {notifications.items.length > 0 && (
+        <Card>
+          <CardBody className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-[#0054A6]" />
+                <h3 className="text-sm font-bold text-slate-900">
+                  Thông báo của bạn ({notifications.unreadCount} chưa đọc)
+                </h3>
+              </div>
+              {notifications.unreadCount > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={async () => {
+                    await operationalService.markAllNotificationsRead();
+                    loadProfile();
+                  }}
+                  className="text-xs gap-1"
+                >
+                  <CheckCheck className="w-3.5 h-3.5" /> Đánh dấu đã đọc hết
+                </Button>
+              )}
+            </div>
+            <div className="space-y-2">
+              {notifications.items.slice(0, 6).map((n) => (
+                <div
+                  key={n.MaTB}
+                  className={`p-3 rounded-xl border text-xs flex items-start justify-between gap-3 ${
+                    n.DaDoc
+                      ? 'bg-slate-50/70 border-slate-200 text-slate-600'
+                      : 'bg-[#EFF6FF] border-[#0054A6]/25 text-slate-900'
+                  }`}
+                >
+                  <div>
+                    <p className="font-semibold">{n.TieuDe}</p>
+                    <p className="mt-0.5 text-slate-600">{n.NoiDung}</p>
+                  </div>
+                  {!n.DaDoc && (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await operationalService.markNotificationRead(n.MaTB);
+                        loadProfile();
+                      }}
+                      className="text-[11px] font-semibold text-[#0054A6] hover:underline shrink-0 cursor-pointer"
+                    >
+                      Đã đọc
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      <ModalDialog open={qrOpen} onOpenChange={setQrOpen} title="Thẻ Thư viện Điện tử UIT (QR / Barcode)">
+        {data.docGia && (
+          <div className="space-y-4 text-center">
+            <div className="p-5 rounded-2xl bg-gradient-to-br from-[#030a24] via-[#0a2b86] to-[#1556d6] text-white space-y-3">
+              <div className="flex items-center justify-between text-xs opacity-90">
+                <span className="font-bold tracking-wider uppercase">UIT LIBRARY PASS</span>
+                <span className="font-mono">{data.docGia.MaDocGia}</span>
+              </div>
+              <p className="text-lg font-bold">{data.docGia.HoTen}</p>
+              <div className="inline-block p-3 bg-white rounded-xl">
+                <svg width="136" height="136" viewBox="0 0 17 17" aria-label="Mã QR thẻ độc giả">
+                  {Array.from({ length: 17 * 17 }).map((_, idx) => {
+                    const x = idx % 17;
+                    const y = Math.floor(idx / 17);
+                    const isCorner =
+                      (x < 5 && y < 5) || (x >= 12 && y < 5) || (x < 5 && y >= 12);
+                    const seedChar = data.docGia!.MaDocGia.charCodeAt(idx % data.docGia!.MaDocGia.length);
+                    const filled = isCorner
+                      ? x === 0 || x === 4 || x === 12 || x === 16 || y === 0 || y === 4 || y === 12 || y === 16 || (x === 2 && y === 2) || (x === 14 && y === 2) || (x === 2 && y === 14)
+                      : (seedChar + x * 7 + y * 13) % 3 === 0;
+                    return filled ? <rect key={idx} x={x} y={y} width={1} height={1} fill="#0a1f4d" /> : null;
+                  })}
+                </svg>
+              </div>
+              <p className="text-xs font-mono text-[#c3d6fa]">
+                Hiệu lực đến: {formatDateVn(data.docGia.NgayHetHan)}
+              </p>
+            </div>
+            <Button type="button" variant="outline" onClick={() => setQrOpen(false)} className="w-full">
+              Đóng thẻ
+            </Button>
+          </div>
+        )}
+      </ModalDialog>
 
       <ChangePasswordModal
         open={changePwOpen}

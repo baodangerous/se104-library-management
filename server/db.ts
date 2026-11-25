@@ -5,6 +5,7 @@ import path from 'node:path';
 import { addDaysIso, addMonthsIso, todayIsoDate } from '../src/lib/businessRules';
 import { migrateOperationalTables } from './migrateOperational';
 import { migrateAndSeedPortalTables } from './migratePortal';
+import { migratePortalFeatures } from './migratePortalFeatures';
 
 const DATA_DIR = path.resolve(process.cwd(), 'data');
 fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -614,3 +615,4 @@ initSchema();
 seedInitialData();
 migrateAndSeedPortalTables(db);
 migrateOperationalTables(db, getSeedPassword());
+migratePortalFeatures(db);

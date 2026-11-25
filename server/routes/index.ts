@@ -6,6 +6,7 @@ import { router as readerRoutes } from "./readerRoutes";
 import { router as circulationRoutes } from "./circulationRoutes";
 import { router as adminRoutes } from "./adminRoutes";
 import { operationalRouter } from "./operationalRoutes";
+import { portalFeaturesRouter } from "./portalFeaturesRoutes";
 
 export const apiRouter = Router();
 apiRouter.use(portalRouter);
@@ -15,3 +16,4 @@ apiRouter.use(readerRoutes);
 apiRouter.use(circulationRoutes);
 apiRouter.use(adminRoutes);
 apiRouter.use(operationalRouter);
+apiRouter.use(portalFeaturesRouter);

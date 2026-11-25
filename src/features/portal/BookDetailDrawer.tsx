@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BookmarkPlus, BookOpen, Building2, Calendar, FileDown, Globe, MapPin, Network, Star, User, X } from 'lucide-react';
+import { BookmarkPlus, BookOpen, Building2, Calendar, Copy, ExternalLink, FileDown, Globe, GraduationCap, MapPin, Network, Quote, Star, User, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../../components/ui/button';
 import { formatDateVN, formatVnd } from '../../lib/utils';
@@ -26,17 +26,24 @@ export function BookDetailDrawer({
   const [copies, setCopies] = React.useState<BanSao[]>([]);
   const [digital, setDigital] = React.useState<TaiNguyenSo | null>(null);
   const [reviews, setReviews] = React.useState<DanhGiaSach[]>([]);
+  const [courses, setCourses] = React.useState<Array<{ MaMon: string; TenMon: string; BatBuoc: number }>>([]);
+  const [drmPreview, setDrmPreview] = React.useState<{ Watermark: string; HanDRM: string; PreviewText: string; ActiveReaders: number; MaxConcurrent: number } | null>(null);
+  const [scholarHits, setScholarHits] = React.useState<Array<{ id: string; title: string; year: number | null; citedBy: number; doi: string; venue: string; authors: string }>>([]);
+  const [scholarLoading, setScholarLoading] = React.useState(false);
   const [rating, setRating] = React.useState(5);
   const [comment, setComment] = React.useState('');
 
   React.useEffect(() => {
     if (!book) return;
+    setDrmPreview(null);
+    setScholarHits([]);
     operationalService
       .getBookExtras(book.MaSach)
       .then((res) => {
         setCopies(res.copies);
         setDigital(res.digital);
         setReviews(res.reviews);
+        setCourses(res.courses || []);
       })
       .catch(() => {});
   }, [book]);
@@ -176,20 +183,133 @@ export function BookDetailDrawer({
           </div>
 
           {digital && (
-            <div className="p-3 rounded-xl bg-sky-50 border border-sky-200 flex items-center justify-between gap-2">
-              <div className="text-xs">
-                <p className="font-semibold text-[#0054A6] flex items-center gap-1.5">
-                  <FileDown className="w-3.5 h-3.5" /> Tài nguyên số ({digital.DinhDangFile})
-                </p>
-                <p className="text-slate-600 mt-0.5">
-                  DRM {digital.ThoiHanDRM_Ngay} ngày · Tối đa {digital.SoLuotMuonDongThoi} lượt đồng thời
-                </p>
+            <div className="p-3 rounded-xl bg-sky-50 border border-sky-200 space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <div className="text-xs">
+                  <p className="font-semibold text-[#0054A6] flex items-center gap-1.5">
+                    <FileDown className="w-3.5 h-3.5" /> Tài nguyên số ({digital.DinhDangFile})
+                  </p>
+                  <p className="text-slate-600 mt-0.5">
+                    DRM {digital.ThoiHanDRM_Ngay} ngày · Tối đa {digital.SoLuotMuonDongThoi} lượt đồng thời
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="primary"
+                  onClick={async () => {
+                    if (!user) {
+                      toast.info('Vui lòng đăng nhập để mở tài liệu số DRM.');
+                      onRequireLogin?.();
+                      return;
+                    }
+                    try {
+                      const res = await operationalService.openDigitalResource(book.MaSach);
+                      setDrmPreview(res);
+                      toast.success(`Đã cấp quyền đọc DRM đến ${res.HanDRM}.`);
+                    } catch (err) {
+                      toast.error(err instanceof Error ? err.message : 'Không thể mở tài nguyên số.');
+                    }
+                  }}
+                  className="text-xs h-7 px-2.5"
+                >
+                  Đọc DRM
+                </Button>
               </div>
-              <span className="text-[11px] font-mono text-sky-700 bg-white px-2 py-1 rounded border border-sky-200">
-                {digital.MaTNS}
-              </span>
+              {drmPreview && (
+                <div className="p-2.5 rounded-lg bg-white border border-sky-200 text-xs space-y-1">
+                  <p className="font-mono text-[10px] text-[#0054A6] font-semibold">
+                    {drmPreview.Watermark} · {drmPreview.ActiveReaders}/{drmPreview.MaxConcurrent} đang đọc · Hạn {drmPreview.HanDRM}
+                  </p>
+                  <p className="text-slate-700 leading-relaxed">{drmPreview.PreviewText}</p>
+                </div>
+              )}
             </div>
           )}
+
+          {courses.length > 0 && (
+            <div className="space-y-1.5 pt-2 border-t border-slate-100">
+              <p className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                <GraduationCap className="w-3.5 h-3.5 text-[#0054A6]" /> Môn học UIT liên kết
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {courses.map((c) => (
+                  <span
+                    key={c.MaMon}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#0054A6]/10 text-[#0054A6]"
+                  >
+                    {c.MaMon} · {c.BatBuoc ? 'Bắt buộc' : 'Tham khảo'}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-2 pt-2 border-t border-slate-100">
+            <p className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+              <Quote className="w-3.5 h-3.5 text-[#0054A6]" /> Trích dẫn &amp; Xuất chuẩn thư mục
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {(['ieee', 'apa', 'bibtex', 'marc21'] as const).map((fmt) => (
+                <button
+                  key={fmt}
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const res = await operationalService.exportCitation(book.MaSach, fmt);
+                      await navigator.clipboard?.writeText(res.content);
+                      toast.success(`Đã sao chép trích dẫn chuẩn ${fmt.toUpperCase()}.`);
+                    } catch {
+                      toast.error('Không thể xuất trích dẫn.');
+                    }
+                  }}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[11px] font-semibold text-slate-700 cursor-pointer"
+                >
+                  <Copy className="w-3 h-3" /> {fmt.toUpperCase()}
+                </button>
+              ))}
+              <button
+                type="button"
+                disabled={scholarLoading}
+                onClick={async () => {
+                  setScholarLoading(true);
+                  try {
+                    const res = await operationalService.searchScholar(book.TenSach);
+                    setScholarHits(res.results);
+                    if (res.results.length === 0) {
+                      toast.info('Không tìm thấy bài báo mở phù hợp hoặc máy chủ đang ngoại tuyến.');
+                    }
+                  } finally {
+                    setScholarLoading(false);
+                  }
+                }}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[#0054A6]/30 bg-[#0054A6]/5 hover:bg-[#0054A6]/10 text-[11px] font-semibold text-[#0054A6] cursor-pointer"
+              >
+                <Globe className="w-3 h-3" /> {scholarLoading ? 'Đang tìm...' : 'Bài báo OpenAlex'}
+              </button>
+            </div>
+            {scholarHits.length > 0 && (
+              <div className="space-y-1.5 pt-1">
+                {scholarHits.map((hit) => (
+                  <a
+                    key={hit.id}
+                    href={hit.doi}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block p-2 rounded-lg bg-slate-50 border border-slate-200 hover:border-[#0054A6] text-xs"
+                  >
+                    <p className="font-semibold text-slate-900 line-clamp-2 flex items-start justify-between gap-1">
+                      <span>{hit.title}</span>
+                      <ExternalLink className="w-3 h-3 shrink-0 mt-0.5 text-[#0054A6]" />
+                    </p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      {hit.authors || hit.venue} · {hit.year || 'N/A'} · {hit.citedBy} trích dẫn
+                    </p>
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
 
           {copies.length > 0 && (
             <div className="space-y-1.5 pt-2 border-t border-slate-100">
