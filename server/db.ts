@@ -17,6 +17,8 @@ db.pragma('journal_mode = WAL');
 db.pragma('synchronous = NORMAL');
 db.pragma('busy_timeout = 5000');
 db.pragma('foreign_keys = ON');
+db.pragma('cache_size = -16000');
+db.pragma('temp_store = MEMORY');
 
 export function getSeedPassword(): string {
   return process.env.SEED_DEMO_PASSWORD?.trim() || 'Uit@2026';
@@ -616,3 +618,14 @@ seedInitialData();
 migrateAndSeedPortalTables(db);
 migrateOperationalTables(db, getSeedPassword());
 migratePortalFeatures(db);
+
+db.exec(`
+  CREATE INDEX IF NOT EXISTS idx_ctpm_sach ON CHITIETPHIEUMUON(MaSach);
+  CREATE INDEX IF NOT EXISTS idx_ctpm_pm ON CHITIETPHIEUMUON(MaPhieuMuon);
+  CREATE INDEX IF NOT EXISTS idx_ctpt_ctm ON CHITIETPHIEUTRA(MaChiTietMuon);
+  CREATE INDEX IF NOT EXISTS idx_bansao_sach_status ON BANSAO(MaSach, TinhTrang);
+  CREATE INDEX IF NOT EXISTS idx_datphong_slot ON DATPHONG(MaPhong, NgayDat, KhungGio);
+  CREATE INDEX IF NOT EXISTS idx_dattruoc_sach_status ON DATTRUOC(MaSach, TrangThai);
+  CREATE INDEX IF NOT EXISTS idx_thongbao_dg_read ON THONGBAO(MaDocGia, DaDoc);
+  CREATE INDEX IF NOT EXISTS idx_dieuchuyen_status ON PHIEUDIEUCHUYEN(MaBanSao, TrangThai);
+`);

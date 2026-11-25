@@ -1032,3 +1032,54 @@ test('Portal Features DB Sync: Course Reserves, Citations/MARC21, DRM Sessions, 
   assert.equal(scholar.status, 200);
   assert.ok(Array.isArray(scholar.data.results));
 });
+
+test('DBMS & Multi-Thread Concurrency: WAL Pragmas, Indexes, Concurrent Fine Payment & Budget Race Guards', async () => {
+  const head = await demoLogin('HEAD_LIBRARIAN');
+  const lib = await demoLogin('LIBRARIAN');
+
+  // 1. Verify SQLite WAL mode, busy_timeout >= 5000, foreign_keys = 1, and indexes
+  const health = await api<{
+    pragmas: { journalMode: string; busyTimeout: number; foreignKeys: number; indexCount: number };
+  }>('/health');
+  assert.equal(health.status, 200);
+  assert.equal(health.data.pragmas.journalMode, 'wal');
+  assert.ok(health.data.pragmas.busyTimeout >= 5000);
+  assert.equal(health.data.pragmas.foreignKeys, 1);
+  assert.ok(health.data.pragmas.indexCount >= 8);
+
+  // 2. Concurrent Acquisitions Budget Race (QĐ37):
+  // Create a plan with 1,000,000 budget, then fire 2 simultaneous orders of 600,000 each -> strictly 1 succeeds (201) and 1 fails (400)
+  const planRes = await api<{ MaKeHoach: string }>('/ops/acquisitions/plans', {
+    method: 'POST',
+    token: head.token,
+    body: { TenKeHoach: `Concurrency Plan ${Date.now()}`, NganSach: 1000000, NgayBatDau: '2026-11-26' },
+  });
+  assert.equal(planRes.status, 201);
+  const maKH = planRes.data.MaKeHoach;
+
+  const [o1, o2] = await Promise.all([
+    api('/ops/acquisitions/orders', {
+      method: 'POST',
+      token: head.token,
+      body: { MaKeHoach: maKH, MaNCC: 'NCC01', ChiTiet: [{ TenTaiLieuDat: 'Race Book A', SoLuongDat: 6, DonGia: 100000 }] },
+    }),
+    api('/ops/acquisitions/orders', {
+      method: 'POST',
+      token: head.token,
+      body: { MaKeHoach: maKH, MaNCC: 'NCC01', ChiTiet: [{ TenTaiLieuDat: 'Race Book B', SoLuongDat: 6, DonGia: 100000 }] },
+    }),
+  ]);
+  assert.deepEqual([o1.status, o2.status].sort(), [201, 400]);
+
+  // 3. Concurrent Online Fine Payment Race on DG002 (if TongNo > 0) or new reader
+  const readers = await api<Array<{ MaDocGia: string; TongNo: number }>>('/docgia', { token: lib.token });
+  const indebted = readers.data.find((r) => r.TongNo >= 1000);
+  if (indebted) {
+    const payAmt = indebted.TongNo;
+    const [p1, p2] = await Promise.all([
+      api('/phieuthu', { method: 'POST', token: lib.token, body: { MaDocGia: indebted.MaDocGia, SoTienThu: payAmt } }),
+      api('/phieuthu', { method: 'POST', token: lib.token, body: { MaDocGia: indebted.MaDocGia, SoTienThu: payAmt } }),
+    ]);
+    assert.deepEqual([p1.status, p2.status].sort(), [201, 400]);
+  }
+});

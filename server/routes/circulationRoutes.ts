@@ -467,7 +467,7 @@ router.post(
           ChiTiet: itemsToReturn,
           HeldReservations: heldReservations,
         };
-      })();
+      }).immediate();
 
       res.status(201).json(result);
     } catch (err: any) {
@@ -559,7 +559,7 @@ router.post(
           SoTienThu,
           ConLai: check.conLai,
         };
-      })();
+      }).immediate();
 
       res.status(201).json(result);
     } catch (err: any) {

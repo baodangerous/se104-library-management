@@ -172,7 +172,7 @@ operationalRouter.post(
         created.push(code);
       }
     });
-    tx();
+    tx.immediate();
 
     writeAuditLog({
       MaTaiKhoan: req.user!.MaTaiKhoan,
@@ -371,7 +371,7 @@ operationalRouter.post(
          VALUES (?, ?, ?, ?, 'Đang dùng', NULL)`
       ).run(newCardId, maDocGia, today, reader.NgayHetHan);
     });
-    tx();
+    tx.immediate();
 
     writeAuditLog({
       MaTaiKhoan: req.user!.MaTaiKhoan,
@@ -629,7 +629,7 @@ operationalRouter.post(
         'UPDATE KEHOACHMUASAM SET NganSachDaDung = NganSachDaDung + ? WHERE MaKeHoach = ?'
       ).run(totalCost, d.MaKeHoach);
     });
-    tx();
+    tx.immediate();
 
     writeAuditLog({
       MaTaiKhoan: req.user!.MaTaiKhoan,
@@ -694,7 +694,7 @@ operationalRouter.post(
         d.MaDonDatMua
       );
     });
-    tx();
+    tx.immediate();
 
     res.status(201).json({ MaPhieuTiepNhan: receiptId, TrangThaiDon: newOrderStatus });
   }
@@ -767,7 +767,7 @@ operationalRouter.post(
          VALUES (?, NULL, 'Chờ duyệt', ?, ?)`
       ).run(id, new Date().toISOString(), req.user!.TenDangNhap);
     });
-    tx();
+    tx.immediate();
 
     res.status(201).json({ SoPhieuDC: id });
   }
@@ -876,7 +876,7 @@ operationalRouter.post(
         req.user!.TenDangNhap
       );
     });
-    tx();
+    tx.immediate();
 
     res.json({ SoPhieuDC: transfer.SoPhieuDC, TrangThai: nextStatus });
   }
@@ -958,7 +958,7 @@ operationalRouter.post(
         insLine.run(id, item.MaSach, sysCount, item.SoLuongThucTe);
       }
     });
-    tx();
+    tx.immediate();
     res.status(201).json({ MaBBKK: id });
   }
 );
@@ -1038,7 +1038,7 @@ operationalRouter.post(
         db.prepare("UPDATE BANSAO SET TinhTrang = 'Đã thanh lý' WHERE MaBanSao = ?").run(row.MaBanSao);
       }
     });
-    tx();
+    tx.immediate();
     res.json({ ok: true });
   }
 );
@@ -1083,7 +1083,7 @@ operationalRouter.post(
       );
       db.prepare("UPDATE BANSAO SET TinhTrang = 'Chờ thanh lý' WHERE MaBanSao = ?").run(d.MaBanSao);
     });
-    tx();
+    tx.immediate();
 
     res.status(201).json({ SoPhieuBT: id, TongBoiThuong: tongBoiThuong });
   }
@@ -1229,7 +1229,7 @@ operationalRouter.post(
         d.MaDocGia
       );
     });
-    tx();
+    tx.immediate();
 
     res.status(201).json({ MaGD: maGD, ConLai: Math.max(0, reader.TongNo - d.SoTien) });
   }

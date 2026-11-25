@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { apiRouter } from './server/routes/index';
 import { chatbotRouter } from './server/chatbotRoute';
+import { db } from './server/db';
 import { createRateLimiter, securityHeaders } from './server/security';
 
 const PORT = Number(process.env.PORT) || 3000;
@@ -17,7 +18,21 @@ async function startServer() {
   app.use(express.json({ limit: '10mb' }));
 
   app.get('/api/health', (_req, res) => {
-    res.json({ ok: true, status: 'UP', db: 'sqlite', timestamp: new Date().toISOString() });
+    const journalMode = db.pragma('journal_mode', { simple: true });
+    const busyTimeout = db.pragma('busy_timeout', { simple: true });
+    const foreignKeys = db.pragma('foreign_keys', { simple: true });
+    const indexCount = (
+      db
+        .prepare("SELECT COUNT(*) AS cnt FROM sqlite_master WHERE type = 'index' AND name LIKE 'idx_%'")
+        .get() as { cnt: number }
+    ).cnt;
+    res.json({
+      ok: true,
+      status: 'UP',
+      db: 'sqlite',
+      pragmas: { journalMode, busyTimeout, foreignKeys, indexCount },
+      timestamp: new Date().toISOString(),
+    });
   });
 
   const chatbotLimiter = createRateLimiter({

@@ -247,24 +247,32 @@ portalFeaturesRouter.post('/ops/books/:maSach/digital-open', requireAuth, (req: 
   };
 
   const today = todayIsoDate();
-  const activeCount = (
-    db
-      .prepare('SELECT COUNT(*) AS cnt FROM LUOTDOCSO WHERE MaTNS = ? AND HanDRM >= ?')
-      .get(tns.MaTNS, today) as { cnt: number }
-  ).cnt;
+  const hanDRM = addDaysIso(today, tns.ThoiHanDRM_Ngay);
 
-  if (activeCount >= tns.SoLuotMuonDongThoi) {
+  const txResult = db.transaction(() => {
+    const activeCount = (
+      db
+        .prepare('SELECT COUNT(*) AS cnt FROM LUOTDOCSO WHERE MaTNS = ? AND HanDRM >= ?')
+        .get(tns.MaTNS, today) as { cnt: number }
+    ).cnt;
+
+    if (activeCount >= tns.SoLuotMuonDongThoi) {
+      return { blocked: true, activeCount };
+    }
+
+    if (req.user!.MaDocGia) {
+      db.prepare(
+        'INSERT INTO LUOTDOCSO (MaTNS, MaDocGia, ThoiGianMo, HanDRM) VALUES (?, ?, ?, ?)'
+      ).run(tns.MaTNS, req.user!.MaDocGia, new Date().toISOString(), hanDRM);
+    }
+    return { blocked: false, activeCount: activeCount + 1 };
+  }).immediate();
+
+  if (txResult.blocked) {
     res.status(429).json({
       error: `Tài nguyên số ${tns.MaTNS} đã đạt tối đa ${tns.SoLuotMuonDongThoi} lượt đọc đồng thời.`,
     });
     return;
-  }
-
-  const hanDRM = addDaysIso(today, tns.ThoiHanDRM_Ngay);
-  if (req.user!.MaDocGia) {
-    db.prepare(
-      'INSERT INTO LUOTDOCSO (MaTNS, MaDocGia, ThoiGianMo, HanDRM) VALUES (?, ?, ?, ?)'
-    ).run(tns.MaTNS, req.user!.MaDocGia, new Date().toISOString(), hanDRM);
   }
 
   res.status(201).json({
@@ -272,7 +280,7 @@ portalFeaturesRouter.post('/ops/books/:maSach/digital-open', requireAuth, (req: 
     DinhDangFile: tns.DinhDangFile,
     HanDRM: hanDRM,
     Watermark: `UIT-DRM · ${req.user!.HoTen} (${maDocGia})`,
-    ActiveReaders: activeCount + 1,
+    ActiveReaders: txResult.activeCount,
     MaxConcurrent: tns.SoLuotMuonDongThoi,
     PreviewText:
       book.MoTa ||
@@ -330,3 +338,4 @@ portalFeaturesRouter.get('/public/scholar-search', async (req, res) => {
     clearTimeout(timer);
   }
 });
+
