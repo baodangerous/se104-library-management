@@ -766,3 +766,71 @@ test('Multi-User Concurrency, Healthcheck, Auth Guards & Negative Validation', a
     403
   );
 });
+
+test('Data Sync: New Book -> BANSAO, Borrow/Return -> BANSAO + LICHSUTRANGTHAIBANSAO, Concurrent Borrow Guard', async () => {
+  const lib = await demoLogin('LIBRARIAN');
+  const cataloger = await demoLogin('CATALOGER');
+
+  // 1. New book automatically creates BS-{MaSach}-01 in BANSAO
+  const createdBook = await api<{ MaSach: string }>('/sach', {
+    method: 'POST',
+    token: cataloger.token,
+    body: {
+      TenSach: `Data Sync Book ${Date.now()}`,
+      MaTheLoai: 'A',
+      NamXuatBan: 2025,
+      NhaXuatBan: 'NXB UIT',
+      TriGia: 120000,
+      TacGiaList: ['TS. Nguyễn Văn Sync'],
+    },
+  });
+  assert.equal(createdBook.status, 201);
+  const maSach = createdBook.data.MaSach;
+  const copyId = `BS-${maSach}-01`;
+
+  const copiesAfterCreate = await api<Array<{ MaBanSao: string; TinhTrang: string }>>(
+    `/ops/copies?maSach=${maSach}`,
+    { token: lib.token }
+  );
+  assert.ok(copiesAfterCreate.data.some((c) => c.MaBanSao === copyId && c.TinhTrang === 'Sẵn sàng'));
+
+  // 2. Concurrent double-borrow race: 2 simultaneous borrows for the same book -> strictly 1 succeeds
+  const [l1, l2] = await Promise.all([
+    api('/phieumuon', { method: 'POST', token: lib.token, body: { MaDocGia: 'DG005', MaSachList: [maSach] } }),
+    api('/phieumuon', { method: 'POST', token: lib.token, body: { MaDocGia: 'DG006', MaSachList: [maSach] } }),
+  ]);
+  assert.deepEqual([l1.status, l2.status].sort(), [201, 400]);
+
+  // 3. Copy status synced to 'Đang mượn' and history logged
+  const copiesBorrowed = await api<Array<{ MaBanSao: string; TinhTrang: string }>>(
+    `/ops/copies?maSach=${maSach}`,
+    { token: lib.token }
+  );
+  assert.equal(copiesBorrowed.data.find((c) => c.MaBanSao === copyId)?.TinhTrang, 'Đang mượn');
+  const histRes = await api<Array<{ TrangThaiMoi: string }>>(`/ops/copies/${copyId}/history`, {
+    token: lib.token,
+  });
+  assert.ok(histRes.data.some((h) => h.TrangThaiMoi === 'Đang mượn'));
+
+  // 4. Return book -> copy returns to 'Sẵn sàng'
+  const winnerReader = l1.status === 201 ? 'DG005' : 'DG006';
+  const activeLoans = await api<Array<{ MaChiTietMuon: number; MaSach: string }>>(
+    `/docgia/${winnerReader}/dang-muon`,
+    { token: lib.token }
+  );
+  const targetDetail = activeLoans.data.find((d) => d.MaSach === maSach);
+  assert.ok(targetDetail);
+  assert.equal(
+    (await api('/phieutra', {
+      method: 'POST',
+      token: lib.token,
+      body: { MaDocGia: winnerReader, MaChiTietMuonList: [targetDetail.MaChiTietMuon] },
+    })).status,
+    201
+  );
+  const copiesReturned = await api<Array<{ MaBanSao: string; TinhTrang: string }>>(
+    `/ops/copies?maSach=${maSach}`,
+    { token: lib.token }
+  );
+  assert.equal(copiesReturned.data.find((c) => c.MaBanSao === copyId)?.TinhTrang, 'Sẵn sàng');
+});

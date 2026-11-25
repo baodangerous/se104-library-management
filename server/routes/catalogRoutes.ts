@@ -425,6 +425,15 @@ router.post(
         meta.MoTa ?? null
       );
       upsertBookAuthors(maSach, data.TacGiaList);
+      const copyCode = `BS-${maSach}-01`;
+      db.prepare(
+        `INSERT OR IGNORE INTO BANSAO (MaBanSao, MaSach, MaCN, MaKe, TinhTrang, NgayNhap)
+         VALUES (?, ?, 'CN01', 'KE01-A1', 'Sẵn sàng', ?)`
+      ).run(copyCode, maSach, ngayNhap);
+      db.prepare(
+        `INSERT INTO LICHSUTRANGTHAIBANSAO (MaBanSao, TrangThaiCu, TrangThaiMoi, ChiNhanhCu, ChiNhanhMoi, ThoiGian, NguoiThucHien, LyDo)
+         VALUES (?, NULL, 'Sẵn sàng', NULL, 'CN01', ?, ?, 'Biên mục sách mới')`
+      ).run(copyCode, new Date().toISOString(), req.user!.TenDangNhap);
     });
     tx();
 

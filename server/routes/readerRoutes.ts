@@ -126,6 +126,10 @@ router.post(
       ngayLapThe,
       check.ngayHetHan
     );
+    db.prepare(
+      `INSERT OR IGNORE INTO THETHUVIEN (MaThe, MaDocGia, NgayLap, NgayHetHan, TrangThai, LyDoKhoa)
+       VALUES (?, ?, ?, ?, 'Đang dùng', NULL)`
+    ).run(`TV-${maDocGia}`, maDocGia, ngayLapThe, check.ngayHetHan);
 
     writeAuditLog({
       MaTaiKhoan: req.user!.MaTaiKhoan,

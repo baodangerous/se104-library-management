@@ -97,6 +97,18 @@ router.post(
           throw new Error('Không tìm thấy độc giả.');
         }
 
+        const totalCards = (
+          db.prepare('SELECT COUNT(*) AS cnt FROM THETHUVIEN WHERE MaDocGia = ?').get(MaDocGia) as { cnt: number }
+        ).cnt;
+        if (totalCards > 0) {
+          const activeCard = db
+            .prepare("SELECT 1 FROM THETHUVIEN WHERE MaDocGia = ? AND TrangThai = 'Đang dùng' LIMIT 1")
+            .get(MaDocGia);
+          if (!activeCard) {
+            throw new Error('Thẻ thư viện của độc giả hiện đang bị khoá hoặc đã báo mất.');
+          }
+        }
+
         const activeLoans = db
           .prepare(
             `SELECT ct.MaSach, s.TenSach, ct.HanTra
@@ -129,13 +141,25 @@ router.post(
         }
 
         const thamSo = getThamSo();
+        const extraQuota = (
+          db
+            .prepare(
+              "SELECT COALESCE(SUM(SoLuongThem), 0) AS extra FROM NGOAILEMUON WHERE MaDocGia = ? AND TrangThai = 'Đã duyệt' AND HanApDung >= ?"
+            )
+            .get(MaDocGia, ngayMuon) as { extra: number }
+        ).extra;
+        const effectiveThamSo = {
+          ...thamSo,
+          SoSachMuonToiDa: thamSo.SoSachMuonToiDa + extraQuota,
+        };
+
         const check = validateBorrowEligibility({
           ngayMuon,
           ngayLapThe: reader.NgayLapThe,
           ngayHetHan: reader.NgayHetHan,
           activeLoans,
           requestedBooks,
-          thamSo,
+          thamSo: effectiveThamSo,
         });
 
         if (!check.valid || !check.hanTra) {
@@ -150,8 +174,30 @@ router.post(
         const insertDetail = db.prepare(
           'INSERT INTO CHITIETPHIEUMUON (MaPhieuMuon, MaSach, HanTra) VALUES (?, ?, ?)'
         );
+        const findReadyCopy = db.prepare(
+          "SELECT MaBanSao, MaCN FROM BANSAO WHERE MaSach = ? AND TinhTrang = 'Sẵn sàng' LIMIT 1"
+        );
+        const markCopyBorrowed = db.prepare(
+          "UPDATE BANSAO SET TinhTrang = 'Đang mượn' WHERE MaBanSao = ?"
+        );
+        const logCopyHist = db.prepare(
+          `INSERT INTO LICHSUTRANGTHAIBANSAO (MaBanSao, TrangThaiCu, TrangThaiMoi, ChiNhanhCu, ChiNhanhMoi, ThoiGian, NguoiThucHien, LyDo)
+           VALUES (?, 'Sẵn sàng', 'Đang mượn', ?, ?, ?, ?, ?)`
+        );
         for (const book of requestedBooks) {
           insertDetail.run(maPhieuMuon, book.MaSach, check.hanTra);
+          const readyCopy = findReadyCopy.get(book.MaSach) as { MaBanSao: string; MaCN: string } | undefined;
+          if (readyCopy) {
+            markCopyBorrowed.run(readyCopy.MaBanSao);
+            logCopyHist.run(
+              readyCopy.MaBanSao,
+              readyCopy.MaCN,
+              readyCopy.MaCN,
+              new Date().toISOString(),
+              req.user!.TenDangNhap,
+              `Cho mượn theo phiếu ${maPhieuMuon}`
+            );
+          }
         }
 
         writeAuditLog({
@@ -171,7 +217,7 @@ router.post(
           HanTra: check.hanTra,
           SoLuongSach: requestedBooks.length,
         };
-      })();
+      }).immediate();
 
       res.status(201).json(result);
     } catch (err: any) {
@@ -344,8 +390,30 @@ router.post(
         const insertCTPT = db.prepare(
           'INSERT INTO CHITIETPHIEUTRA (MaPhieuTra, MaChiTietMuon, TienPhat) VALUES (?, ?, ?)'
         );
+        const findBorrowedCopy = db.prepare(
+          "SELECT MaBanSao, MaCN FROM BANSAO WHERE MaSach = ? AND TinhTrang = 'Đang mượn' LIMIT 1"
+        );
+        const markCopyReady = db.prepare(
+          "UPDATE BANSAO SET TinhTrang = 'Sẵn sàng' WHERE MaBanSao = ?"
+        );
+        const logReturnCopyHist = db.prepare(
+          `INSERT INTO LICHSUTRANGTHAIBANSAO (MaBanSao, TrangThaiCu, TrangThaiMoi, ChiNhanhCu, ChiNhanhMoi, ThoiGian, NguoiThucHien, LyDo)
+           VALUES (?, 'Đang mượn', 'Sẵn sàng', ?, ?, ?, ?, ?)`
+        );
         for (const item of itemsToReturn) {
           insertCTPT.run(maPhieuTra, item.MaChiTietMuon, item.TienPhat);
+          const borrowedCopy = findBorrowedCopy.get(item.MaSach) as { MaBanSao: string; MaCN: string } | undefined;
+          if (borrowedCopy) {
+            markCopyReady.run(borrowedCopy.MaBanSao);
+            logReturnCopyHist.run(
+              borrowedCopy.MaBanSao,
+              borrowedCopy.MaCN,
+              borrowedCopy.MaCN,
+              new Date().toISOString(),
+              req.user!.TenDangNhap,
+              `Nhận trả theo phiếu ${maPhieuTra}`
+            );
+          }
         }
 
         // Auto-hold returned books for waiting reservations
