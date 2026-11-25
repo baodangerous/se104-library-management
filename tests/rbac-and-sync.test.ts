@@ -834,3 +834,129 @@ test('Data Sync: New Book -> BANSAO, Borrow/Return -> BANSAO + LICHSUTRANGTHAIBA
   );
   assert.equal(copiesReturned.data.find((c) => c.MaBanSao === copyId)?.TinhTrang, 'Sẵn sàng');
 });
+
+test('Full CRUD (Create/Read/Update/Delete) + Read/Write/Approve RBAC Matrix across all 5 roles', async () => {
+  const admin = await demoLogin('ADMIN');
+  const head = await demoLogin('HEAD_LIBRARIAN');
+  const lib = await demoLogin('LIBRARIAN');
+  const cataloger = await demoLogin('CATALOGER');
+  const reader = await demoLogin('READER');
+
+  // 1. THELOAI CRUD + Referential Integrity
+  const catCode = `T${String(Date.now()).slice(-4)}`;
+  assert.equal(
+    (await api('/theloai', { method: 'POST', token: lib.token, body: { MaTheLoai: catCode, TenTheLoai: 'Chặn Thủ thư' } })).status,
+    403
+  );
+  assert.equal(
+    (await api('/theloai', { method: 'POST', token: head.token, body: { MaTheLoai: catCode, TenTheLoai: 'Thể loại Test CRUD' } })).status,
+    201
+  );
+  assert.equal(
+    (await api(`/theloai/${catCode}`, { method: 'PUT', token: head.token, body: { TenTheLoai: 'Thể loại Updated' } })).status,
+    200
+  );
+  assert.equal((await api(`/theloai/${catCode}`, { method: 'DELETE', token: head.token })).status, 200);
+  // Deleting category in use ('A') must fail (400)
+  assert.equal((await api('/theloai/A', { method: 'DELETE', token: head.token })).status, 400);
+
+  // 2. SACH CRUD (Create -> Update -> Delete unused; Librarian cannot delete)
+  const bookRes = await api<{ MaSach: string }>('/sach', {
+    method: 'POST',
+    token: cataloger.token,
+    body: {
+      TenSach: `CRUD Book ${Date.now()}`,
+      MaTheLoai: 'A',
+      NamXuatBan: 2025,
+      NhaXuatBan: 'NXB UIT',
+      TriGia: 90000,
+      TacGiaList: ['Tác giả CRUD'],
+    },
+  });
+  assert.equal(bookRes.status, 201);
+  const newBookId = bookRes.data.MaSach;
+  assert.equal(
+    (await api(`/sach/${newBookId}`, {
+      method: 'PUT',
+      token: cataloger.token,
+      body: {
+        TenSach: 'CRUD Book Updated',
+        MaTheLoai: 'A',
+        NamXuatBan: 2025,
+        NhaXuatBan: 'NXB UIT',
+        TriGia: 95000,
+        TacGiaList: ['Tác giả CRUD'],
+      },
+    })).status,
+    200
+  );
+  assert.equal((await api(`/sach/${newBookId}`, { method: 'DELETE', token: lib.token })).status, 403);
+  assert.equal((await api(`/sach/${newBookId}`, { method: 'DELETE', token: head.token })).status, 200);
+
+  // 3. DOCGIA CRUD (Librarian creates, updates, deletes unused; Reader & Cataloger blocked)
+  assert.equal(
+    (await api('/docgia', {
+      method: 'POST',
+      token: cataloger.token,
+      body: { HoTen: 'Blocked', MaLoaiDocGia: 'X', NgaySinh: '2004-01-01', DiaChi: 'HCM', Email: `b_${Date.now()}@uit.edu.vn` },
+    })).status,
+    403
+  );
+  const dgRes = await api<{ MaDocGia: string }>('/docgia', {
+    method: 'POST',
+    token: lib.token,
+    body: {
+      HoTen: 'Độc giả CRUD Test',
+      MaLoaiDocGia: 'X',
+      NgaySinh: '2004-05-10',
+      DiaChi: 'Thủ Đức',
+      Email: `crud_${Date.now()}@gm.uit.edu.vn`,
+    },
+  });
+  assert.equal(dgRes.status, 201);
+  const maDG = dgRes.data.MaDocGia;
+  assert.equal(
+    (await api(`/docgia/${maDG}`, {
+      method: 'PUT',
+      token: lib.token,
+      body: {
+        HoTen: 'Độc giả CRUD Updated',
+        MaLoaiDocGia: 'X',
+        NgaySinh: '2004-05-10',
+        DiaChi: 'Q.1, TP.HCM',
+        Email: `crud_upd_${Date.now()}@gm.uit.edu.vn`,
+      },
+    })).status,
+    200
+  );
+  assert.equal((await api(`/docgia/${maDG}`, { method: 'DELETE', token: lib.token })).status, 200);
+
+  // 4. TAIKHOAN Hierarchy & Read/Write/Approve Boundaries
+  const catAcc = await api<{ MaTaiKhoan: number }>('/taikhoan', {
+    method: 'POST',
+    token: head.token,
+    body: {
+      TenDangNhap: `cat_${Date.now()}@uit.edu.vn`,
+      MatKhau: 'Uit@2026',
+      HoTen: 'Biên mục viên Test',
+      VaiTro: 'CATALOGER',
+    },
+  });
+  assert.equal(catAcc.status, 201);
+  assert.equal(
+    (await api(`/taikhoan/${catAcc.data.MaTaiKhoan}`, {
+      method: 'PUT',
+      token: head.token,
+      body: { HoTen: 'Biên mục Updated', TrangThai: 'LOCKED' },
+    })).status,
+    200
+  );
+  assert.equal((await api(`/taikhoan/${catAcc.data.MaTaiKhoan}`, { method: 'DELETE', token: head.token })).status, 200);
+
+  // Self-delete & cross-privilege escalation checks
+  assert.equal((await api(`/taikhoan/${admin.user.MaTaiKhoan}`, { method: 'DELETE', token: admin.token })).status, 400);
+  assert.equal((await api(`/taikhoan/${admin.user.MaTaiKhoan}`, { method: 'DELETE', token: head.token })).status, 403);
+  assert.equal((await api('/hethong/backup', { token: head.token })).status, 403);
+  assert.equal((await api('/docgia', { token: reader.token })).status, 403);
+  assert.equal((await api('/nhatky', { token: lib.token })).status, 403);
+});

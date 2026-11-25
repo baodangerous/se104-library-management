@@ -447,7 +447,7 @@ router.post(
 
 const updateAccountSchema = z.object({
   HoTen: z.string().trim().min(2).optional(),
-  VaiTro: z.enum(['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'READER']).optional(),
+  VaiTro: z.enum(['ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN', 'CATALOGER', 'READER']).optional(),
   MaDocGia: z.string().trim().nullable().optional(),
   TrangThai: z.enum(['ACTIVE', 'LOCKED']).optional(),
   MatKhauMoi: z.string().min(6, 'Mật khẩu mới tối thiểu 6 ký tự.').optional(),
@@ -472,15 +472,15 @@ router.put(
     const d = parsed.data;
 
     if (req.user!.VaiTro === 'HEAD_LIBRARIAN') {
-      if (!['LIBRARIAN', 'READER'].includes(existing.VaiTro)) {
+      if (!['LIBRARIAN', 'CATALOGER', 'READER'].includes(existing.VaiTro)) {
         res.status(403).json({
           error: 'Phụ trách thư viện không được chỉnh sửa tài khoản Quản trị viên hoặc Phụ trách khác.',
         });
         return;
       }
-      if (d.VaiTro && !['LIBRARIAN', 'READER'].includes(d.VaiTro)) {
+      if (d.VaiTro && !['LIBRARIAN', 'CATALOGER', 'READER'].includes(d.VaiTro)) {
         res.status(403).json({
-          error: 'Phụ trách thư viện chỉ được phân quyền Chuyên viên thư viện hoặc Độc giả.',
+          error: 'Phụ trách thư viện chỉ được phân quyền Chuyên viên thư viện, Biên mục hoặc Độc giả.',
         });
         return;
       }
@@ -552,10 +552,10 @@ router.delete(
     }
     if (
       req.user!.VaiTro === 'HEAD_LIBRARIAN' &&
-      !['LIBRARIAN', 'READER'].includes(existing.VaiTro)
+      !['LIBRARIAN', 'CATALOGER', 'READER'].includes(existing.VaiTro)
     ) {
       res.status(403).json({
-        error: 'Phụ trách thư viện chỉ được xóa tài khoản Chuyên viên thư viện hoặc Độc giả.',
+        error: 'Phụ trách thư viện chỉ được xóa tài khoản Chuyên viên thư viện, Biên mục hoặc Độc giả.',
       });
       return;
     }
