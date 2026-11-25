@@ -86,6 +86,10 @@ router.post(
     if (!parsed.success) return sendZodError(res, parsed.error);
 
     const { MaDocGia, MaSachList } = parsed.data;
+    if (new Set(MaSachList).size !== MaSachList.length) {
+      res.status(400).json({ error: 'Danh sách sách mượn không được chứa mã sách trùng lặp trong cùng một phiếu.' });
+      return;
+    }
     const ngayMuon = parsed.data.NgayMuon || todayIsoDate();
 
     try {

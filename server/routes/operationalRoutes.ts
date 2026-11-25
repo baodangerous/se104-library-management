@@ -244,7 +244,11 @@ operationalRouter.get('/ops/copies/:maBanSao/history', requireAuth, (req, res) =
 /* ===========================
  * 3. VÒNG ĐỜI THẺ THƯ VIỆN
  * =========================== */
-operationalRouter.get('/ops/cards/:maDocGia', requireAuth, (req, res) => {
+operationalRouter.get('/ops/cards/:maDocGia', requireAuth, (req: AuthenticatedRequest, res) => {
+  if (req.user!.VaiTro === 'READER' && req.user!.MaDocGia !== req.params.maDocGia) {
+    res.status(403).json({ error: 'Bạn chỉ được xem lịch sử thẻ của chính mình.' });
+    return;
+  }
   const rows = db
     .prepare('SELECT * FROM THETHUVIEN WHERE MaDocGia = ? ORDER BY NgayLap DESC, MaThe DESC')
     .all(req.params.maDocGia);
@@ -808,6 +812,22 @@ operationalRouter.post(
     }
 
     const { nextStatus } = parsed.data;
+    const VALID_TRANSITIONS: Record<string, string[]> = {
+      'Nháp': ['Chờ duyệt'],
+      'Chờ duyệt': ['Đã duyệt', 'Từ chối'],
+      'Đã duyệt': ['Đang vận chuyển', 'Đã xuất kho'],
+      'Đang vận chuyển': ['Đã xuất kho'],
+      'Đã xuất kho': ['Đã nhập kho', 'Thất lạc'],
+      'Đã nhập kho': ['Hoàn tất'],
+    };
+    const allowedNext = VALID_TRANSITIONS[transfer.TrangThai] || [];
+    if (!allowedNext.includes(nextStatus)) {
+      res.status(400).json({
+        error: `Không thể chuyển trạng thái điều chuyển từ "${transfer.TrangThai}" sang "${nextStatus}".`,
+      });
+      return;
+    }
+
     if (
       (nextStatus === 'Đã duyệt' || nextStatus === 'Từ chối') &&
       req.user!.VaiTro !== 'HEAD_LIBRARIAN'
@@ -1059,11 +1079,15 @@ operationalRouter.post(
 
     const copy = db
       .prepare(
-        `SELECT b.MaBanSao, s.TriGia FROM BANSAO b JOIN SACH s ON s.MaSach = b.MaSach WHERE b.MaBanSao = ?`
+        `SELECT b.MaBanSao, b.TinhTrang, s.TriGia FROM BANSAO b JOIN SACH s ON s.MaSach = b.MaSach WHERE b.MaBanSao = ?`
       )
-      .get(d.MaBanSao) as { MaBanSao: string; TriGia: number } | undefined;
+      .get(d.MaBanSao) as { MaBanSao: string; TinhTrang: string; TriGia: number } | undefined;
     if (!copy) {
       res.status(404).json({ error: 'Không tìm thấy bản sao.' });
+      return;
+    }
+    if (['Chờ thanh lý', 'Đã thanh lý', 'Thất lạc'].includes(copy.TinhTrang)) {
+      res.status(400).json({ error: `Bản sao ${copy.MaBanSao} đang ở trạng thái "${copy.TinhTrang}", không thể lập bồi thường lặp lại.` });
       return;
     }
 
@@ -1219,19 +1243,38 @@ operationalRouter.post(
     }
 
     const maGD = `GD${Date.now()}`;
-    const tx = db.transaction(() => {
-      db.prepare(
-        `INSERT INTO GIAODICHTHANHTOAN (MaGD, MaDocGia, KenhThanhToan, MaGD_CongThanhToan, SoTien, TrangThai, ThoiGianGD)
-         VALUES (?, ?, ?, ?, ?, 'Thành công', ?)`
-      ).run(maGD, d.MaDocGia, d.KenhThanhToan, d.MaGD_CongThanhToan, d.SoTien, new Date().toISOString());
-      db.prepare('UPDATE DOCGIA SET TongNo = MAX(0, TongNo - ?) WHERE MaDocGia = ?').run(
-        d.SoTien,
-        d.MaDocGia
-      );
-    });
-    tx.immediate();
-
-    res.status(201).json({ MaGD: maGD, ConLai: Math.max(0, reader.TongNo - d.SoTien) });
+    try {
+      const tx = db.transaction(() => {
+        const dupInTx = db
+          .prepare('SELECT MaGD FROM GIAODICHTHANHTOAN WHERE MaGD_CongThanhToan = ?')
+          .get(d.MaGD_CongThanhToan);
+        if (dupInTx) {
+          throw Object.assign(new Error(`Giao dịch cổng thanh toán ${d.MaGD_CongThanhToan} đã được ghi nhận trước đó.`), { status: 409 });
+        }
+        const liveReader = db.prepare('SELECT TongNo FROM DOCGIA WHERE MaDocGia = ?').get(d.MaDocGia) as
+          | { TongNo: number }
+          | undefined;
+        if (!liveReader) {
+          throw Object.assign(new Error('Không tìm thấy độc giả.'), { status: 404 });
+        }
+        if (d.SoTien > liveReader.TongNo) {
+          throw Object.assign(new Error('Số tiền thanh toán vượt quá tổng nợ hiện tại.'), { status: 400 });
+        }
+        db.prepare(
+          `INSERT INTO GIAODICHTHANHTOAN (MaGD, MaDocGia, KenhThanhToan, MaGD_CongThanhToan, SoTien, TrangThai, ThoiGianGD)
+           VALUES (?, ?, ?, ?, ?, 'Thành công', ?)`
+        ).run(maGD, d.MaDocGia, d.KenhThanhToan, d.MaGD_CongThanhToan, d.SoTien, new Date().toISOString());
+        db.prepare('UPDATE DOCGIA SET TongNo = MAX(0, TongNo - ?) WHERE MaDocGia = ?').run(
+          d.SoTien,
+          d.MaDocGia
+        );
+        return Math.max(0, liveReader.TongNo - d.SoTien);
+      });
+      const conLai = tx.immediate();
+      res.status(201).json({ MaGD: maGD, ConLai: conLai });
+    } catch (err: any) {
+      res.status(err?.status || 400).json({ error: err?.message || 'Thanh toán thất bại.' });
+    }
   }
 );
 
@@ -1266,6 +1309,10 @@ operationalRouter.post('/ops/overrides', requireAuth, (req: AuthenticatedRequest
   const parsed = schema.safeParse(req.body);
   if (!parsed.success) return sendZodError(res, parsed.error);
   const d = parsed.data;
+  if (req.user!.VaiTro === 'READER' && req.user!.MaDocGia !== d.MaDocGia) {
+    res.status(403).json({ error: 'Bạn chỉ có thể gửi yêu cầu ngoại lệ mượn cho chính mình.' });
+    return;
+  }
   const id = nextPrefixedId('NGOAILEMUON', 'MaNgoaiLe', 'NL2026-');
   db.prepare(
     `INSERT INTO NGOAILEMUON (MaNgoaiLe, MaDocGia, SoLuongThem, LyDo, HanApDung, TrangThai, NgayTao)

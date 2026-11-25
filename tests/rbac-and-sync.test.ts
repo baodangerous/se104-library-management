@@ -473,6 +473,11 @@ test('Acquisitions Budget Guard (QĐ37) & 7-Step Transfer Lifecycle (QĐ29)', as
   await api(`/ops/transfers/${trfBack.data.SoPhieuDC}/transition`, {
     method: 'POST',
     token: lib.token,
+    body: { nextStatus: 'Đã xuất kho' },
+  });
+  await api(`/ops/transfers/${trfBack.data.SoPhieuDC}/transition`, {
+    method: 'POST',
+    token: lib.token,
     body: { nextStatus: 'Đã nhập kho' },
   });
 });
@@ -1082,4 +1087,67 @@ test('DBMS & Multi-Thread Concurrency: WAL Pragmas, Indexes, Concurrent Fine Pay
     ]);
     assert.deepEqual([p1.status, p2.status].sort(), [201, 400]);
   }
+});
+
+test('Security & Logic Audit: IDOR Guards, Transfer State Machine, Duplicate Borrow & Double-Pay Guards', async () => {
+  const head = await demoLogin('HEAD_LIBRARIAN');
+  const lib = await demoLogin('LIBRARIAN');
+  const reader = await demoLogin('READER');
+
+  // 1. IDOR Guards: READER cannot inspect other reader cards or submit overrides for another reader
+  assert.equal((await api('/ops/cards/DG002', { token: reader.token })).status, 403);
+  assert.equal(
+    (await api('/ops/overrides', {
+      method: 'POST',
+      token: reader.token,
+      body: { MaDocGia: 'DG002', SoLuongThem: 3, LyDo: 'IDOR attempt', HanApDung: '2026-12-31' },
+    })).status,
+    403
+  );
+
+  // 2. Duplicate MaSach in single loan request must return clean 400 (not 500 SQLITE_CONSTRAINT)
+  assert.equal(
+    (await api('/phieumuon', {
+      method: 'POST',
+      token: lib.token,
+      body: { MaDocGia: 'DG005', MaSachList: ['S002', 'S002'] },
+    })).status,
+    400
+  );
+
+  // 3. Transfer State Machine Guard: cannot skip 'Đã duyệt' -> 'Đã nhập kho' directly
+  const copiesRes = await api<any[]>('/ops/copies?maCN=CN01', { token: lib.token });
+  const readyCopy = copiesRes.data.find((c) => c.TinhTrang === 'Sẵn sàng');
+  assert.ok(readyCopy);
+  const trf = await api<{ SoPhieuDC: string }>('/ops/transfers', {
+    method: 'POST',
+    token: lib.token,
+    body: { MaBanSao: readyCopy.MaBanSao, ChiNhanhNhan: 'CN02' },
+  });
+  assert.equal(trf.status, 201);
+
+  const skipAttempt = await api(`/ops/transfers/${trf.data.SoPhieuDC}/transition`, {
+    method: 'POST',
+    token: head.token,
+    body: { nextStatus: 'Đã nhập kho' },
+  });
+  assert.equal(skipAttempt.status, 400);
+
+  // Reject cleanly to terminal state -> subsequent transition must fail (400)
+  assert.equal(
+    (await api(`/ops/transfers/${trf.data.SoPhieuDC}/transition`, {
+      method: 'POST',
+      token: head.token,
+      body: { nextStatus: 'Từ chối' },
+    })).status,
+    200
+  );
+  assert.equal(
+    (await api(`/ops/transfers/${trf.data.SoPhieuDC}/transition`, {
+      method: 'POST',
+      token: head.token,
+      body: { nextStatus: 'Đã duyệt' },
+    })).status,
+    400
+  );
 });
