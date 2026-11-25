@@ -1,6 +1,7 @@
 import * as Tabs from '@radix-ui/react-tabs';
 import { Printer } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
+import { WorkspacePageHeader } from '../../../components/ui/workspace-header';
 import { ReportBM71Panel } from './ReportBM71Panel';
 import { ReportBM72Panel } from './ReportBM72Panel';
 import { useReports } from './useReports';
@@ -10,18 +11,16 @@ export function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold text-slate-900">Báo cáo &amp; Thống kê</h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Thống kê động tình hình mượn sách theo thể loại và danh sách sách trả trễ, hỗ trợ in
-            ấn và xuất file CSV.
-          </p>
-        </div>
-        <Button variant="outline" size="sm" onClick={() => window.print()}>
-          <Printer className="w-4 h-4" /> In báo cáo
-        </Button>
-      </div>
+      <WorkspacePageHeader
+        eyebrow="Thống kê & Kết xuất"
+        title="Báo cáo & Thống kê"
+        description="Thống kê động tình hình mượn sách theo thể loại và danh sách sách trả trễ, hỗ trợ in ấn và xuất CSV."
+        actions={
+          <Button variant="outline" size="sm" onClick={() => window.print()}>
+            <Printer className="w-4 h-4" /> In báo cáo
+          </Button>
+        }
+      />
 
       <Tabs.Root defaultValue="bm71" className="space-y-4">
         <Tabs.List className="inline-flex rounded-xl bg-slate-200/70 p-1 gap-1">

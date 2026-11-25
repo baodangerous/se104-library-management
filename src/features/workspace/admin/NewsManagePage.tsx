@@ -3,6 +3,7 @@ import { Newspaper, Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../../../components/ui/button';
 import { Card, CardBody, CardHeader } from '../../../components/ui/card';
+import { WorkspacePageHeader } from '../../../components/ui/workspace-header';
 import { ConfirmDialog, ModalDialog } from '../../../components/ui/dialog';
 import { Input, Label } from '../../../components/ui/input';
 import { portalService } from '../../../services/portalService';
@@ -106,17 +107,16 @@ export function NewsManagePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold text-slate-900">Tin tức, Sự kiện &amp; Bài đăng Portal</h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Quản trị viên và Phụ trách thư viện có quyền đăng bài, chỉnh sửa và xóa tin sự kiện hiển thị trên Cổng thư viện.
-          </p>
-        </div>
-        <Button onClick={openCreate}>
-          <Plus className="w-4 h-4" /> Đăng bài mới
-        </Button>
-      </div>
+      <WorkspacePageHeader
+        eyebrow="Truyền thông Portal"
+        title="Tin tức, Sự kiện & Bài đăng Portal"
+        description="Đăng bài, chỉnh sửa và quản lý tin sự kiện hiển thị trên Cổng thư viện UIT."
+        actions={
+          <Button size="sm" onClick={openCreate}>
+            <Plus className="w-4 h-4" /> Đăng bài mới
+          </Button>
+        }
+      />
 
       <Card>
         <CardHeader

@@ -9,7 +9,7 @@ export function SurfaceCard({
   return (
     <div
       className={cn(
-        'bg-white border border-slate-200 rounded-xl',
+        'bg-white border border-slate-200 rounded-xl shadow-xs',
         className
       )}
       {...props}

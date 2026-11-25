@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { ConfirmDialog } from '../../../components/ui/dialog';
+import { WorkspacePageHeader } from '../../../components/ui/workspace-header';
 import { operationalService } from '../../../services/operationalService';
 import type { ChiNhanh, KeSach, LichSuCauHinh } from '../../../types/library';
 import { CategoriesCard } from './CategoriesCard';
@@ -34,13 +35,11 @@ export function RegulationsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-lg font-bold text-slate-900">Quy định thư viện</h2>
-        <p className="text-xs text-slate-500 mt-0.5">
-          Điều chỉnh tham số hoạt động và quản lý danh mục thể loại sách. Các thay đổi chỉ áp
-          dụng cho thẻ và phiếu mượn tạo mới.
-        </p>
-      </div>
+      <WorkspacePageHeader
+        eyebrow="Quản trị & Cấu hình"
+        title="Quy định thư viện"
+        description="Điều chỉnh tham số hoạt động, theo dõi lịch sử hiệu lực (QĐ31) và quản lý thể loại, chi nhánh."
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         <ParamsFormCard

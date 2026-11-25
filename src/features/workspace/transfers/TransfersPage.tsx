@@ -5,6 +5,7 @@ import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
 import { ModalDialog } from '../../../components/ui/dialog';
 import { FieldLabel, SelectInput } from '../../../components/ui/input';
+import { WorkspacePageHeader } from '../../../components/ui/workspace-header';
 import { operationalService } from '../../../services/operationalService';
 import type { BanSao, ChiNhanh, PhieuDieuChuyen, UserRole } from '../../../types/library';
 
@@ -72,18 +73,17 @@ export function TransfersPage({ userRole }: { userRole: UserRole }) {
   const canApprove = userRole === 'HEAD_LIBRARIAN';
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-bold text-slate-900">Điều chuyển tài liệu giữa chi nhánh</h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Theo dõi vòng đời 7 bước (QĐ29): chi nhánh quản lý bản sao chỉ cập nhật khi xác nhận nhập kho.
-          </p>
-        </div>
-        <Button variant="primary" size="sm" onClick={() => setOpenCreate(true)} className="gap-1.5">
-          <Plus className="w-4 h-4" /> Lập phiếu điều chuyển
-        </Button>
-      </div>
+    <div className="space-y-6">
+      <WorkspacePageHeader
+        eyebrow="Lưu thông Liên chi nhánh"
+        title="Điều chuyển tài liệu giữa chi nhánh"
+        description="Theo dõi vòng đời 7 bước (QĐ29): chi nhánh quản lý bản sao chỉ cập nhật khi xác nhận nhập kho."
+        actions={
+          <Button variant="primary" size="sm" onClick={() => setOpenCreate(true)} className="gap-1.5">
+            <Plus className="w-4 h-4" /> Lập phiếu điều chuyển
+          </Button>
+        }
+      />
 
       {loading ? (
         <div className="bg-white rounded-xl border border-slate-200 p-8 text-center text-sm text-slate-500">
@@ -193,3 +193,4 @@ export function TransfersPage({ userRole }: { userRole: UserRole }) {
     </div>
   );
 }
+

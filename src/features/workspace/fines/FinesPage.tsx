@@ -5,6 +5,8 @@ import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
 import { ModalDialog } from '../../../components/ui/dialog';
 import { FieldLabel, SelectInput, TextInput } from '../../../components/ui/input';
+import { SegmentedTabs } from '../../../components/ui/segmented-tabs';
+import { WorkspacePageHeader } from '../../../components/ui/workspace-header';
 import { operationalService } from '../../../services/operationalService';
 import { formatVnd as formatCurrency } from '../../../lib/utils';
 import type { GiaoDichThanhToan, PhieuDieuChinh, UserRole } from '../../../types/library';
@@ -72,41 +74,28 @@ export function FinesPage({ userRole }: { userRole?: UserRole }) {
   }
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold text-slate-900">Tài chính, Thu phạt &amp; Đối soát</h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Ghi nhận thu phạt tại quầy, đối soát giao dịch trực tuyến và lập phiếu điều chỉnh chứng từ đã chốt.
-          </p>
-        </div>
-        {tab === 'reconcile' && (
-          <Button variant="primary" size="sm" onClick={() => setOpenAdj(true)} className="gap-1.5">
-            <Plus className="w-4 h-4" /> Lập phiếu điều chỉnh
-          </Button>
-        )}
-      </div>
+    <div className="space-y-6">
+      <WorkspacePageHeader
+        eyebrow="Lưu thông & Tài chính"
+        title="Tài chính, Thu phạt & Đối soát"
+        description="Ghi nhận thu phạt tại quầy, đối soát giao dịch trực tuyến và lập phiếu điều chỉnh chứng từ đã chốt."
+        actions={
+          tab === 'reconcile' ? (
+            <Button variant="primary" size="sm" onClick={() => setOpenAdj(true)} className="gap-1.5">
+              <Plus className="w-4 h-4" /> Lập phiếu điều chỉnh
+            </Button>
+          ) : null
+        }
+      />
 
-      <div className="flex gap-2 border-b border-slate-200 pb-2">
-        <button
-          type="button"
-          onClick={() => setTab('collect')}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
-            tab === 'collect' ? 'bg-[#0054A6] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
-        >
-          <CreditCard className="w-3.5 h-3.5" /> Thu tiền phạt tại quầy
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab('reconcile')}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
-            tab === 'reconcile' ? 'bg-[#0054A6] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
-        >
-          <Scale className="w-3.5 h-3.5" /> Đối soát thu – chi &amp; Phiếu điều chỉnh
-        </button>
-      </div>
+      <SegmentedTabs
+        value={tab}
+        onChange={setTab}
+        items={[
+          { id: 'collect', label: 'Thu tiền phạt tại quầy', icon: CreditCard },
+          { id: 'reconcile', label: 'Đối soát thu – chi & Phiếu điều chỉnh', icon: Scale },
+        ]}
+      />
 
       {tab === 'collect' ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">

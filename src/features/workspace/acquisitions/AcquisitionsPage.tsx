@@ -5,6 +5,8 @@ import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
 import { ModalDialog } from '../../../components/ui/dialog';
 import { FieldLabel, SelectInput, TextInput } from '../../../components/ui/input';
+import { SegmentedTabs } from '../../../components/ui/segmented-tabs';
+import { WorkspacePageHeader } from '../../../components/ui/workspace-header';
 import { operationalService } from '../../../services/operationalService';
 import { formatVnd as formatCurrency } from '../../../lib/utils';
 import type { DonDatMua, KeHoachMuaSam, NhaCungCap, PhieuTiepNhan, UserRole } from '../../../types/library';
@@ -138,52 +140,35 @@ export function AcquisitionsPage({ userRole }: { userRole: UserRole }) {
   }
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-bold text-slate-900">Bổ sung &amp; Mua sắm tài liệu</h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Kế hoạch ngân sách (QĐ37), đơn đặt mua, nhà cung cấp và tiếp nhận hàng (BM28).
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {canApprovePlan && (
-            <Button variant="outline" size="sm" onClick={() => setOpenPlan(true)} className="gap-1.5">
-              <Plus className="w-4 h-4" /> Kế hoạch mới
+    <div className="space-y-6">
+      <WorkspacePageHeader
+        eyebrow="Nghiệp vụ Bổ sung"
+        title="Bổ sung & Mua sắm tài liệu"
+        description="Kế hoạch ngân sách (QĐ37), đơn đặt mua, nhà cung cấp và tiếp nhận hàng (BM28)."
+        actions={
+          <>
+            {canApprovePlan && (
+              <Button variant="outline" size="sm" onClick={() => setOpenPlan(true)} className="gap-1.5">
+                <Plus className="w-4 h-4" /> Kế hoạch mới
+              </Button>
+            )}
+            <Button variant="primary" size="sm" onClick={() => setOpenOrder(true)} className="gap-1.5">
+              <ShoppingCart className="w-4 h-4" /> Lập đơn đặt mua
             </Button>
-          )}
-          <Button variant="primary" size="sm" onClick={() => setOpenOrder(true)} className="gap-1.5">
-            <ShoppingCart className="w-4 h-4" /> Lập đơn đặt mua
-          </Button>
-        </div>
-      </div>
+          </>
+        }
+      />
 
-      <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-2">
-        {[
-          { id: 'plans', label: `Kế hoạch (${plans.length})`, icon: PackagePlus },
-          { id: 'orders', label: `Đơn đặt mua (${orders.length})`, icon: ShoppingCart },
-          { id: 'receipts', label: `Tiếp nhận (${receipts.length})`, icon: FileCheck2 },
-          { id: 'suppliers', label: `Nhà cung cấp (${suppliers.length})`, icon: Building2 },
-        ].map((item) => {
-          const Icon = item.icon;
-          const active = tab === item.id;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setTab(item.id as typeof tab)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
-                active
-                  ? 'bg-[#0054A6] text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5" />
-              {item.label}
-            </button>
-          );
-        })}
-      </div>
+      <SegmentedTabs
+        value={tab}
+        onChange={setTab}
+        items={[
+          { id: 'plans', label: 'Kế hoạch', count: plans.length, icon: PackagePlus },
+          { id: 'orders', label: 'Đơn đặt mua', count: orders.length, icon: ShoppingCart },
+          { id: 'receipts', label: 'Tiếp nhận', count: receipts.length, icon: FileCheck2 },
+          { id: 'suppliers', label: 'Nhà cung cấp', count: suppliers.length, icon: Building2 },
+        ]}
+      />
 
       {loading ? (
         <div className="bg-white rounded-xl border border-slate-200 p-8 text-center text-sm text-slate-500">

@@ -5,6 +5,8 @@ import { Button } from '../../../components/ui/button';
 import { Card, CardBody, CardHeader } from '../../../components/ui/card';
 import { DataTable, type DataTableColumn } from '../../../components/ui/data-table';
 import { ConfirmDialog } from '../../../components/ui/dialog';
+import { SegmentedTabs } from '../../../components/ui/segmented-tabs';
+import { WorkspacePageHeader } from '../../../components/ui/workspace-header';
 import { operationalService } from '../../../services/operationalService';
 import { formatDateVn } from '../../../services/rules/dateUtils';
 import type { ChiNhanh, PhamViChiNhanh, QuyenItem, TaiKhoan, UserRole, VaiTroQuyen } from '../../../types/library';
@@ -139,39 +141,25 @@ export function AccountsPage({ currentRole }: { currentRole: UserRole }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold text-slate-900">Tài khoản &amp; Phân quyền</h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Quản lý tài khoản đăng nhập và phân quyền sử dụng cho Quản trị viên, Thủ thư và Độc
-            giả UIT.
-          </p>
-        </div>
-        <Button onClick={state.openCreate}>
-          <ShieldPlus className="w-4 h-4" /> Tạo tài khoản
-        </Button>
-      </div>
+      <WorkspacePageHeader
+        eyebrow="Quản trị & Bảo mật"
+        title="Tài khoản & Phân quyền"
+        description="Quản lý tài khoản 5 vai trò và ma trận phân quyền chi tiết theo chức năng."
+        actions={
+          <Button onClick={state.openCreate} size="sm" className="gap-1.5">
+            <ShieldPlus className="w-4 h-4" /> Tạo tài khoản
+          </Button>
+        }
+      />
 
-      <div className="flex gap-2 border-b border-slate-200 pb-2">
-        <button
-          type="button"
-          onClick={() => setTab('accounts')}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
-            tab === 'accounts' ? 'bg-[#0054A6] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
-        >
-          <Users className="w-3.5 h-3.5" /> Danh sách tài khoản
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab('matrix')}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
-            tab === 'matrix' ? 'bg-[#0054A6] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
-        >
-          <ShieldCheck className="w-3.5 h-3.5" /> Ma trận phân quyền
-        </button>
-      </div>
+      <SegmentedTabs
+        value={tab}
+        onChange={setTab}
+        items={[
+          { id: 'accounts', label: 'Danh sách tài khoản', count: state.accounts.length, icon: Users },
+          { id: 'matrix', label: 'Ma trận phân quyền', icon: ShieldCheck },
+        ]}
+      />
 
       {tab === 'accounts' ? (
         <Card>

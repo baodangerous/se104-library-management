@@ -2,6 +2,7 @@ import * as React from 'react';
 import { BookPlus, CheckCircle2, DoorOpen, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardBody, CardHeader } from '../../../components/ui/card';
+import { WorkspacePageHeader } from '../../../components/ui/workspace-header';
 import { formatDateVn } from '../../../services/rules/dateUtils';
 import { serviceRequestService } from '../../../services/serviceRequestService';
 import type { LichDatPhong, YeuCauTaiLieu } from '../../../types/portal';
@@ -67,14 +68,11 @@ export function ServiceRequestsManagePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-          Xử lý Biểu mẫu &amp; Đặt phòng (A7)
-        </h2>
-        <p className="text-sm text-slate-500 mt-0.5">
-          Duyệt đề xuất bổ sung tài liệu từ bạn đọc và theo dõi lịch sử dụng phòng học nhóm tầng 2.
-        </p>
-      </div>
+      <WorkspacePageHeader
+        eyebrow="Dịch vụ Bạn đọc"
+        title="Xử lý Biểu mẫu & Đặt phòng (A7)"
+        description="Duyệt đề xuất bổ sung tài liệu và phê duyệt lịch đặt phòng học nhóm tầng 2."
+      />
 
       {/* Book Requests Table */}
       <Card>

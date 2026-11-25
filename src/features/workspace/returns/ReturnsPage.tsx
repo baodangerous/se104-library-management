@@ -1,3 +1,4 @@
+import { WorkspacePageHeader } from '../../../components/ui/workspace-header';
 import { ReturnFormCard } from './ReturnFormCard';
 import { ReturnHistoryList } from './ReturnHistoryList';
 import { useReturns } from './useReturns';
@@ -7,13 +8,11 @@ export function ReturnsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-lg font-bold text-slate-900">Nhận trả sách</h2>
-        <p className="text-xs text-slate-500 mt-0.5">
-          Ghi nhận trả sách, tự động tính tiền phạt quá hạn 1.000 ₫/ngày và cập nhật công nợ
-          độc giả.
-        </p>
-      </div>
+      <WorkspacePageHeader
+        eyebrow="Lưu thông & Tài chính"
+        title="Nhận trả sách"
+        description="Ghi nhận trả sách, tự động tính tiền phạt quá hạn 1.000 ₫/ngày và đồng bộ trạng thái bản sao."
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         <ReturnFormCard

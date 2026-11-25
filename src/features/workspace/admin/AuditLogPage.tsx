@@ -5,6 +5,7 @@ import { Button } from '../../../components/ui/button';
 import { Card, CardBody, CardHeader } from '../../../components/ui/card';
 import { DataTable, type DataTableColumn } from '../../../components/ui/data-table';
 import { Input } from '../../../components/ui/input';
+import { WorkspacePageHeader } from '../../../components/ui/workspace-header';
 import { adminService } from '../../../services/adminService';
 import type { NhatKyThaoTac } from '../../../types/library';
 
@@ -91,18 +92,16 @@ export function AuditLogPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold text-slate-900">Nhật ký hoạt động</h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Theo dõi lịch sử thao tác quản trị, lưu thông học liệu và truy cập hệ thống Thư viện
-            UIT.
-          </p>
-        </div>
-        <Button variant="outline" size="sm" onClick={loadLogs}>
-          <RefreshCw className="w-4 h-4" /> Làm mới
-        </Button>
-      </div>
+      <WorkspacePageHeader
+        eyebrow="Quản trị & Bảo mật"
+        title="Nhật ký hoạt động"
+        description="Theo dõi lịch sử thao tác quản trị, lưu thông học liệu và truy cập hệ thống Thư viện UIT."
+        actions={
+          <Button variant="outline" size="sm" onClick={loadLogs}>
+            <RefreshCw className="w-4 h-4" /> Làm mới
+          </Button>
+        }
+      />
 
       <Card>
         <CardHeader

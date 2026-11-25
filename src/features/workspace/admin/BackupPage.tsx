@@ -3,6 +3,7 @@ import { AlertTriangle, DatabaseBackup, Download, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../../../components/ui/button';
 import { Card, CardBody, CardHeader } from '../../../components/ui/card';
+import { WorkspacePageHeader } from '../../../components/ui/workspace-header';
 import { ConfirmDialog } from '../../../components/ui/dialog';
 import { adminService } from '../../../services/adminService';
 
@@ -75,13 +76,11 @@ export function BackupPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-lg font-bold text-slate-900">Sao lưu &amp; Khôi phục dữ liệu</h2>
-        <p className="text-xs text-slate-500 mt-0.5">
-          Xuất bản sao lưu dữ liệu thư viện dưới dạng tệp JSON an toàn hoặc khôi phục lại trạng
-          thái hệ thống khi bảo trì.
-        </p>
-      </div>
+      <WorkspacePageHeader
+        eyebrow="Quản trị & Bảo mật"
+        title="Sao lưu & Khôi phục dữ liệu"
+        description="Xuất bản sao lưu dữ liệu thư viện dưới dạng tệp JSON an toàn hoặc khôi phục lại trạng thái hệ thống."
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <Card>
