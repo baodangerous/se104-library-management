@@ -1,76 +1,132 @@
-.dark .bg-white,
-.dark .bg-white\/95,
-.dark .bg-white\/90,
-.dark .hover\:bg-white:hover {
-  background-color: #06164a !important;
+/* Unified Dark Mode Surface, Text, Border, and Control Overrides */
+.dark {
+  color-scheme: dark;
 }
+
+/* Page & AppShell Backgrounds */
+.dark .bg-\[\#f4f7fc\],
+.dark .bg-\[\#f8fafc\],
 .dark .bg-slate-50,
 .dark .bg-slate-50\/60,
 .dark .bg-slate-50\/70,
 .dark .hover\:bg-slate-50:hover {
   background-color: #030a24 !important;
 }
+
+/* Cards, Drawers, Modals, Headers */
+.dark .bg-white,
+.dark .bg-white\/95,
+.dark .bg-white\/90,
+.dark .hover\:bg-white:hover {
+  background-color: #06164a !important;
+}
+
+/* Subtle Tinted Panels & Light Accents */
+.dark .bg-\[\#f7faff\],
+.dark .bg-\[\#f3f8ff\],
+.dark .bg-\[\#f3f8ff\]\/60,
+.dark .hover\:bg-\[\#f3f8ff\]:hover,
 .dark .bg-slate-100,
 .dark .hover\:bg-slate-100:hover,
-.dark .hover\:bg-slate-100\/80:hover,
-.dark .hover\:bg-slate-200\/70:hover {
+.dark .hover\:bg-slate-100\/80:hover {
   background-color: #0a2272 !important;
 }
+
+.dark .bg-slate-200,
+.dark .hover\:bg-slate-200:hover,
+.dark .hover\:bg-slate-200\/70:hover,
+.dark .bg-\[\#dcebff\],
+.dark .bg-\[\#dcebff\]\/60,
+.dark .hover\:bg-\[\#dcebff\]\/60:hover,
 .dark .bg-\[\#EFF6FF\],
 .dark .bg-blue-50\/60,
-.dark .hover\:bg-\[\#EFF6FF\]:hover {
+.dark .hover\:bg-\[\#EFF6FF\]:hover,
+.dark .bg-sky-50,
+.dark .hover\:bg-sky-50:hover {
   background-color: rgba(31, 95, 224, 0.25) !important;
 }
+
 .dark .bg-\[\#0054A6\]\/5,
 .dark .bg-\[\#0054A6\]\/8,
-.dark .bg-\[\#0054A6\]\/10 {
+.dark .bg-\[\#0054A6\]\/10,
+.dark .bg-\[\#0054A6\]\/15,
+.dark .hover\:bg-\[\#0054A6\]\/15:hover {
   background-color: rgba(111, 196, 255, 0.16) !important;
 }
-.dark .text-slate-900 {
+
+/* Primary & Secondary Typography */
+.dark .text-slate-900,
+.dark .text-\[\#0a1f4d\],
+.dark .text-\[\#0f172a\],
+.dark .hover\:text-\[\#0a1f4d\]:hover,
+.dark .hover\:text-slate-900:hover {
   color: #eef5ff !important;
 }
-.dark .text-slate-800 {
+
+.dark .text-slate-800,
+.dark .text-\[\#1e293b\],
+.dark .text-\[\#0a2b86\] {
   color: #dcebff !important;
 }
+
 .dark .text-slate-700,
 .dark .text-slate-600,
 .dark .text-slate-500,
-.dark .text-slate-400 {
+.dark .text-slate-400,
+.dark .text-\[\#2c4a7d\],
+.dark .text-\[\#334155\],
+.dark .text-\[\#475569\] {
   color: #c3d6fa !important;
 }
-.dark .text-\[\#0054A6\] {
+
+.dark .text-\[\#0054A6\],
+.dark .text-\[\#1556d6\],
+.dark .text-sky-700,
+.dark .text-sky-600 {
   color: #6fc4ff !important;
 }
-.dark .hover\:text-\[\#0054A6\]:hover {
+
+.dark .hover\:text-\[\#0054A6\]:hover,
+.dark .hover\:text-\[\#1556d6\]:hover,
+.dark .group:hover .group-hover\:text-\[\#1556d6\],
+.dark .group:hover .group-hover\:text-\[\#003B73\] {
   color: #8fefff !important;
 }
+
+/* Semantic Status Surfaces & Texts */
 .dark .bg-emerald-50,
 .dark .bg-emerald-50\/70 {
   background-color: rgba(11, 122, 75, 0.25) !important;
 }
 .dark .text-emerald-700,
+.dark .text-emerald-600,
 .dark .text-emerald-900 {
   color: #5be0a3 !important;
 }
 .dark .border-emerald-200 {
   border-color: rgba(91, 224, 163, 0.35) !important;
 }
+
 .dark .bg-amber-50,
 .dark .bg-amber-50\/70 {
   background-color: rgba(242, 184, 74, 0.2) !important;
 }
 .dark .text-amber-700,
+.dark .text-amber-600,
 .dark .text-amber-900 {
   color: #ffd98a !important;
 }
 .dark .border-amber-200 {
   border-color: rgba(255, 217, 138, 0.35) !important;
 }
+
 .dark .bg-rose-50,
-.dark .bg-red-50 {
+.dark .bg-red-50,
+.dark .hover\:bg-rose-50:hover {
   background-color: rgba(168, 50, 26, 0.28) !important;
 }
 .dark .text-rose-700,
+.dark .text-rose-600,
 .dark .text-rose-800,
 .dark .text-red-700 {
   color: #ff9a85 !important;
@@ -79,14 +135,24 @@
 .dark .border-red-200 {
   border-color: rgba(255, 154, 133, 0.35) !important;
 }
+
+/* Borders & Dividers */
+.dark .border-slate-300,
 .dark .border-slate-200,
 .dark .border-slate-200\/80,
-.dark .border-slate-100 {
-  border-color: rgba(111, 196, 255, 0.2) !important;
+.dark .border-slate-100,
+.dark .border-sky-200,
+.dark .border-\[\#1556d6\]\/20,
+.dark .border-\[\#1556d6\]\/30 {
+  border-color: rgba(111, 196, 255, 0.22) !important;
 }
+
+.dark .divide-slate-200 > :not(:last-child),
 .dark .divide-slate-100 > :not(:last-child) {
   border-color: rgba(111, 196, 255, 0.16) !important;
 }
+
+/* Inputs, Selects, Textareas & Placeholders */
 .dark input,
 .dark select,
 .dark textarea {
@@ -95,3 +161,17 @@
   border-color: #1f5fe0 !important;
 }
 
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #8eb4f0 !important;
+}
+
+.dark select option {
+  background-color: #06164a;
+  color: #eef5ff;
+}
+
+/* Preserve dark text on bright gold/yellow badges */
+.dark .bg-\[\#f2b84a\] {
+  color: #0a1f4d !important;
+}
