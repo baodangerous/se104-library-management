@@ -696,3 +696,73 @@ test('Student -> Librarian Workflow: Room Booking Approval & Book Request Sync',
     200
   );
 });
+
+test('Multi-User Concurrency, Healthcheck, Auth Guards & Negative Validation', async () => {
+  // 1. Healthcheck endpoint for production load balancers / deploy
+  const health = await api<{ ok: boolean; status: string; db: string }>('/health');
+  assert.equal(health.status, 200);
+  assert.equal(health.data.ok, true);
+  assert.equal(health.data.status, 'UP');
+  assert.equal(health.data.db, 'sqlite');
+
+  // 2. Unauthenticated requests to protected endpoints must return 401
+  assert.equal((await api('/docgia')).status, 401);
+  assert.equal((await api('/taikhoan')).status, 401);
+  assert.equal((await api('/ops/transfers', { method: 'POST', body: {} })).status, 401);
+  assert.equal((await api('/hethong/backup')).status, 401);
+
+  // 3. Concurrent double-booking race condition: 2 students request the exact same room/date/slot at once
+  const raceDate = '2026-12-29';
+  const [b1, b2] = await Promise.all([
+    api<{ MaDatPhong?: string }>('/public/datphong', {
+      method: 'POST',
+      body: {
+        MaPhong: 'P202',
+        NguoiDat: 'SV Race 1',
+        MaSoSV: '23520001',
+        Email: '23520001@gm.uit.edu.vn',
+        NgayDat: raceDate,
+        KhungGio: '08:00 - 10:00',
+        MucDich: 'Test race 1',
+      },
+    }),
+    api<{ MaDatPhong?: string }>('/public/datphong', {
+      method: 'POST',
+      body: {
+        MaPhong: 'P202',
+        NguoiDat: 'SV Race 2',
+        MaSoSV: '23520002',
+        Email: '23520002@gm.uit.edu.vn',
+        NgayDat: raceDate,
+        KhungGio: '08:00 - 10:00',
+        MucDich: 'Test race 2',
+      },
+    }),
+  ]);
+  const statuses = [b1.status, b2.status].sort();
+  assert.deepEqual(statuses, [201, 409]);
+
+  // Cleanup the winning booking
+  const winnerId = b1.status === 201 ? b1.data.MaDatPhong : b2.data.MaDatPhong;
+  if (winnerId) {
+    const lib = await demoLogin('LIBRARIAN');
+    await api(`/datphong/${winnerId}/status`, {
+      method: 'PATCH',
+      token: lib.token,
+      body: { TrangThai: 'Đã hủy' },
+    });
+  }
+
+  // 4. Cross-reader isolation: READER cannot renew/pay for another reader's card
+  const reader = await demoLogin('READER');
+  assert.equal((await api('/ops/cards/DG002/renew', { method: 'POST', token: reader.token })).status, 403);
+  assert.equal((await api('/ops/cards/DG002/report-lost', { method: 'POST', token: reader.token })).status, 403);
+  assert.equal(
+    (await api('/ops/finance/online-pay', {
+      method: 'POST',
+      token: reader.token,
+      body: { MaDocGia: 'DG002', KenhThanhToan: 'VNPay', SoTien: 1000, MaGD_CongThanhToan: `X-${Date.now()}` },
+    })).status,
+    403
+  );
+});

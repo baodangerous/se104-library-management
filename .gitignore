@@ -7,4 +7,5 @@ coverage/
 .env*
 !.env.example
 data/*.sqlite*
+data/.jwt_secret
 package-lock.json

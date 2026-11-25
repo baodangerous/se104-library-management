@@ -13,6 +13,8 @@ export const DB_PATH = path.join(DATA_DIR, 'uit_library.sqlite');
 
 export const db = new Database(DB_PATH);
 db.pragma('journal_mode = WAL');
+db.pragma('synchronous = NORMAL');
+db.pragma('busy_timeout = 5000');
 db.pragma('foreign_keys = ON');
 
 export function getSeedPassword(): string {

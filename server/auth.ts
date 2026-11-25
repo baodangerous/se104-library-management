@@ -1,13 +1,31 @@
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
 import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { db } from './db';
 import type { AuthUser, UserRole } from '../src/types/library';
 
-const JWT_SECRET =
-  process.env.JWT_SECRET && process.env.JWT_SECRET.trim().length >= 16
-    ? process.env.JWT_SECRET.trim()
-    : crypto.randomBytes(32).toString('hex');
+function resolveJwtSecret(): string {
+  if (process.env.JWT_SECRET && process.env.JWT_SECRET.trim().length >= 16) {
+    return process.env.JWT_SECRET.trim();
+  }
+  const secretFile = path.resolve(process.cwd(), 'data', '.jwt_secret');
+  try {
+    if (fs.existsSync(secretFile)) {
+      const stored = fs.readFileSync(secretFile, 'utf8').trim();
+      if (stored.length >= 32) return stored;
+    }
+    const generated = crypto.randomBytes(32).toString('hex');
+    fs.mkdirSync(path.dirname(secretFile), { recursive: true });
+    fs.writeFileSync(secretFile, generated, { mode: 0o600 });
+    return generated;
+  } catch {
+    return crypto.randomBytes(32).toString('hex');
+  }
+}
+
+const JWT_SECRET = resolveJwtSecret();
 
 export interface AuthenticatedRequest extends Request {
   user?: AuthUser;

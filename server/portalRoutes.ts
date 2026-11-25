@@ -59,17 +59,23 @@ portalRouter.post('/public/datphong', (req, res) => {
     | undefined;
   if (!room) return res.status(404).json({ error: 'Không tìm thấy phòng họp nhóm.' });
   if (room.TrangThai !== 'Sẵn sàng') return res.status(400).json({ error: 'Phòng họp này hiện đang bảo trì.' });
-  const conflict = db.prepare(
-    `SELECT 1 FROM DATPHONG WHERE TrangThai IN ('Chờ duyệt', 'Đã xác nhận') AND MaPhong = ? AND NgayDat = ? AND KhungGio = ?`
-  ).get(MaPhong, NgayDat, KhungGio);
-  if (conflict) {
+  const tx = db.transaction(() => {
+    const conflict = db.prepare(
+      `SELECT 1 FROM DATPHONG WHERE TrangThai IN ('Chờ duyệt', 'Đã xác nhận') AND MaPhong = ? AND NgayDat = ? AND KhungGio = ?`
+    ).get(MaPhong, NgayDat, KhungGio);
+    if (conflict) return null;
+    const maDatPhong = nextCode('DATPHONG', 'MaDatPhong', 'DP');
+    db.prepare(
+      `INSERT INTO DATPHONG (MaDatPhong, MaPhong, NguoiDat, MaSoSV, Email, NgayDat, KhungGio, MucDich, TrangThai)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Chờ duyệt')`
+    ).run(maDatPhong, room.MaPhong, String(NguoiDat || '').trim(), String(MaSoSV || '').trim(), String(Email || '').trim(), NgayDat, KhungGio, String(MucDich || '').trim() || 'Thảo luận nhóm học tập');
+    return maDatPhong;
+  });
+
+  const maDatPhong = tx.immediate();
+  if (!maDatPhong) {
     return res.status(409).json({ error: `${room.TenPhong} đã có nhóm đặt trong khung giờ ${KhungGio} ngày ${NgayDat}.` });
   }
-  const maDatPhong = nextCode('DATPHONG', 'MaDatPhong', 'DP');
-  db.prepare(
-    `INSERT INTO DATPHONG (MaDatPhong, MaPhong, NguoiDat, MaSoSV, Email, NgayDat, KhungGio, MucDich, TrangThai)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Chờ duyệt')`
-  ).run(maDatPhong, room.MaPhong, String(NguoiDat || '').trim(), String(MaSoSV || '').trim(), String(Email || '').trim(), NgayDat, KhungGio, String(MucDich || '').trim() || 'Thảo luận nhóm học tập');
   res.status(201).json({
     MaDatPhong: maDatPhong, MaPhong: room.MaPhong, TenPhong: room.TenPhong,
     NguoiDat: String(NguoiDat || '').trim(), MaSoSV: String(MaSoSV || '').trim(),
