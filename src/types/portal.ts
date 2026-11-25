@@ -47,7 +47,7 @@ export interface LichDatPhong {
   NgayDat: string;
   KhungGio: string;
   MucDich: string;
-  TrangThai: 'Đã xác nhận' | 'Đã hủy';
+  TrangThai: 'Chờ duyệt' | 'Đã xác nhận' | 'Đã hủy';
 }
 
 export interface YeuCauTaiLieu {

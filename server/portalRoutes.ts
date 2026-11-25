@@ -60,7 +60,7 @@ portalRouter.post('/public/datphong', (req, res) => {
   if (!room) return res.status(404).json({ error: 'Không tìm thấy phòng họp nhóm.' });
   if (room.TrangThai !== 'Sẵn sàng') return res.status(400).json({ error: 'Phòng họp này hiện đang bảo trì.' });
   const conflict = db.prepare(
-    `SELECT 1 FROM DATPHONG WHERE TrangThai = 'Đã xác nhận' AND MaPhong = ? AND NgayDat = ? AND KhungGio = ?`
+    `SELECT 1 FROM DATPHONG WHERE TrangThai IN ('Chờ duyệt', 'Đã xác nhận') AND MaPhong = ? AND NgayDat = ? AND KhungGio = ?`
   ).get(MaPhong, NgayDat, KhungGio);
   if (conflict) {
     return res.status(409).json({ error: `${room.TenPhong} đã có nhóm đặt trong khung giờ ${KhungGio} ngày ${NgayDat}.` });
@@ -68,13 +68,13 @@ portalRouter.post('/public/datphong', (req, res) => {
   const maDatPhong = nextCode('DATPHONG', 'MaDatPhong', 'DP');
   db.prepare(
     `INSERT INTO DATPHONG (MaDatPhong, MaPhong, NguoiDat, MaSoSV, Email, NgayDat, KhungGio, MucDich, TrangThai)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Đã xác nhận')`
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Chờ duyệt')`
   ).run(maDatPhong, room.MaPhong, String(NguoiDat || '').trim(), String(MaSoSV || '').trim(), String(Email || '').trim(), NgayDat, KhungGio, String(MucDich || '').trim() || 'Thảo luận nhóm học tập');
   res.status(201).json({
     MaDatPhong: maDatPhong, MaPhong: room.MaPhong, TenPhong: room.TenPhong,
     NguoiDat: String(NguoiDat || '').trim(), MaSoSV: String(MaSoSV || '').trim(),
     Email: String(Email || '').trim(), NgayDat, KhungGio,
-    MucDich: String(MucDich || '').trim() || 'Thảo luận nhóm học tập', TrangThai: 'Đã xác nhận',
+    MucDich: String(MucDich || '').trim() || 'Thảo luận nhóm học tập', TrangThai: 'Chờ duyệt',
   });
 });
 
@@ -83,6 +83,32 @@ portalRouter.patch('/public/datphong/:id/cancel', (req, res) => {
   if (info.changes === 0) return res.status(404).json({ error: 'Không tìm thấy lịch đặt phòng.' });
   res.json({ success: true });
 });
+
+portalRouter.patch(
+  '/datphong/:id/status',
+  requireAuth,
+  requireRole('ADMIN', 'HEAD_LIBRARIAN', 'LIBRARIAN'),
+  (req: AuthenticatedRequest, res) => {
+    const allowed = ['Chờ duyệt', 'Đã xác nhận', 'Đã hủy'];
+    const trangThai = String(req.body?.TrangThai || '');
+    if (!allowed.includes(trangThai)) {
+      return res.status(400).json({ error: 'Trạng thái đặt phòng không hợp lệ.' });
+    }
+    const info = db
+      .prepare('UPDATE DATPHONG SET TrangThai = ? WHERE MaDatPhong = ?')
+      .run(trangThai, req.params.id);
+    if (info.changes === 0) return res.status(404).json({ error: 'Không tìm thấy lịch đặt phòng.' });
+    writeAuditLog({
+      MaTaiKhoan: req.user?.MaTaiKhoan ?? null,
+      TenDangNhap: req.user?.TenDangNhap ?? 'system',
+      VaiTro: req.user?.VaiTro ?? 'LIBRARIAN',
+      HanhDong: 'DUYET_DAT_PHONG',
+      BangTacDong: 'DATPHONG',
+      ChiTiet: `Cập nhật lịch đặt phòng ${req.params.id} → "${trangThai}".`,
+    });
+    res.json({ success: true, TrangThai: trangThai });
+  }
+);
 
 portalRouter.get('/public/yeucausach', (_req, res) => {
   res.json(db.prepare('SELECT * FROM YEUCAUTAILIEU ORDER BY NgayGui DESC, MaYeuCau DESC').all());

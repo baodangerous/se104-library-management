@@ -50,6 +50,51 @@ export function migrateOperationalTables(
     ensureColumn(db, 'TAIKHOAN', 'MaCN', "TEXT DEFAULT 'CN01'");
   }
 
+  // 1b. Upgrade DATPHONG & YEUCAUTAILIEU CHECK constraints so student requests support full approval lifecycle
+  const dpTable = db
+    .prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'DATPHONG'")
+    .get() as { sql: string } | undefined;
+  if (dpTable && !dpTable.sql.includes('Chờ duyệt')) {
+    db.exec(`
+      CREATE TABLE DATPHONG_NEW (
+        MaDatPhong TEXT PRIMARY KEY,
+        MaPhong TEXT NOT NULL,
+        NguoiDat TEXT NOT NULL,
+        MaSoSV TEXT NOT NULL,
+        Email TEXT NOT NULL,
+        NgayDat TEXT NOT NULL,
+        KhungGio TEXT NOT NULL,
+        MucDich TEXT NOT NULL,
+        TrangThai TEXT NOT NULL CHECK (TrangThai IN ('Chờ duyệt', 'Đã xác nhận', 'Đã hủy'))
+      );
+      INSERT INTO DATPHONG_NEW SELECT * FROM DATPHONG;
+      DROP TABLE DATPHONG;
+      ALTER TABLE DATPHONG_NEW RENAME TO DATPHONG;
+    `);
+  }
+
+  const ycTable = db
+    .prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'YEUCAUTAILIEU'")
+    .get() as { sql: string } | undefined;
+  if (ycTable && !ycTable.sql.includes('Đã duyệt mua')) {
+    db.exec(`
+      CREATE TABLE YEUCAUTAILIEU_NEW (
+        MaYeuCau TEXT PRIMARY KEY,
+        TenTaiLieu TEXT NOT NULL,
+        TacGia TEXT NOT NULL,
+        MaNganh TEXT NOT NULL,
+        NguoiGui TEXT NOT NULL,
+        Email TEXT NOT NULL,
+        LyDo TEXT NOT NULL,
+        NgayGui TEXT NOT NULL,
+        TrangThai TEXT NOT NULL CHECK (TrangThai IN ('Đang tiếp nhận', 'Đã duyệt mua', 'Đã bổ sung', 'Đã duyệt bổ sung', 'Đã có trong kho'))
+      );
+      INSERT INTO YEUCAUTAILIEU_NEW SELECT * FROM YEUCAUTAILIEU;
+      DROP TABLE YEUCAUTAILIEU;
+      ALTER TABLE YEUCAUTAILIEU_NEW RENAME TO YEUCAUTAILIEU;
+    `);
+  }
+
   // 2. Extend LOAIDOCGIA with configurable limits (QĐ1)
   ensureColumn(db, 'LOAIDOCGIA', 'TuoiToiThieu', 'INTEGER NOT NULL DEFAULT 16');
   ensureColumn(db, 'LOAIDOCGIA', 'TuoiToiDa', 'INTEGER NOT NULL DEFAULT 60');
@@ -546,3 +591,4 @@ export function migrateOperationalTables(
 
   runSeed();
 }
+

@@ -44,13 +44,16 @@ export function ServiceRequestsManagePage() {
     }
   }
 
-  async function handleCancelBooking(maDatPhong: string) {
+  async function handleBookingStatus(
+    maDatPhong: string,
+    status: LichDatPhong['TrangThai']
+  ) {
     try {
-      await serviceRequestService.cancelRoomBooking(maDatPhong);
-      toast.success(`Đã hủy lịch đặt phòng ${maDatPhong}.`);
+      await serviceRequestService.updateRoomBookingStatus(maDatPhong, status);
+      toast.success(`Đã cập nhật lịch đặt phòng ${maDatPhong} → ${status}.`);
       loadData();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Không thể hủy lịch phòng.');
+      toast.error(err instanceof Error ? err.message : 'Không thể cập nhật lịch phòng.');
     }
   }
 
@@ -171,17 +174,38 @@ export function ServiceRequestsManagePage() {
                         className={`px-2 py-0.5 rounded-full font-semibold ${
                           b.TrangThai === 'Đã xác nhận'
                             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-slate-100 text-slate-500'
+                            : b.TrangThai === 'Chờ duyệt'
+                              ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                              : 'bg-slate-100 text-slate-500'
                         }`}
                       >
                         {b.TrangThai}
                       </span>
                     </td>
-                    <td className="px-4 py-2.5 text-right">
-                      {b.TrangThai === 'Đã xác nhận' ? (
+                    <td className="px-4 py-2.5 text-right space-x-1.5 whitespace-nowrap">
+                      {b.TrangThai === 'Chờ duyệt' ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => handleBookingStatus(b.MaDatPhong, 'Đã xác nhận')}
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 font-semibold cursor-pointer"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            Duyệt phòng
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleBookingStatus(b.MaDatPhong, 'Đã hủy')}
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 font-semibold cursor-pointer"
+                          >
+                            <XCircle className="w-3.5 h-3.5" />
+                            Từ chối
+                          </button>
+                        </>
+                      ) : b.TrangThai === 'Đã xác nhận' ? (
                         <button
                           type="button"
-                          onClick={() => handleCancelBooking(b.MaDatPhong)}
+                          onClick={() => handleBookingStatus(b.MaDatPhong, 'Đã hủy')}
                           className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 font-semibold cursor-pointer"
                         >
                           <XCircle className="w-3.5 h-3.5" />

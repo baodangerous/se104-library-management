@@ -617,3 +617,82 @@ test('E2E All 5 Roles & Permissions: Every role executes its full workflows with
   assert.equal((await api('/ops/branches', { token: admin.token })).status, 200);
   assert.equal((await api('/hethong/backup', { token: admin.token })).status, 200);
 });
+
+test('Student -> Librarian Workflow: Room Booking Approval & Book Request Sync', async () => {
+  const lib = await demoLogin('LIBRARIAN');
+  const futureDate = '2026-12-28';
+
+  // 1. Student books room -> starts as 'Chờ duyệt'
+  const booked = await api<{ MaDatPhong: string; TrangThai: string }>('/public/datphong', {
+    method: 'POST',
+    body: {
+      MaPhong: 'P201',
+      NguoiDat: 'Sinh viên Test E2E',
+      MaSoSV: '23520999',
+      Email: '23520999@gm.uit.edu.vn',
+      NgayDat: futureDate,
+      KhungGio: '14:00 - 16:00',
+      MucDich: 'Ôn thi cuối kỳ',
+    },
+  });
+  assert.equal(booked.status, 201);
+  assert.equal(booked.data.TrangThai, 'Chờ duyệt');
+
+  // 2. Librarian sees it in list & approves ('Đã xác nhận')
+  const listRes = await api<Array<{ MaDatPhong: string; TrangThai: string }>>('/public/datphong', {
+    token: lib.token,
+  });
+  const found = listRes.data.find((b) => b.MaDatPhong === booked.data.MaDatPhong);
+  assert.ok(found);
+  assert.equal(found.TrangThai, 'Chờ duyệt');
+
+  const approveRes = await api<{ TrangThai: string }>(
+    `/datphong/${booked.data.MaDatPhong}/status`,
+    {
+      method: 'PATCH',
+      token: lib.token,
+      body: { TrangThai: 'Đã xác nhận' },
+    }
+  );
+  assert.equal(approveRes.status, 200);
+  assert.equal(approveRes.data.TrangThai, 'Đã xác nhận');
+
+  // Cleanup booking
+  await api(`/datphong/${booked.data.MaDatPhong}/status`, {
+    method: 'PATCH',
+    token: lib.token,
+    body: { TrangThai: 'Đã hủy' },
+  });
+
+  // 3. Student suggests book -> Librarian approves ('Đã duyệt mua' -> 'Đã bổ sung')
+  const reqBook = await api<{ MaYeuCau: string; TrangThai: string }>('/public/yeucausach', {
+    method: 'POST',
+    body: {
+      TenTaiLieu: 'Clean Architecture E2E',
+      TacGia: 'Robert C. Martin',
+      MaNganh: 'KTPM',
+      NguoiGui: 'Sinh viên Test E2E',
+      Email: '23520999@gm.uit.edu.vn',
+      LyDo: 'Phục vụ SE104',
+    },
+  });
+  assert.equal(reqBook.status, 201);
+  assert.equal(reqBook.data.TrangThai, 'Đang tiếp nhận');
+
+  assert.equal(
+    (await api(`/yeucausach/${reqBook.data.MaYeuCau}/status`, {
+      method: 'PATCH',
+      token: lib.token,
+      body: { TrangThai: 'Đã duyệt mua' },
+    })).status,
+    200
+  );
+  assert.equal(
+    (await api(`/yeucausach/${reqBook.data.MaYeuCau}/status`, {
+      method: 'PATCH',
+      token: lib.token,
+      body: { TrangThai: 'Đã bổ sung' },
+    })).status,
+    200
+  );
+});

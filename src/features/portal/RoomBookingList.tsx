@@ -27,7 +27,9 @@ export function RoomBookingList({ bookings, onRequestCancel }: RoomBookingListPr
                 className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
                   item.TrangThai === 'Đã xác nhận'
                     ? 'bg-emerald-50 text-emerald-700'
-                    : 'bg-slate-200 text-slate-600'
+                    : item.TrangThai === 'Chờ duyệt'
+                      ? 'bg-amber-50 text-amber-700'
+                      : 'bg-slate-200 text-slate-600'
                 }`}
               >
                 {item.TrangThai}
@@ -40,7 +42,7 @@ export function RoomBookingList({ bookings, onRequestCancel }: RoomBookingListPr
             <p className="text-xs text-slate-600">
               {item.NguoiDat} ({item.MaSoSV}) — {item.MucDich}
             </p>
-            {item.TrangThai === 'Đã xác nhận' ? (
+            {item.TrangThai === 'Đã xác nhận' || item.TrangThai === 'Chờ duyệt' ? (
               <button
                 type="button"
                 onClick={() => onRequestCancel(item)}

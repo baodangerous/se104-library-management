@@ -44,6 +44,16 @@ export const serviceRequestService = {
     );
   },
 
+  async updateRoomBookingStatus(
+    maDatPhong: string,
+    trangThai: LichDatPhong['TrangThai']
+  ): Promise<{ success: boolean; TrangThai: LichDatPhong['TrangThai'] }> {
+    return apiRequest(`/datphong/${encodeURIComponent(maDatPhong)}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ TrangThai: trangThai }),
+    });
+  },
+
   async listBookRequests(): Promise<YeuCauTaiLieu[]> {
     return apiRequest<YeuCauTaiLieu[]>('/public/yeucausach');
   },
